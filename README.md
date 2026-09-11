@@ -14,6 +14,12 @@ cp .env.example .env.local   # e preencha ANTHROPIC_API_KEY
 npm run dev                  # http://localhost:3000
 ```
 
+Testar com os casos fictícios (app no ar):
+
+```bash
+node scripts/testar-casos.mjs
+```
+
 ## Entrar no projeto (cada integrante, uma vez)
 
 Passo a passo completo em [`docs/ONBOARDING.md`](docs/ONBOARDING.md).
@@ -28,5 +34,7 @@ Passo a passo completo em [`docs/ONBOARDING.md`](docs/ONBOARDING.md).
 | `lib/useDitado.ts` | ditado pelo microfone (Web Speech API, sem servidor) |
 | `docs/IDEIA.md` | a ideia, decidida nas reuniões de 10/09 |
 | `docs/EVENTO.md` | regras, datas, o que o edital exige |
-| `docs/TAREFAS.md` | quem faz o quê |
+| `docs/TAREFAS.md` | quem faz o quê, na ordem das entregas |
+| `docs/entregas/` | o que se entrega em cada horário, dados de teste, prints |
+| `scripts/testar-casos.mjs` | roda os casos de teste contra o app |
 | `CLAUDE.md` | regras que o Claude Code de cada um segue |
