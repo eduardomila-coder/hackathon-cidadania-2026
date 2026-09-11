@@ -54,7 +54,7 @@ Na primeira vez ele pede login: escolhe a conta Claude que você já assinou.
 
 ```bash
 cd ~
-git clone https://github.com/EDUARDO_USUARIO/hackathon-cidadania-2026.git
+git clone https://github.com/eduardomila-coder/hackathon-cidadania-2026.git
 cd hackathon-cidadania-2026
 npm install
 cp .env.example .env.local
