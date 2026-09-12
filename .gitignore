@@ -42,3 +42,8 @@ next-env.d.ts
 
 # material privado da equipe (gravações, transcrições)
 /docs/privado/
+
+# lixo que Windows e Mac deixam em pasta compartilhada
+Thumbs.db
+desktop.ini
+._*
