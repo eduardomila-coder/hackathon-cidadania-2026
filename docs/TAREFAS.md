@@ -17,7 +17,7 @@ testes, slides). Aqui no repositório fica a cópia em `docs/entregas/`.
 
 - [x] Anotar em `docs/EVENTO.md` o que a abertura explicou (repositório = pasta no Drive, padrinho, formato livre do canvas)
 - [x] @maria **Foto no banner com alguém da organização**, postar com #hackathonoabpr, print em `docs/entregas/prints/` **até 10h de sábado** — 15 pts (story às 9h12, print no Drive e em `prints/2026-09-12-foto-banner-story-maria.jpg`) drive:IMG_0924|banner
-- [x] Os três com o projeto rodando (`docs/ONBOARDING.md`); a Maria pelo claude.ai/code no tablet
+- [ ] Os três com o projeto rodando (`docs/ONBOARDING.md`); a Maria pelo claude.ai/code no tablet
 
 ## Sábado 12/09
 
