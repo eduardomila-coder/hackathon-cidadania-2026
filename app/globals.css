@@ -151,3 +151,33 @@ button, input, textarea { font:inherit; }
   .cfp-ensaio{grid-template-columns:repeat(2,1fr)}
 }
 .cf-arquitetura{position:absolute;right:-4.2vw;bottom:20px;width:330px;height:440px;overflow:visible}.cf-arquitetura i{position:absolute;z-index:0;left:-44px;bottom:22px;width:125px;height:275px;background:#9ab4a5}.cf-arquitetura img{position:absolute;z-index:1;right:0;bottom:0;width:290px;height:415px;object-fit:cover;object-position:58% center;clip-path:polygon(25% 0,100% 0,100% 100%,0 100%,0 15%)}
+
+/* Acessibilidade: rótulo só para leitor de tela. A classe era usada no JSX
+   mas não existia aqui, então o texto aparecia solto na tela. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* Triagem do advogado: força do caso, requisitos e medição de custo. */
+.cf-opcional{margin-top:14px;border:1px solid var(--linha);border-radius:7px;background:rgba(255,255,255,.6)}
+.cf-opcional summary{padding:14px 18px;cursor:pointer;color:var(--azul);font-weight:bold}
+.cf-opcional textarea{width:100%;min-height:110px;resize:vertical;border:0;border-top:1px solid var(--linha);border-radius:0 0 7px 7px;background:#fffefd;padding:18px;color:var(--azul);outline-color:var(--verde)}
+.cf-forca{display:grid;grid-template-columns:1fr;gap:16px;margin-top:25px;padding:25px;border:1px solid #cfd9cf;border-radius:10px;background:linear-gradient(110deg,#eef3ec,#f7f5ee)}
+.cf-forca strong{display:block;margin:8px 0 6px;font:700 34px Georgia,serif;letter-spacing:-.03em}
+.cf-forca small{color:var(--texto);line-height:1.45}
+.cf-forca-barra{height:14px;border-radius:10px;background:#dfe3da;overflow:hidden}
+.cf-forca-barra i{display:block;height:100%;background:linear-gradient(90deg,#4d7a64,#6d9a7f)}
+.cf-requisitos{margin:0;padding:14px 0 0;list-style:none}
+.cf-requisitos li{display:grid;grid-template-columns:1fr auto;gap:6px 14px;padding:16px 0;border-bottom:1px solid var(--linha)}
+.cf-requisitos strong{font-size:17px}
+.cf-requisitos p{grid-column:1/-1;margin:0;color:var(--texto);line-height:1.45}
+.cf-requisitos code{color:#30506c;font-size:13px}
+.cf-req-tag{align-self:start;padding:5px 11px;border-radius:999px;background:#e6e3da;color:#4a5565;font-size:12px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.cf-req-comprovado .cf-req-tag{background:#dcebe0;color:#28533a}
+.cf-req-falta_documento .cf-req-tag{background:#f3e6d2;color:#7a5a24}
+.cf-medidor li{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--linha)}
+.cf-medidor li:last-child{display:block;border:0;color:#6a7180;font-size:13px}
+.cf-desfecho{margin-top:16px;padding-top:16px;border-top:1px solid var(--linha);color:var(--texto)}
+.cf-desfecho div{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.cf-desfecho button{padding:9px 15px;border:1px solid var(--azul);border-radius:999px;background:#fffdfa;color:var(--azul);cursor:pointer}
+.cf-desfecho button:hover{background:var(--azul);color:#fff}
+.cf-link-legal code{color:#bcd4ea;font-size:13px}
+@media (max-width:800px){.cf-forca strong{font-size:27px}.cf-requisitos li{grid-template-columns:1fr}}
