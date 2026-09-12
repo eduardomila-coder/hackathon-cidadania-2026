@@ -83,3 +83,4 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 |---|---|---|
 | 2026-09-12 | Criado o cérebro local do projeto | Centralizar contexto sem misturar com outros projetos |
 | 2026-09-12 | Roadmap técnico passa a seguir a rubrica da auditoria: RAG sobre a lei, verificação de fontes, cadeia de prompts, acessibilidade | Manual, seção 8: é o que dá nota 5 nas três dimensões (300 pts) |
+| 2026-09-12 | Adicionado dado sobre tamanho do público (72% dos ~1,3 mi de advogados no Brasil são autônomos) em `docs/IDEIA.md` | Reforça o problema para o pitch: advogado autônomo sem estrutura de escritório é público-alvo direto |
