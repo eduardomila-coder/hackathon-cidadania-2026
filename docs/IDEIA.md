@@ -182,6 +182,17 @@ nem promete resultado) sem soar fria — reconhecer o que a pessoa está
 sentindo antes de encaminhar, principalmente quando o assunto é
 delicado.
 
+**Terceiro ajuste da Maria (mesmo dia): nunca rotular a pessoa.**
+Reconhecer a dor não é **classificar** a pessoa — a resposta nunca diz
+"você está vulnerável" ou qualquer rótulo parecido na cara dela. Isso
+soa clínico e de cima para baixo, o oposto do acolhimento que o ajuste
+acima busca. `sinal_de_sofrimento` é um **campo interno**, que decide o
+tom e o encaminhamento; não vira palavra na resposta. A frase de exemplo
+acima ("percebo que isso pesa muito pra você...") já segue essa regra —
+fala do assunto ("isso pesa", "situação delicada"), nunca da pessoa
+("você é vulnerável"). Vale como instrução explícita no prompt também,
+para não escapar em nenhuma variação de resposta que o modelo gerar.
+
 ## Proposta: acompanhamento real do processo (aguardando aprovação do Eduardo)
 
 Pedido da Maria em 12/09/2026: a ferramenta atualizar o cliente sobre em que
