@@ -29,6 +29,11 @@ fictício de compra de geladeira com defeito:
 Os dois testes confirmam que foto e complemento de conversa não são gravados
 no registro de eficiência: o dossiê recebe somente a análise e as métricas.
 
+**Evidências visuais:**
+
+- `prints/2026-09-12-teste-triagem-inicial-app.png`
+- `prints/2026-09-12-teste-triagem-inicial.mov` (10 s)
+
 ## Onde o modelo tentou inventar e foi barrado
 
 - O valor em reais dos limites do JEC não foi afirmado sem fonte.
