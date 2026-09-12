@@ -29,8 +29,10 @@ Uma atendente virtual, como se fosse a pessoa da secretaria:
 
 ## O que fica de fora (por enquanto)
 
-- Integração real com o tribunal: exigiria convênio. Mostramos o pedido pronto
-  para a pessoa levar ou protocolar.
+- Integração real com o tribunal via convênio direto. Mostramos o pedido
+  pronto para a pessoa levar ou protocolar. **Atualização 12/09/2026:** existe
+  um caminho sem convênio — ver "Proposta: acompanhamento real do processo"
+  abaixo, ainda não implementado, aguardando aprovação do Eduardo.
 - Orientação jurídica no sentido de parecer: risco de conflito com a OAB.
   O sistema **explica e organiza**; não aconselha se processa ou não.
 
@@ -85,6 +87,47 @@ vale para aconselhar a pessoa leiga diretamente. Se quem usa é o
 profissional habilitado, que assina a peça por cima — não é o sistema
 dando parecer para quem não é advogado. Vale como resposta pronta no
 pitch para a pergunta "e o risco com a OAB?".
+
+## Proposta: acompanhamento real do processo (aguardando aprovação do Eduardo)
+
+Pedido da Maria em 12/09/2026: a ferramenta atualizar o cliente sobre em que
+fase o processo real dele está e quais os próximos andamentos, em linguagem
+simples. Já tinha sido levantado e deixado de lado (ver "Outras pautas"
+abaixo) assumindo que precisaria de convênio com o tribunal. Pesquisando de
+novo, achei um caminho sem convênio — **registrando para o Eduardo decidir,
+não implementado**, porque mexe em `lib/` (área dele) e no núcleo do produto.
+
+**O que existe:** a **API Pública do DataJud**, do CNJ, gratuita e
+documentada, cobre todos os tribunais do Brasil, inclusive o TJPR, sem exigir
+convênio — autenticação por uma chave pública compartilhada:
+
+```
+https://api-publica.datajud.cnj.jus.br/api_publica_tjpr/_search
+```
+
+Devolve as movimentações do processo em formato técnico (códigos da Tabela
+Processual Unificada do CNJ), não em linguagem simples.
+
+**Como encaixaria na arquitetura atual:** a pessoa informa o número do
+processo (formato CNJ, 20 dígitos) → busca na API → os códigos de
+movimentação passam pelo mesmo tipo de etapa que já existe em
+`lib/claude.ts`/`lib/analise.ts` para virar "você está na fase X, o próximo
+passo é Y" em linguagem simples. Não é código novo do zero, é uma etapa a
+mais na cadeia existente.
+
+**Limitações a considerar antes de aprovar:**
+
+- Só processos **não sigilosos** aparecem (família, por exemplo, não).
+- Os dados **não são em tempo real**; a sincronização varia por tribunal.
+- Só funciona para quem **já tem** número de processo — ou seja, é uma
+  funcionalidade para depois que a pessoa já entrou com a ação, fora do
+  fluxo atual do produto (que é anterior ao processo existir).
+- Precisaria de rota nova (`app/api/...`) e ajuste em `lib/`, além de testar
+  se o acesso à API do DataJud funciona a partir de onde o app roda.
+
+Fontes: [API Pública — Portal CNJ](https://www.cnj.jus.br/sistemas/datajud/api-publica/),
+[Datajud-Wiki, página de acesso](https://datajud-wiki.cnj.jus.br/api-publica/acesso/),
+[tutorial em PDF do CNJ](https://www.cnj.jus.br/wp-content/uploads/2023/05/tutorial-api-publica-datajud-beta.pdf).
 
 ## Referências levantadas
 
