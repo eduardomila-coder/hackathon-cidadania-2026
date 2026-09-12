@@ -28,14 +28,15 @@ fonte de verdade sobre objetivo, prioridade, divisão da equipe e entregas.
 | Pessoa | Área principal | Pode publicar em `main`? |
 |---|---|---|
 | Eduardo | `lib/`, integração, revisão e pitch | Sim, depois de build e revisão |
-| Fernando | `app/`, componentes e acessibilidade | Não, envia para revisão |
+| Fernando | `app/`, componentes e acessibilidade | Sim, depois de build |
 | Maria | `docs/juridico/`, `docs/entregas/`, testes e evidências | Não, envia para revisão |
 
 ## Como cada pessoa abre o agente
 
 - **Eduardo:** abre este repositório no Codex, Claude Code ou DeepCode no Mac.
 - **Fernando:** abre o Claude Code no Windows dentro do clone local e pode usar
-  `/comecar` e `/enviar-revisao`.
+  `/comecar` e `/enviar-revisao`, e também publicar direto em `main` (como o
+  Eduardo) quando quiser pular a revisão.
 - **Maria:** abre a área Code do aplicativo Claude no Android, seleciona este
   repositório conectado ao GitHub e escreve a tarefa em português. Não depende
   de terminal nem dos comandos com barra. Quando terminar, ela pede: "envie
@@ -52,14 +53,15 @@ para revisão sem juntar na `main` e explique ao Eduardo como testar ou conferir
 ## Entrega correta
 
 - Toda alteração deve passar por `npm run build` antes de ser enviada.
-- Eduardo pode usar `npm run enviar -- "mensagem"` para publicar em `main`.
-- Maria e Fernando nunca usam `npm run enviar`: fazem commit na própria branch,
-  fazem `git push -u origin HEAD` e abrem ou pedem uma Pull Request para a
-  `main`. A mudança aparece no Habeas Release em `/revisoes` para Eduardo
-  aprovar. Maria pede isso ao Claude no aplicativo; Fernando pode usar
-  `/enviar-revisao`.
-- Nunca faça `push --force`, `reset --hard`, merge na `main` em nome de Maria
-  ou Fernando, nem leia ou envie `.env.local`, chaves ou `docs/privado/`.
+- Eduardo e Fernando podem usar `npm run enviar -- "mensagem"` para publicar
+  direto em `main`, sem passar pelo Habeas Release.
+- Maria nunca usa `npm run enviar`: faz commit na própria branch, faz
+  `git push -u origin HEAD` e abre ou pede uma Pull Request para a `main`. A
+  mudança aparece no Habeas Release em `/revisoes` para Eduardo aprovar.
+  Maria pede isso ao Claude no aplicativo.
+- Nunca faça `push --force`, `reset --hard`, nem publique em `main` em nome
+  de Maria sem ela pedir, nem leia ou envie `.env.local`, chaves ou
+  `docs/privado/`.
 
 ## Comunicação esperada ao terminar
 
