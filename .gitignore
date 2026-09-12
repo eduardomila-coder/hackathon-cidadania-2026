@@ -43,6 +43,9 @@ next-env.d.ts
 # material privado da equipe (gravações, transcrições)
 /docs/privado/
 
+# registro de triagens gravado pelo app em execução (só medida, sem relato)
+/data/
+
 # lixo que Windows e Mac deixam em pasta compartilhada
 Thumbs.db
 desktop.ini

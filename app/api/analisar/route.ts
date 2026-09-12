@@ -1,4 +1,5 @@
 import { analisarRelato, type Etapa } from "@/lib/analise";
+import { registrar } from "@/lib/casos";
 
 // Resposta em NDJSON: uma linha {"etapa": ...} a cada passo e, por fim,
 // {"resultado": ...} ou {"erro": ...}. A tela mostra o progresso real.
@@ -14,7 +15,15 @@ export async function POST(request: Request) {
       const enviar = (obj: unknown) => controlador.enqueue(codificador.encode(JSON.stringify(obj) + "\n"));
       try {
         const resultado = await analisarRelato(relato, (etapa: Etapa) => enviar({ etapa }));
-        enviar({ resultado });
+        // A medição não pode derrubar a triagem: se o registro falhar, o
+        // advogado ainda recebe o dossiê.
+        let caso = null;
+        try {
+          caso = registrar(resultado);
+        } catch (e) {
+          console.error("não registrei o caso:", e);
+        }
+        enviar({ resultado, caso });
       } catch (e) {
         console.error(e);
         enviar({ erro: "Não consegui analisar agora. Tente de novo." });
