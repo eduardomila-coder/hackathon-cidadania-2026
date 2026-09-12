@@ -13,6 +13,13 @@ const ETAPAS: { chave: Etapa; titulo: string; texto: string }[] = [
   { chave: "verificando", titulo: "Conferindo cada afirmação", texto: "Validando as informações, ponto a ponto." },
 ];
 
+const PERGUNTAS: { pergunta: string; resposta: string }[] = [
+  { pergunta: "O serviço substitui um advogado?", resposta: "Não. O Cidadania Fácil organiza o que você contou, mostra o que a lei diz sobre isso e lista os documentos que ajudam. Quem analisa o caso, decide o que fazer e escreve o pedido é o advogado: isso é atividade privativa da advocacia." },
+  { pergunta: "Meu relato fica salvo?", resposta: "Não. O que você escreve ou fala é usado só para montar a análise e não fica gravado no site. Se fechar a página, o relato some. Por isso, não coloque dados de outras pessoas nem informações que não queira compartilhar." },
+  { pergunta: "Posso usar pelo celular?", resposta: "Sim. Abra habeastitas.eduardomila.adv.br no navegador do celular, sem instalar nada e sem cadastro. Dá para escrever ou falar o relato: o botão \"Falar o relato\" aparece quando o navegador aceita ditado, como o Chrome e o Safari." },
+  { pergunta: "A análise é uma orientação?", resposta: "É uma organização inicial do seu caso, com caráter informativo. Cada afirmação sobre a lei vem com o trecho da Lei 9.099/95 ou do Código de Defesa do Consumidor em que se baseia, e o que não encontrou base na lei aparece em \"Pontos não confirmados\". Ela não substitui a orientação de um advogado." },
+];
+
 export default function Home() {
   const [relato, setRelato] = useState("");
   const [resultado, setResultado] = useState<Resultado | null>(null);
@@ -63,7 +70,7 @@ export default function Home() {
       {erro && <p role="alert" className="cf-erro">{erro}</p>}
       <section className="cf-passos" id="como-funciona"><Passo numero="1" titulo="Conte">Descreva sua situação de forma simples e objetiva, no seu jeito de falar.</Passo><Passo numero="2" titulo="Entenda">Receba uma análise inicial, com linguagem clara e orientação confiável.</Passo><Passo numero="3" titulo="Aja">Saiba quais são os próximos passos e como buscar ajuda, se necessário.</Passo></section>
       <section className="cf-conteudo" id="sobre"><p className="cf-sobrelinha">Nossa missão</p><h2>Direito mais acessível para todas as pessoas.</h2><p>O Cidadania Fácil organiza informações jurídicas com linguagem simples, fontes verificáveis e orientação prática.</p></section>
-      <section className="cf-duvidas" id="perguntas"><p className="cf-sobrelinha">Dúvidas reais, respostas claras</p><h2>Perguntas frequentes</h2>{["O serviço substitui um advogado?", "Meu relato fica salvo?", "Posso usar pelo celular?", "A análise é uma orientação?"].map((pergunta) => <details key={pergunta}><summary>{pergunta}<span>⌄</span></summary><p>O Cidadania Fácil oferece informação organizada para ajudar você a entender a situação e decidir o próximo passo com mais segurança.</p></details>)}</section>
+      <section className="cf-duvidas" id="perguntas"><p className="cf-sobrelinha">Dúvidas reais, respostas claras</p><h2>Perguntas frequentes</h2>{PERGUNTAS.map(({ pergunta, resposta }) => <details key={pergunta}><summary>{pergunta}<span>⌄</span></summary><p>{resposta}</p></details>)}</section>
       <section className="cf-contato" id="contato"><div><p className="cf-sobrelinha">Contato</p><h2>Fale com a gente.</h2><p>Estamos à disposição para esclarecer dúvidas e ouvir sugestões durante o Hackathon da Cidadania.</p></div><div className="cf-cartao"><h3>Habeas Titas · OAB/PR</h3><p><strong>Atendimento no Hackathon da Cidadania</strong><br />OAB/PR, Curitiba/PR</p><p><strong>Horário</strong><br />Durante o período do evento.</p></div></section>
       <Versoes />
     </>}
