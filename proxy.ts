@@ -21,7 +21,7 @@ function autorizado(request: NextRequest) {
   }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (autorizado(request)) return NextResponse.next();
 
   return new NextResponse("Acesso restrito ao painel da equipe.", {
@@ -30,6 +30,4 @@ export function middleware(request: NextRequest) {
   });
 }
 
-export const config = {
-  matcher: ["/painel/:path*"],
-};
+export const config = { matcher: ["/painel/:path*"] };
