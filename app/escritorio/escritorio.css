@@ -1,0 +1,58 @@
+/* Casca do escritório do advogado (módulo 1: base) e a tela de entrada.
+   Paleta do Ponto Dativo: azul #143b65, vermelho #a12434, creme #faf6f0.
+   Cada módulo tem o seu CSS (casos.css, mensagens.css…); aqui fica só o que
+   é comum a todas as telas e o que a base cria. */
+
+.pd-escritorio{min-height:100vh;background:#faf6f0;color:#143b65}
+.pd-cabecalho{display:flex;align-items:center;gap:28px;min-height:78px;padding:0 4.2%;border-bottom:1px solid #ded7d0;background:#fffdfa}
+.pd-marca{color:#143b65;font:700 28px/1 Georgia,serif;letter-spacing:-.04em;text-decoration:none;white-space:nowrap}
+.pd-marca span{color:#a12434}
+.pd-marca small{display:block;margin-top:4px;color:#637080;font:700 9px Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase}
+.pd-nav{display:flex;flex:1;justify-content:center;gap:4px}
+.pd-nav a{padding:9px 14px;border-radius:999px;color:#40516a;font-size:13px;font-weight:bold;text-decoration:none;white-space:nowrap}
+.pd-nav a:hover{background:#f2e1df;color:#8b1f2d}
+.pd-nav a[aria-current="page"]{background:#143b65;color:#fff}
+.pd-conta{display:flex;align-items:center;gap:14px}
+.pd-conta strong,.pd-conta small{display:block;text-align:right}
+.pd-conta strong{font-size:13px}
+.pd-conta small{margin-top:2px;color:#687184;font-size:11px}
+.pd-sair{padding:9px 14px;border:1px solid #143b65;border-radius:7px;background:#fffdfa;color:#143b65;font-size:12px;font-weight:bold;cursor:pointer}
+.pd-sair:hover{background:#143b65;color:#fff}
+.pd-sair:disabled{opacity:.5;cursor:wait}
+.pd-conteudo{width:min(1370px,100%);margin:auto;padding:40px 4.2% 80px}
+
+/* Cartão e títulos comuns, para os módulos não repetirem o básico. */
+.pd-cartao{padding:27px;border:1px solid #dedbd3;border-radius:14px;background:#fffefa;box-shadow:0 9px 25px #342f2510}
+.pd-cartao h1,.pd-cartao h2{margin:0 0 12px;font:700 31px/1.03 Georgia,serif;letter-spacing:-.04em}
+.pd-cartao>p{margin:0;color:#506075;font-size:15px;line-height:1.55}
+.pd-cartao>p+p{margin-top:10px}
+
+/* Tela de entrada (/entrar). */
+.pd-entrar{min-height:100vh;display:grid;place-items:center;padding:40px 20px;background:#faf6f0;color:#143b65}
+.pd-entrar-caixa{width:min(440px,100%);padding:36px;border:1px solid #dedbd3;border-radius:14px;background:#fffefa;box-shadow:0 20px 60px #d8d1c54f}
+.pd-entrar-caixa h1{margin:0;font:700 40px/1 Georgia,serif;letter-spacing:-.05em}
+.pd-entrar-intro{margin:14px 0 0;color:#506075;font-size:15px;line-height:1.5}
+.pd-entrar-form{display:grid;gap:7px;margin-top:26px}
+.pd-entrar-form label{margin-top:8px;font-size:12px;font-weight:bold}
+.pd-entrar-form input{padding:12px 13px;border:1px solid #ccd2d3;border-radius:7px;background:#fff;color:#143b65;font-size:15px;outline-color:#a12434}
+.pd-entrar-form button{margin-top:18px;width:100%}
+.pd-entrar-form button:disabled{opacity:.45;cursor:not-allowed}
+.pd-entrar-erro{margin:10px 0 0;padding:11px 13px;border-left:3px solid #a12434;border-radius:4px;background:#fbefed;color:#7f1d2a;font-size:13px;line-height:1.4}
+.pd-entrar-aviso{margin:24px 0 0;padding-top:18px;border-top:1px solid #e8e4dc;color:#687184;font-size:12px;line-height:1.45}
+.pd-entrar-voltar{display:inline-block;margin-top:16px;color:#8b1f2d;font-size:13px;font-weight:bold;text-decoration:none}
+
+@media (max-width:850px){
+  .pd-cabecalho{flex-wrap:wrap;gap:12px;padding:14px 20px}
+  .pd-nav{order:3;width:100%;justify-content:flex-start;overflow:auto;padding-bottom:2px}
+  .pd-conta{margin-left:auto}
+  .pd-conteudo{padding:28px 20px 64px}
+  .pd-cartao{padding:20px}
+  .pd-cartao h1,.pd-cartao h2{font-size:27px}
+  .pd-entrar-caixa{padding:26px 22px}
+}
+@media (max-width:470px){
+  .pd-marca{font-size:24px}
+  .pd-conta strong{font-size:12px}
+  .pd-conta small{display:none}
+  .pd-sair{padding:8px 11px}
+}
