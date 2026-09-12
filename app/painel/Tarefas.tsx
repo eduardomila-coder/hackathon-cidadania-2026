@@ -71,7 +71,7 @@ export function Tarefas({ blocos, pessoas, drive }: Props) {
                       {t.feita ? "✓" : ""}
                     </button>
                     <span className="cfp-item-texto">
-                      {t.texto}
+                      <span className="cfp-item-nome">{t.texto}</span>
                       {t.noDrive && (
                         <a className="cfp-drive" href={t.noDrive.url} target="_blank" rel="noreferrer" title={`No Drive: ${t.noDrive.nome}`}>
                           no Drive: {t.noDrive.nome} ↗

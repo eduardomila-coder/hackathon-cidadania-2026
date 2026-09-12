@@ -76,7 +76,7 @@ button, input, textarea { font:inherit; }
 .cfp-itens{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .cfp-itens li{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-top:1px solid var(--linha);line-height:1.45}
 .cfp-itens li:first-child{border-top:0}
-.cfp-itens li.feita .cfp-item-texto{color:#8a93a3;text-decoration:line-through}
+.cfp-itens li.feita .cfp-item-nome{color:#8a93a3;text-decoration:line-through}
 .cfp-item-texto{flex:1;color:#1f2a44}
 .cfp-check{flex:0 0 auto;width:28px;height:28px;margin-top:1px;border:2px solid #8fa596;border-radius:7px;background:#fffdfa;color:#fff;font-size:16px;font-weight:700;cursor:pointer;display:grid;place-items:center;transition:background .15s,border-color .15s}
 .cfp-check:hover{border-color:var(--verde)}
@@ -84,7 +84,6 @@ button, input, textarea { font:inherit; }
 .cfp-check:disabled{opacity:.5;cursor:wait}
 .cfp-check:focus-visible{outline:3px solid #7ba887;outline-offset:2px}
 .cfp-drive{display:block;margin-top:3px;font-size:12px;color:#315743;text-decoration:none;font-weight:700}
-.cfp-itens li.feita .cfp-drive{text-decoration:none}
 .cfp-drive:hover{text-decoration:underline}
 .cfp-avs{display:flex;gap:4px;flex:0 0 auto}
 .cfp-av{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;color:#fff;font-size:12px;font-weight:700}
