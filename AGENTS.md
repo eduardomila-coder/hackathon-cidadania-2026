@@ -38,6 +38,14 @@ fonte de verdade sobre objetivo, prioridade, divisão da equipe e entregas.
   de terminal nem dos comandos com barra. Quando terminar, ela pede: "envie
   para revisão em uma branch, sem juntar na main, e diga como testar".
 
+### Atalho da Maria
+
+Se Maria escrever apenas **"começar"**, assuma como tarefa padrão: preparar ou
+atualizar o registro dos testes externos em
+`docs/entregas/3-testes-externos.md`. Leia as tarefas e evidências existentes,
+não invente depoimentos nem resultados. Faça a alteração em uma branch, envie
+para revisão sem juntar na `main` e explique ao Eduardo como testar ou conferir.
+
 ## Entrega correta
 
 - Toda alteração deve passar por `npm run build` antes de ser enviada.

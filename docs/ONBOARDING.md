@@ -118,10 +118,14 @@ chama no grupo antes de responder.
 
 No aplicativo Claude, abra a área **Code**, conecte o GitHub se for pedido e
 escolha o repositório `hackathon-cidadania-2026`. O projeto entrega as regras
-automaticamente para o Claude. Para começar, escreva somente o que quer fazer,
-por exemplo:
+automaticamente para o Claude. Para começar a tarefa padrão dela, escreva só:
 
-> Sou Maria. Faça o registro dos testes externos em `docs/entregas/3-testes-externos.md`. Envie para revisão em uma branch, sem juntar na main, e diga como testar.
+> começar
+
+O Claude prepara ou atualiza o registro dos testes externos em
+`docs/entregas/3-testes-externos.md`, sem inventar depoimentos, cria a branch e
+envia para a revisão do Eduardo. Para outra tarefa, Maria escreve normalmente o
+que quer fazer.
 
 Não use `/comecar` nem `/enviar-revisao` no tablet: eles são comandos do Claude
 Code do computador. O Claude no aplicativo cria a branch e envia para o Eduardo
