@@ -91,6 +91,14 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
       *aumentar*, não diminuir, se um advogado adotar a ferramenta como
       própria. Detalhes em `docs/IDEIA.md`, seção "Pesquisa: contato com o
       cliente e como melhorar essas diretrizes".
+- [ ] @eduardo **Fácil, pronto pra pegar**: `docs/juridico/orientacoes-praticas.md`
+      Art. 5 estava bloqueado esperando confirmação do salário mínimo —
+      confirmei hoje (R$ 1.621,00, Decreto 12.797/2025): limite do
+      juizado R$ 64.840,00, dispensa de advogado até R$ 32.420,00. Falta
+      só tirar a instrução "não converta para reais" do prompt de
+      `lib/etapas.ts` (etapa "analisar") pra pessoa ver o valor em reais,
+      não só "quarenta salários mínimos" — deixa a resposta mais simples
+      pro leigo.
 
 ### Log curto
 
@@ -101,3 +109,4 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 | 2026-09-12 | Adicionado dado sobre tamanho do público (72% dos ~1,3 mi de advogados no Brasil são autônomos) em `docs/IDEIA.md` | Reforça o problema para o pitch: advogado autônomo sem estrutura de escritório é público-alvo direto |
 | 2026-09-12 | Registrado requisito (não implementado) de reconhecer quando uma pergunta deve ir para o advogado humano em vez da IA responder, com proposta de campo `encaminhar_advogado` | Pedido da Maria: no modelo B2B2C, o advogado só dá um norte pontual; a IA precisa saber os próprios limites |
 | 2026-09-12 | Registrada proposta (não implementada) de acompanhamento real do processo via API pública DataJud/CNJ, aguardando aprovação do Eduardo | Pedido da Maria; mexe em `lib/`, área do Eduardo, e tem limitações (só processo não sigiloso, dados não em tempo real) que pedem decisão dele antes de codar |
+| 2026-09-12 | Confirmado salário mínimo vigente (R$ 1.621,00) em `docs/juridico/orientacoes-praticas.md`, Art. 5, com limites em reais calculados | Desbloqueia pendência antiga; deixa a resposta mais simples pro leigo (reais em vez de "salários mínimos") assim que o Eduardo ajustar `lib/etapas.ts` |

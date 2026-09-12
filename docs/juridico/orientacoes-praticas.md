@@ -36,9 +36,10 @@ com lesão grave ou crime. O sistema deve encaminhar, não tentar encaixar.
 
 Valor de referência: o limite do Juizado Especial Cível é de quarenta salários
 mínimos (Lei 9.099/95, art. 3º, I) e a dispensa de advogado vai até vinte
-salários mínimos (art. 9º). O valor do salário mínimo vigente deve ser
-confirmado pela equipe jurídica antes de qualquer cálculo em reais; o sistema
-não deve afirmar um valor em reais para o limite sem essa confirmação.
+salários mínimos (art. 9º). Salário mínimo vigente confirmado em 12/09/2026:
+**R$ 1.621,00** (Decreto nº 12.797/2025, vigente desde 1º/01/2026). Em reais,
+hoje: **até R$ 64.840,00** cabe no juizado; **até R$ 32.420,00** dispensa
+advogado. Revisar este valor se o salário mínimo mudar antes da entrega.
 
 ## Art. 6
 
