@@ -6,7 +6,8 @@ import QRCode from "qrcode";
 // WhatsApp do advogado via Evolution API v2. O servidor guarda só a URL e a
 // chave global da Evolution; cada advogado cadastra o próprio número na tela
 // do escritório, ganha uma instância com o seu login e conecta pelo QR. Nada
-// aqui envia mensagem: o webhook só avisa que chegou algo, para revisão humana.
+// aqui envia sozinho: `enviarTexto` só é chamado pela rota de responder,
+// depois do clique do advogado, e o webhook apenas guarda o que chegou.
 
 type Configuracao = {
   url: string;
@@ -26,6 +27,7 @@ export type NumeroCadastrado = {
 type RespostaEstado = { instance?: { state?: string; instanceName?: string } };
 type RespostaConectar = { pairingCode?: string; code?: string; base64?: string; instance?: { state?: string } };
 type RespostaCriar = { instance?: { instanceName?: string; status?: string }; qrcode?: RespostaConectar };
+type RespostaEnvio = { key?: { id?: string; remoteJid?: string; fromMe?: boolean }; messageTimestamp?: number | string; status?: string };
 
 export class ErroEvolution extends Error {
   constructor(message: string, readonly status = 502) { super(message); }
@@ -69,6 +71,14 @@ function gravarCadastro(lista: NumeroCadastrado[]) {
 
 function cadastroDe(usuario: string) {
   return lerCadastro().find((item) => item.usuario === usuario) ?? null;
+}
+
+// O login dono de uma instância: é assim que o webhook descobre de qual
+// advogado é a mensagem, pelo campo `instance` do payload da Evolution.
+export function usuarioDaInstancia(instancia: string): string | null {
+  const procurada = (instancia ?? "").trim();
+  if (!procurada) return null;
+  return lerCadastro().find((item) => item.instancia === procurada)?.usuario ?? null;
 }
 
 export function nomeDaInstancia(usuario: string) {
@@ -226,6 +236,39 @@ export async function removerNumero(usuario: string) {
   return { pronto: true };
 }
 
+// Envia um texto pelo WhatsApp do advogado. Só a rota de responder chama
+// isto, e só depois do clique: a IA redige, o advogado envia. Confere antes
+// que a instância está aberta, para o erro ser claro e não um 400 genérico.
+export async function enviarTexto(usuario: string, numero: string, texto: string) {
+  const cadastro = cadastroDe(usuario);
+  if (!cadastro) throw new ErroEvolution("Cadastre e conecte o seu WhatsApp na página WhatsApp antes de enviar mensagens.", 400);
+  const destino = normalizarNumero(numero);
+  const conteudo = (texto ?? "").trim();
+  if (!conteudo) throw new ErroEvolution("Escreva a mensagem antes de enviar.", 400);
+
+  const estado = await requisitar<RespostaEstado>(`/instance/connectionState/${encodeURIComponent(cadastro.instancia)}`);
+  if (estado.instance?.state !== "open") {
+    throw new ErroEvolution("O seu WhatsApp não está conectado. Abra a página WhatsApp, leia o QR e tente de novo.", 409);
+  }
+
+  const resposta = await requisitar<RespostaEnvio>(`/message/sendText/${encodeURIComponent(cadastro.instancia)}`, {
+    method: "POST",
+    body: JSON.stringify({ number: destino, text: conteudo }),
+  });
+  return {
+    instancia: cadastro.instancia,
+    idExterno: typeof resposta.key?.id === "string" ? resposta.key.id : null,
+    quando: dataDoCarimbo(resposta.messageTimestamp) ?? new Date().toISOString(),
+  };
+}
+
+// `messageTimestamp` da Evolution vem em segundos, como número ou texto.
+function dataDoCarimbo(carimbo: unknown): string | null {
+  const segundos = typeof carimbo === "number" ? carimbo : typeof carimbo === "string" ? Number(carimbo) : NaN;
+  if (!Number.isFinite(segundos) || segundos <= 0) return null;
+  return new Date(segundos * 1000).toISOString();
+}
+
 export function webhookAutorizado(token: string | null) {
   const segredo = process.env.EVOLUTION_WEBHOOK_SECRET;
   if (!segredo || !token) return false;
@@ -247,4 +290,84 @@ export function resumoDoEvento(payload: unknown) {
     temTexto: Boolean(mensagem.conversation || (mensagem.extendedTextMessage as Record<string, unknown> | undefined)?.text),
     temMidia: Object.keys(mensagem).some((chaveMensagem) => /image|document|audio|video/i.test(chaveMensagem)),
   };
+}
+
+// Uma mensagem já traduzida do payload da Evolution: o que o webhook guarda.
+export type MensagemDoEvento = {
+  contato: string; // só dígitos
+  nomeContato: string | null;
+  texto: string;
+  deMim: boolean;
+  quando: string;
+  idExterno: string | null;
+};
+
+const JIDS_IGNORADOS = /@(g\.us|broadcast|newsletter)$/i;
+
+function objeto(valor: unknown): Record<string, unknown> {
+  return valor && typeof valor === "object" && !Array.isArray(valor) ? valor as Record<string, unknown> : {};
+}
+
+// O número do contato. Prefere um JID de telefone (`@s.whatsapp.net`) entre os
+// campos que a Evolution manda; conversas de grupo, status e canais são
+// ignoradas. Se só veio o id ligado (`@lid`), usa os dígitos dele mesmo.
+function contatoDoEvento(chave: Record<string, unknown>, dados: Record<string, unknown>): string | null {
+  const candidatos = [chave.remoteJid, chave.remoteJidAlt, chave.senderPn, chave.participantPn, dados.remoteJid]
+    .filter((valor): valor is string => typeof valor === "string" && valor.length > 0);
+  if (candidatos.length === 0) return null;
+  if (candidatos.some((jid) => JIDS_IGNORADOS.test(jid))) return null;
+  const telefone = candidatos.find((jid) => /@s\.whatsapp\.net$/i.test(jid)) ?? candidatos[0];
+  const digitos = telefone.split("@")[0].split(":")[0].replace(/\D/g, "");
+  return digitos.length >= 8 ? digitos : null;
+}
+
+// O texto que o advogado vê. Mídia vira só um marcador: nada é baixado.
+function textoDoEvento(mensagem: Record<string, unknown>): string {
+  const desembrulhada = objeto(objeto(mensagem.ephemeralMessage).message);
+  const semLimite = objeto(objeto(mensagem.viewOnceMessage).message);
+  const conteudo = Object.keys(desembrulhada).length ? desembrulhada : Object.keys(semLimite).length ? semLimite : mensagem;
+  if (typeof conteudo.conversation === "string" && conteudo.conversation.trim()) return conteudo.conversation.trim();
+  const estendida = objeto(conteudo.extendedTextMessage);
+  if (typeof estendida.text === "string" && estendida.text.trim()) return estendida.text.trim();
+
+  const legenda = (chave: string) => {
+    const item = objeto(conteudo[chave]);
+    return typeof item.caption === "string" && item.caption.trim() ? ` ${item.caption.trim()}` : "";
+  };
+  if (conteudo.imageMessage) return `[imagem]${legenda("imageMessage")}`;
+  if (conteudo.audioMessage) return "[áudio]";
+  if (conteudo.videoMessage) return `[vídeo]${legenda("videoMessage")}`;
+  if (conteudo.documentMessage || conteudo.documentWithCaptionMessage) return `[documento]${legenda("documentMessage")}`;
+  if (conteudo.stickerMessage) return "[figurinha]";
+  if (conteudo.locationMessage || conteudo.liveLocationMessage) return "[localização]";
+  if (conteudo.contactMessage || conteudo.contactsArrayMessage) return "[contato]";
+  if (conteudo.reactionMessage) return "[reação]";
+  return "[mensagem sem texto]";
+}
+
+// Traduz um evento `messages.upsert` nas mensagens que ele carrega (a
+// Evolution v2 manda uma por evento, mas aceita-se lista por segurança).
+// Devolve lista vazia para qualquer outro evento ou payload estranho.
+export function mensagensDoEvento(payload: unknown): MensagemDoEvento[] {
+  const resumo = resumoDoEvento(payload);
+  if (!/messages[._]upsert/i.test(resumo.evento)) return [];
+  const dado = objeto(payload);
+  const itens = Array.isArray(dado.data) ? dado.data : [dado.data];
+  const mensagens: MensagemDoEvento[] = [];
+  for (const item of itens) {
+    const dados = objeto(item);
+    const chave = objeto(dados.key);
+    const contato = contatoDoEvento(chave, dados);
+    if (!contato) continue;
+    const deMim = chave.fromMe === true;
+    mensagens.push({
+      contato,
+      nomeContato: !deMim && typeof dados.pushName === "string" && dados.pushName.trim() ? dados.pushName.trim().slice(0, 200) : null,
+      texto: textoDoEvento(objeto(dados.message)),
+      deMim,
+      quando: dataDoCarimbo(dados.messageTimestamp) ?? new Date().toISOString(),
+      idExterno: typeof chave.id === "string" && chave.id ? chave.id : null,
+    });
+  }
+  return mensagens;
 }
