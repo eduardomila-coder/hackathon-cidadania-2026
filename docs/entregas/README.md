@@ -6,6 +6,11 @@ O que vale para a organização é a pasta da equipe no Drive (repositório
 oficial): https://drive.google.com/drive/folders/1Gi9xWrC9v3ia5M2JJHLKsvi1SpZswOfO
 Suba lá primeiro, no prazo; depois copie para cá.
 
+Nomes na pasta do Drive (o `00-LEIA-ME` de lá explica): `1-canvas-…`,
+`2-testes-internos-…`, `3-testes-externos-…`, `4-produto-…`, `5-pitch-…`,
+`print-AAAA-MM-DD-…`, `live-AAAA-MM-DD-…`, `depoimento-…`. Pode subir com o nome
+do celular; o Eduardo renomeia depois.
+
 | Arquivo | Entrega | Quando |
 |---|---|---|
 | `1-canvas.md` ou `.pdf` | Canvas de IA preenchido | sáb 12h |
