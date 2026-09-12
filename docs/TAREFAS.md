@@ -1,6 +1,7 @@
 # Tarefas, na ordem das entregas
 
-Marque `[x]` ao terminar e faça `/entregar`. Para assumir uma tarefa, escreva
+Marque `[x]` ao terminar. Eduardo publica com `/entregar`; Maria e Fernando
+enviam a própria branch com `/enviar-revisao`. Para assumir uma tarefa, escreva
 `@eduardo`, `@maria` ou `@fernando` na linha. O painel em
 https://habeastitas.eduardomila.adv.br/painel lê este arquivo ao vivo.
 Pontuação e horários em `docs/EVENTO.md`.

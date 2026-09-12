@@ -43,11 +43,12 @@ Três comandos dentro do Claude Code, que a pessoa digita como `/comecar`:
 | Comando | O que faz |
 |---|---|
 | `/comecar` | atualiza com o que os outros enviaram, cria ou retoma a branch da pessoa, lista as tarefas abertas na área dela |
-| `/entregar` | commit, atualiza com `main`, `npm run build`, junta em `main`, push. Se o build quebra, nada sobe |
+| `/entregar` | **Eduardo somente:** commit, build, junta em `main` e publica |
+| `/enviar-revisao` | **Maria e Fernando:** build, commit e envia a branch para aprovação do Eduardo |
 | `/situacao` | quem enviou o quê, o que está aberto, próxima entrega com hora |
 
-Quem não for Eduardo não junta alterações em `main`: envia para revisão numa
-branch. Eduardo aprova pelo Habeas Release em `/revisoes` e faz a publicação.
+Quem não for Eduardo não junta alterações em `main`: usa `/enviar-revisao`.
+Eduardo aprova pelo Habeas Release em `/revisoes` e faz a publicação.
 
 Por baixo, `npm run pegar` e `npm run enviar -- "mensagem"` (`scripts/git.mjs`,
 funciona igual em Mac e Windows). Use-os quando o usuário pedir para

@@ -1,7 +1,10 @@
 ---
 description: Entregar o que fiz — build, commit, junta em main e sobe para o servidor
 ---
-Quero entregar o que fiz nesta sessão. Faça, nesta ordem:
+Quero entregar o que fiz nesta sessão. Este comando é só do Eduardo. Se eu não
+for Eduardo, pare e diga para usar `/enviar-revisao`.
+
+Faça, nesta ordem:
 
 1. `git status --short` e `git diff --stat`: me mostre em uma frase o que mudou.
 2. Escreva uma mensagem de commit em português, no imperativo, curta (ex.: "adiciona upload de foto ao relato"). Me mostre e use-a.
