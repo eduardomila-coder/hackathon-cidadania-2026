@@ -124,12 +124,20 @@ ${formatarContexto(trechos)}`,
 }
 
 // ── Etapa 3: verificar ──────────────────────────────────────────────────────
+// O modelo eventualmente usa um sinônimo para o status. Na dúvida, a saída
+// segura é "sem_base": a triagem continua, mas não apresenta a afirmação como
+// confirmada nem deixa o advogado acreditar em uma validação inexistente.
+const SituacaoVerificacaoSchema = z.preprocess(
+  (valor) => typeof valor === "string" && ["confirmada", "sem_base", "contradiz"].includes(valor) ? valor : "sem_base",
+  z.enum(["confirmada", "sem_base", "contradiz"]),
+);
+
 export const VerificacaoSchema = z.object({
   itens: z.array(
     z.object({
       afirmacao: z.string(),
       fonte: z.string(),
-      situacao: z.enum(["confirmada", "sem_base", "contradiz"]),
+      situacao: SituacaoVerificacaoSchema,
       observacao: z.string().describe("Uma frase: por que confirma, ou o que o trecho realmente diz"),
     }),
   ),
