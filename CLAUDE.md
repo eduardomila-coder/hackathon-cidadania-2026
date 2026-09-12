@@ -43,12 +43,13 @@ Três comandos dentro do Claude Code, que a pessoa digita como `/comecar`:
 | Comando | O que faz |
 |---|---|
 | `/comecar` | atualiza com o que os outros enviaram, cria ou retoma a branch da pessoa, lista as tarefas abertas na área dela |
-| `/entregar` | **Eduardo somente:** commit, build, junta em `main` e publica |
-| `/enviar-revisao` | **Maria e Fernando:** build, commit e envia a branch para aprovação do Eduardo |
+| `/entregar` | envia a branch para revisão no Habeas Release |
+| `/enviar-revisao` | build, commit e envia a branch para aprovação |
 | `/situacao` | quem enviou o quê, o que está aberto, próxima entrega com hora |
 
-Quem não for Eduardo não junta alterações em `main`: usa `/enviar-revisao`.
-Eduardo aprova pelo Habeas Release em `/revisoes` e faz a publicação.
+Ninguém publica diretamente em `main`: toda mudança usa `/enviar-revisao` ou
+`/entregar`. Eduardo aprova pelo Habeas Release em `/revisoes` e faz a
+publicação final no GitHub.
 
 Por baixo, `npm run pegar` e `npm run enviar -- "mensagem"` (`scripts/git.mjs`,
 funciona igual em Mac e Windows). Use-os quando o usuário pedir para
@@ -98,6 +99,16 @@ Se precisar mexer fora da sua área, avise no grupo antes.
 
 Decisões rápidas e pendências do evento ficam em `docs/CEREBRO.md`; leia-o no
 início da sessão e anote lá o que mudar.
+
+## Entrega automática
+
+Quando qualquer integrante pedir uma alteração em linguagem normal, o agente
+deve concluir o ciclo sozinho, sem exigir comandos de barra: identificar a
+pessoa, criar ou retomar a branch dela, editar, testar, rodar o build, fazer o
+commit, enviar a branch ao GitHub e abrir a Pull Request para `main`.
+Ninguém deve publicar diretamente em `main`. A Pull Request aparece no Habeas
+Release em `/revisoes`; a aprovação final continua sendo feita pelo Eduardo
+no GitHub.
 
 ## O que não fazer
 
