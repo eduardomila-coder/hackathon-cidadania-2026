@@ -36,45 +36,77 @@ aponta caminhos sem processo, lista documentos e monta o pedido. Detalhes em
   commits, textos da interface. Termos técnicos ficam como são (`route`, `hook`).
 - Interface em linguagem simples, sem juridiquês: o usuário final é leigo.
 
-## Como o trabalho circula entre os três
+## Como o trabalho circula entre os três (desde 12/09, sem clone/PR pra Fernando e Maria)
 
-Três comandos dentro do Claude Code, que a pessoa digita como `/comecar`:
+Decisão do Eduardo: para o resto do hackathon, Fernando e Maria **não clonam o
+repositório nem usam GitHub**. Os três trabalham direto na mesma pasta do
+projeto, física no MacBook do Eduardo e compartilhada por SMB (ver seção
+abaixo). Cada um abre o Claude Code apontando para essa mesma pasta.
 
-| Comando | O que faz |
-|---|---|
-| `/comecar` | atualiza com o que os outros enviaram, cria ou retoma a branch da pessoa, lista as tarefas abertas na área dela |
-| `/entregar` | envia a branch para revisão no Habeas Release |
-| `/enviar-revisao` | build, commit e envia a branch para aprovação |
-| `/situacao` | quem enviou o quê, o que está aberto, próxima entrega com hora |
+Isso muda o modelo de branch: como é **uma pasta só**, e não um clone por
+pessoa, ninguém pode ter sua própria branch fora da de todo mundo — trocar de
+branch naquela pasta muda os arquivos de todo mundo ao mesmo tempo, no meio do
+que os outros estão editando. Então, a partir de agora:
 
-Ninguém publica diretamente em `main`: toda mudança usa `/enviar-revisao` ou
-`/entregar`. Eduardo aprova pelo Habeas Release em `/revisoes` e faz a
-publicação final no GitHub.
+- **Não crie branch por pessoa.** Fernando e Maria trabalham direto em `main`,
+  na pasta compartilhada. Só o Eduardo decide se quer isolar algo em branch
+  local antes de publicar.
+- **A divisão de áreas da tabela abaixo passa a ser a principal proteção
+  contra conflito** (antes era a branch). Antes de editar um arquivo fora da
+  sua área, avise no grupo.
+- **Commits pequenos e frequentes, em português, no imperativo**
+  (`adiciona upload de foto`), direto na pasta compartilhada — isso é o que
+  sobra de histórico se a rede cair no meio de uma edição.
+- Fernando e Maria **não têm mais acesso de push a um remoto GitHub**: eles só
+  editam arquivos e commitam localmente naquela pasta. Quem publica em GitHub
+  `main` continua sendo só o Eduardo, rodando `npm run enviar -- "mensagem"`
+  (ou `/enviar-revisao`) na própria máquina — é isso que satisfaz a exigência
+  do edital de "solução sob licença MIT, publicada no repositório oficial"
+  (`docs/EVENTO.md`). Antes de publicar, o Eduardo confere com `git log` e
+  `git diff` o que mudou (revisão manual, já que não há mais Pull Request no
+  Habeas Release para o trabalho deles).
+- `/comecar` e `/situacao` continuam úteis para qualquer um: mostram tarefas
+  abertas e o que mudou, mas sem criar branch nem depender do GitHub.
+- `/entregar` e `/enviar-revisao` (que fazem push e abrem Pull Request) ficam
+  **só para o Eduardo**, que ainda pode escolher publicar via GitHub.
 
-Por baixo, `npm run pegar` e `npm run enviar -- "mensagem"` (`scripts/git.mjs`,
-funciona igual em Mac e Windows). Use-os quando o usuário pedir para
-"atualizar" ou "enviar"; não invente sequências de git à mão.
+Regras que continuam valendo:
 
-Regras que os comandos já cumprem e você não pode contornar:
-
-- `main` sempre roda: só entra em `main` o que passou no `npm run build`.
-- Cada pessoa em branch própria: `eduardo/<o-que>`, `maria/<o-que>`,
-  `fernando/<o-que>`. Merge rápido, sem PR: não há tempo.
-- Commits pequenos, em português, no imperativo: `adiciona upload de foto`.
+- `main` sempre roda: só o Eduardo publica em `main`, e só depois do
+  `npm run build` passar.
 - Nunca `git push --force`, nunca `git reset --hard`, nunca reescreva
   histórico de outra pessoa.
 - Conflito em arquivo de outra área: pergunte antes de resolver.
 
+**Risco técnico que isso assume, de olhos abertos:** vários Claude Code, `npm
+run dev` e edições de arquivo ao mesmo tempo, de máquinas diferentes, na
+mesma pasta via SMB — é mais escrita concorrente no mesmo `.git` do que a
+pasta aguentava antes (que era só para prints/PDF, um de cada vez). Evite
+duas pessoas commitando no mesmo instante; se notar lentidão ou erro estranho
+de git, pare e chame o Eduardo antes de tentar consertar sozinho. Sem clone
+próprio, também não há mais uma cópia de segurança individual: se a pasta
+corromper, o único histórico é o que já foi publicado em GitHub `main` — por
+isso commits frequentes e o Eduardo publicando com regularidade importam mais
+agora do que antes.
+
 ## Pasta compartilhada na rede (Wi-Fi do Eduardo)
 
-A pasta do projeto está compartilhada por SMB na rede que o Mac do Eduardo
-distribui (`smb://192.168.2.1/hackathon`, usuário e senha individuais).
-**Serve para arquivos**: prints, fotos, canvas, PDFs, depoimentos — quem está
-no tablet joga direto em `docs/entregas/`. **Não serve para código**: não
-rode Claude Code, `npm` nem `git` a partir do drive de rede (lento no Windows
-e o `.git` corrompe). Código continua no clone local de cada um, com
-`/comecar` e `/entregar`. O que entra pela pasta compartilhada é commitado
-pelo Eduardo no próximo `/entregar` dele.
+A pasta do projeto inteira — código incluso — está compartilhada por SMB na
+rede que o Mac do Eduardo distribui (`smb://192.168.2.1/hackathon`, usuário e
+senha individuais). **Desde 12/09, Fernando e Maria abrem o Claude Code
+direto nessa pasta de rede**, sem clone próprio: é a mesma pasta física do
+Mac do Eduardo, só acessada por outro computador. Isso substitui a regra
+antiga (que dizia para nunca rodar `git`/`npm`/Claude Code a partir do drive
+de rede); ver o aviso de risco na seção acima — o Eduardo decidiu assumir
+isso pelo resto do hackathon, pela simplicidade de não depender de GitHub
+para os três.
+
+A mesma pasta também serve para arquivos que não são código: prints, fotos,
+canvas, PDFs, depoimentos — quem está no tablet joga direto em
+`docs/entregas/`. Se houver um vault do Obsidian (segundo cérebro,
+anotações), compartilhe a pasta dele também pela mesma rede e registre o
+caminho em `docs/CEREBRO.md`; qualquer Claude Code lendo daquela pasta pode
+consultar as notas de lá.
 
 ## Servidor compartilhado
 
@@ -102,13 +134,13 @@ início da sessão e anote lá o que mudar.
 
 ## Entrega automática
 
-Quando qualquer integrante pedir uma alteração em linguagem normal, o agente
-deve concluir o ciclo sozinho, sem exigir comandos de barra: identificar a
-pessoa, criar ou retomar a branch dela, editar, testar, rodar o build, fazer o
-commit, enviar a branch ao GitHub e abrir a Pull Request para `main`.
-Ninguém deve publicar diretamente em `main`. A Pull Request aparece no Habeas
-Release em `/revisoes`; a aprovação final continua sendo feita pelo Eduardo
-no GitHub.
+Quando Fernando ou Maria pedirem uma alteração em linguagem normal, o agente
+deve concluir o ciclo sozinho, sem exigir comandos de barra: editar, testar,
+rodar o build e fazer o commit direto na pasta compartilhada em `main` — sem
+criar branch, sem push para GitHub, sem Pull Request (eles não têm mais
+acesso de push a um remoto). Quando for o Eduardo pedindo, o agente pode
+seguir o fluxo completo (`npm run enviar`) e publicar em `main` no GitHub,
+já que só ele faz essa publicação.
 
 ## O que não fazer
 

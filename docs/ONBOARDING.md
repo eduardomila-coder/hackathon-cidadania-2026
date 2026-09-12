@@ -3,7 +3,12 @@
 Faça uma vez, na sua máquina. Leva uns 15 minutos. Se travar em qualquer
 passo, chame no grupo — não gaste mais de 5 minutos sozinho.
 
-## 1. Conta no GitHub (quem ainda não tem)
+**Desde 12/09, Fernando e Maria não precisam mais de conta no GitHub nem de
+clonar o repositório.** Vocês trabalham direto na pasta compartilhada do Mac
+do Eduardo (seção 5b abaixo) — pule a seção 1 e a seção 5. Só o Eduardo
+continua com clone próprio e GitHub, porque é ele quem publica em `main`.
+
+## 1. Conta no GitHub (só o Eduardo)
 
 1. https://github.com/signup — usa o e-mail que você já usa.
 2. Confirma o e-mail.
@@ -30,11 +35,16 @@ Depois abre o **Git Bash** (não o cmd) para os próximos passos.
 
 ## 3. Identidade no git e login no GitHub
 
-Troque pelo seu nome e e-mail do GitHub:
+Troque pelo seu nome e e-mail:
 
 ```bash
 git config --global user.name "Seu Nome"
 git config --global user.email "seu-email@exemplo.com"
+```
+
+`gh auth login` só é necessário pro Eduardo, que é quem publica em GitHub:
+
+```bash
 gh auth login
 ```
 
@@ -50,7 +60,7 @@ claude
 
 Na primeira vez ele pede login: escolhe a conta Claude que você já assinou.
 
-## 5. Baixar o projeto
+## 5. Baixar o projeto (só o Eduardo)
 
 ```bash
 cd ~
@@ -65,7 +75,38 @@ compartilhado (https://habeastitas.eduardomila.adv.br). Localmente, tudo abre e
 funciona, menos o botão Analisar. Se o Eduardo te mandar uma chave no
 privado, cola ali. **Nunca cole chave no grupo nem no git.**
 
-## 6. Testar
+## 5b. Fernando e Maria: entrar pela pasta compartilhada (desde 12/09)
+
+Vocês não clonam nada. A pasta do projeto inteira, código incluso, está
+compartilhada por SMB direto do MacBook do Eduardo. Usuário e senha ele manda
+no privado.
+
+- **Windows:** Explorador → Este Computador → Mapear unidade de rede →
+  `\\192.168.2.1\hackathon`, marcar "conectar usando outras credenciais".
+- **Mac:** Finder → Ir → Conectar ao Servidor → `smb://192.168.2.1/hackathon`.
+- **Android (tablet):** app Cx File Explorer ou Solid Explorer → Rede →
+  SMB → host `192.168.2.1`, pasta `hackathon`, usuário e senha (só pra ver
+  arquivos; para editar código, prefira computador).
+
+Depois de mapear, abra o Claude Code apontando para esse caminho de rede (no
+Windows, o drive mapeado, ex. `Z:\hackathon-cidadania-2026`) — não é mais um
+clone local. Se houver um vault do Obsidian compartilhado (pasta de notas do
+Eduardo), ele deve aparecer na mesma pasta de rede; abra o Obsidian apontando
+pra lá.
+
+**Duas coisas importantes para não travar:**
+
+1. **Só o Eduardo roda `npm install` e `npm run dev`**, no próprio Mac.
+   `node_modules` tem binário nativo por sistema operacional — instalar pelo
+   Windows em cima de uma instalação feita no Mac (ou vice-versa) quebra o
+   projeto para todo mundo. Fernando e Maria só editam arquivos; para ver o
+   app rodando, abrem `http://<ip-do-mac-no-wifi>:3000` no navegador (o
+   Eduardo informa o IP), com o `npm run dev` do Eduardo já no ar.
+2. **O recarregamento automático pode não perceber mudança feita pela rede.**
+   Se editar um arquivo pelo Windows e a página não atualizar sozinha, dê F5
+   no navegador.
+
+## 6. Testar (Eduardo, no seu clone)
 
 ```bash
 npm run dev
@@ -74,60 +115,35 @@ npm run dev
 Abre http://localhost:3000, escreve um relato, clica em Analisar. Funcionou?
 Está pronto.
 
-## 6b. Pasta compartilhada (para arquivos, não para código)
-
-Conectado no Wi-Fi do Eduardo, a pasta do projeto aparece como um drive de
-rede. Usuário e senha ele manda no privado.
-
-- **Windows:** Explorador → Este Computador → Mapear unidade de rede →
-  `\\192.168.2.1\hackathon`, marcar "conectar usando outras credenciais".
-- **Mac:** Finder → Ir → Conectar ao Servidor → `smb://192.168.2.1/hackathon`.
-- **Android (tablet):** app Cx File Explorer ou Solid Explorer → Rede →
-  SMB → host `192.168.2.1`, pasta `hackathon`, usuário e senha.
-
-Use para colocar prints, fotos, canvas e PDFs em `docs/entregas/`. Não abra
-o Claude Code nem rode comandos a partir daí.
-
 ## 7. Trabalhar
 
-Sempre que sentar pra trabalhar:
+**Eduardo**, no seu clone local:
 
 ```bash
 cd ~/hackathon-cidadania-2026
 claude
 ```
 
-Dentro do Claude Code, digita `/comecar`. Ele atualiza o projeto, cria sua
-branch e diz o que está aberto pra você. Aí é só pedir em português o que
-quer fazer: "adiciona um botão pra tirar foto do documento".
+Dentro do Claude Code, digite `/comecar` (sem criar branch — ver `CLAUDE.md`),
+peça em português o que quer fazer, e quando estiver pronto publique com
+`/enviar-revisao` ou `npm run enviar -- "mensagem"`. Isso é o que atualiza
+https://habeastitas.eduardomila.adv.br em até um minuto.
 
-Quando algo estiver funcionando, basta descrever a próxima tarefa em português.
-O agente cria a branch, testa, faz o commit, envia a mudança e abre a Pull
-Request sozinho. O Eduardo vê no Habeas Release, confere e publica quando
-estiver certo:
-https://habeastitas.eduardomila.adv.br/revisoes
-
-Não junte nem publique em `main` por conta própria. Em até um minuto depois da
-aprovação, a mudança aparece em https://habeastitas.eduardomila.adv.br.
+**Fernando e Maria**, na pasta de rede (seção 5b): abra o Claude Code
+apontando pra lá e peça em português o que quer fazer: "adiciona um botão pra
+tirar foto do documento". O agente edita, testa e faz o commit direto ali,
+em `main` — sem branch, sem push, sem Pull Request. Avise o Eduardo o que
+mudou e como conferir; ele revisa e publica no GitHub quando for a hora.
 
 Quer saber o que os outros fizeram? `/situacao`.
 
 Não precisa saber git. Se o Claude Code perguntar algo sobre "conflito",
 chama no grupo antes de responder.
 
-## 7b. Maria no aplicativo Claude para Android
+## 7b. Maria sem acesso à pasta de rede (aplicativo Claude para Android)
 
-No aplicativo Claude, abra a área **Code**, conecte o GitHub se for pedido e
-escolha o repositório `hackathon-cidadania-2026`. O projeto entrega as regras
-automaticamente para o Claude. Para começar a tarefa padrão dela, escreva só:
-
-> começar
-
-O Claude prepara ou atualiza o registro dos testes externos em
-`docs/entregas/3-testes-externos.md`, sem inventar depoimentos, cria a branch e
-envia para a revisão do Eduardo. Para outra tarefa, Maria escreve normalmente o
-que quer fazer.
-
-Não use `/comecar` nem `/enviar-revisao` no tablet: eles são comandos do Claude
-Code do computador. O Claude no aplicativo cria a branch e envia para o Eduardo
-revisar.
+Se Maria estiver longe do Wi-Fi do Eduardo e só tiver o aplicativo Claude no
+Android conectado ao GitHub, ela ainda pode usar o repositório do GitHub como
+antes (branch própria, Pull Request) enquanto não estiver na mesma rede.
+Assim que estiver perto, prefira a pasta compartilhada (seção 5b): mais
+simples e sem depender de conta no GitHub.

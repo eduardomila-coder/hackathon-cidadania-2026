@@ -1,9 +1,14 @@
 ---
 description: Enviar o que fiz para o Habeas Release
 ---
-Quero enviar o que fiz nesta sessão para o Habeas Release. Este comando usa o
-mesmo fluxo de revisão para qualquer integrante. Nunca publique diretamente na
-main.
+Desde 12/09, este comando é só para quem tem clone próprio e acesso de push ao
+GitHub (o Eduardo). Fernando e Maria trabalham direto na pasta compartilhada
+por SMB e não usam mais push nem Pull Request (ver `CLAUDE.md`) — se for um
+deles rodando isto, avise que não se aplica mais e explique que é só commitar
+direto ali, em `main`.
+
+Quero enviar o que fiz nesta sessão para o Habeas Release. Nunca publique
+diretamente na main.
 
 1. Rode git status --short e git diff --stat e mostre em uma frase o que mudou.
 2. Se eu estiver em main, pare e crie ou peça para criar uma branch de trabalho.
