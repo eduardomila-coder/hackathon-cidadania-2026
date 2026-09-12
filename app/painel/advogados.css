@@ -1,0 +1,45 @@
+/* Seção "Advogados de teste" do painel da equipe (módulo 4). Segue as classes
+   cfp-* do painel em globals.css; aqui fica só a tabela e o formulário. */
+
+.adv-grade{align-items:start}
+.adv-lista-cabeca{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.adv-lista h2,.adv-novo h2{font-size:24px}
+.adv-lista p code,.adv-criado code,.adv-tabela code{padding:2px 6px;border-radius:4px;background:#f3efe8;color:#143b65;font-size:12px}
+.adv-lista>p a,.adv-criado a{color:#a12434;font-weight:700;text-decoration:none;overflow-wrap:anywhere}
+.adv-lista>p a:hover,.adv-criado a:hover{text-decoration:underline}
+
+.adv-tabela-caixa{margin-top:14px;overflow-x:auto}
+.adv-tabela{width:100%;border-collapse:collapse;font-size:13px}
+.adv-tabela th,.adv-tabela td{padding:10px 8px;border-bottom:1px solid #e8e4dc;text-align:left;vertical-align:middle}
+.adv-tabela th{color:#687184;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.adv-tabela td:last-child{text-align:right;white-space:nowrap}
+.adv-tabela tr.inativo td{color:#8a93a3}
+.adv-tabela tr.inativo strong{color:#8a93a3;text-decoration:line-through}
+
+.adv-form{display:grid;gap:6px;margin-top:16px}
+.adv-form label{margin-top:8px;font-size:12px;font-weight:700}
+.adv-form input{width:100%;padding:11px 12px;border:1px solid #ccd2d3;border-radius:7px;background:#fff;color:#143b65;font-size:14px;outline-color:#a12434}
+.adv-form small{color:#687184;font-size:11px;line-height:1.4}
+.adv-form button{margin-top:16px;justify-self:start}
+
+.adv-botao{padding:8px 12px;border:1px solid #143b65;border-radius:7px;background:#fffdfa;color:#143b65;font-size:12px;font-weight:700;cursor:pointer}
+.adv-botao:hover{background:#143b65;color:#fff}
+.adv-botao:disabled{opacity:.45;cursor:not-allowed}
+.adv-botao-principal{padding:12px 18px;background:#143b65;color:#fff;font-size:13px}
+.adv-botao-principal:hover{background:#0f2d4e}
+
+.adv-criado{margin-top:18px;padding:16px;border:1px solid #cfdccf;border-radius:10px;background:#eef4ee;color:#274634}
+.adv-criado strong{display:block;font-size:14px}
+.adv-criado dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:12px 0 0;font-size:13px}
+.adv-criado dt{color:#4f6656;font-weight:700}
+.adv-criado dd{margin:0;overflow-wrap:anywhere}
+.adv-criado small{display:block;margin-top:12px;color:#4f6656;font-size:11px;line-height:1.45}
+
+@media (max-width:700px){
+  .adv-tabela thead{display:none}
+  .adv-tabela tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:12px 0;border-bottom:1px solid #e8e4dc}
+  .adv-tabela td{padding:0;border:0}
+  .adv-tabela td[data-rotulo]:before{content:attr(data-rotulo);display:block;color:#687184;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+  .adv-tabela td:first-child{grid-column:1/-1}
+  .adv-tabela td:last-child{grid-column:1/-1;text-align:left}
+}

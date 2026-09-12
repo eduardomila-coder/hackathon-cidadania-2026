@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { AUDITORIA, DRIVE, EQUIPE, LINKS, MARCOS, PITCH, PREMIOS, REGRAS } from "@/lib/evento";
 import { lerTarefas } from "@/lib/tarefas";
 import { listarRevisoes } from "@/lib/revisoes";
 import { acharNoDrive, listarDrive, type ArquivoDrive } from "@/lib/drive";
+import { listarAdvogados } from "@/lib/contas";
+import { Advogados } from "./Advogados";
 import { Relogio } from "./Relogio";
 import { Tarefas } from "./Tarefas";
+import "./advogados.css";
 
 export const metadata: Metadata = { title: "Painel — Habeas Titas · Hackathon da Cidadania 2026" };
 // As tarefas vêm do TAREFAS.md a cada pedido: nada fica em cache.
@@ -15,6 +19,7 @@ const SECOES = [
   ["agora", "Agora"],
   ["cronograma", "Cronograma"],
   ["tarefas", "Tarefas"],
+  ["advogados", "Advogados"],
   ["auditoria", "Auditoria"],
   ["pitch", "Pitch"],
   ["regras", "Regras"],
@@ -41,11 +46,24 @@ function diaDe(iso: string) {
 function primeiroNome(nome: string) {
   return nome.split(" ")[0];
 }
+// Endereço completo de /entrar para a equipe copiar e passar ao advogado:
+// APP_URL quando configurado; senão, o host por onde o painel foi aberto.
+async function linkDeEntrada() {
+  const configurado = (process.env.APP_URL ?? "").trim().replace(/\/+$/, "");
+  if (configurado) return `${configurado}/entrar`;
+  const cabecalhos = await headers();
+  const host = cabecalhos.get("x-forwarded-host") ?? cabecalhos.get("host");
+  const protocolo = cabecalhos.get("x-forwarded-proto") ?? "http";
+  return host ? `${protocolo}://${host}/entrar` : "/entrar";
+}
 
 export default async function Painel() {
   const blocos = lerTarefas();
   const [arquivos, revisoes] = await Promise.all([listarDrive(), listarRevisoes()]);
   const pendentes = revisoes?.length ?? 0;
+  const advogados = listarAdvogados();
+  const contasAtivas = advogados.filter((a) => a.ativo).length;
+  const entrada = await linkDeEntrada();
   // Tarefa com `drive:` casada com um arquivo da pasta: concluída por evidência.
   const noDrive: Record<number, ArquivoDrive> = {};
   for (const t of blocos.flatMap((b) => b.tarefas)) {
@@ -182,6 +200,18 @@ export default async function Painel() {
                 </ul>
               )}
             </article>
+          </section>
+
+          <section id="advogados" className="cfp-secao">
+            <div className="cfp-titulo">
+              <div>
+                <span className="cfp-eyebrow">Plataforma do advogado</span>
+                <h1>Advogados de teste</h1>
+                <p className="cfp-lead">Contas para quem vai usar o escritório de verdade. A equipe cria aqui, passa usuário e senha, e o advogado entra em /entrar. Não há cadastro livre.</p>
+              </div>
+              <aside className="cfp-placar"><strong>{contasAtivas}</strong> {contasAtivas === 1 ? "conta ativa" : "contas ativas"}</aside>
+            </div>
+            <Advogados advogados={advogados} linkDeEntrada={entrada} />
           </section>
 
           <section id="auditoria" className="cfp-secao">
