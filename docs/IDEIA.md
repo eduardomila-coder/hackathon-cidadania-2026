@@ -106,6 +106,18 @@ acordo"), decisão sobre valor/negociação, caso emocionalmente sensível, ou
 prazo urgente e específico do processo real da pessoa — isso é para o
 advogado responder, não a IA, mesmo que a IA "soubesse" a resposta.
 
+**Importante (ajuste da Maria em 12/09/2026, pra não ler tudo isso ao
+contrário): a resposta genérica é exceção, não regra.** Tudo que está
+registrado aqui — sinais A, B, C, tom, compaixão — é sobre **tratamento
+do cliente para garantir a satisfação dele**, não sobre a IA passar a
+responder pouco. A regra geral continua sendo o que o produto já faz:
+responder de verdade, organizar o caso, citar a lei, apontar caminho. A
+resposta genérica só entra **nos casos marcados pelos sinais abaixo**, e
+o motivo dela existir é bem específico: **não passar por cima do
+advogado** em decisão que é dele (estratégia, negociação, avaliação de
+risco do caso). Fora desses gatilhos, a IA responde com todo o material
+que já tem.
+
 **O filtro, definido em duas partes** (não implementado — mexe em `lib/`,
 pendência para o Eduardo, ver `docs/CEREBRO.md`):
 
