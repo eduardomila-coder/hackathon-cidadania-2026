@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { Etapa, Resultado } from "@/lib/analise";
 import { useDitado } from "@/lib/useDitado";
 
@@ -63,11 +64,11 @@ export default function Home() {
     <main className="min-h-screen bg-[#f7f8fc] text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-5 py-6 sm:px-8 sm:py-10">
       <header className="mb-10 flex items-center justify-between">
-        <a href="/" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-700 text-xl text-white shadow-lg shadow-blue-200">✓</span>
           <span><strong className="block text-lg leading-none">Cidadania Fácil</strong><small className="text-slate-500">Habeas Titas · OAB/PR</small></span>
-        </a>
-        <a href="/painel" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm hover:border-blue-300 hover:text-blue-700">Área da equipe →</a>
+        </Link>
+        <Link href="/painel" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm hover:border-blue-300 hover:text-blue-700">Área da equipe →</Link>
       </header>
 
       <section className="mb-8 max-w-3xl">

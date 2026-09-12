@@ -48,7 +48,7 @@ export default function Painel() {
         <div className="relative mx-auto max-w-6xl px-6 pb-8 pt-7">
           <div className="mb-8 flex items-center justify-between gap-4 text-sm text-blue-100">
             <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">OAB/PR · 12 e 13 de setembro</span>
-            <Link href="/" className="rounded-full border border-white/20 px-3 py-1 hover:bg-white/10">Abrir atendente →</Link>
+            <div className="flex gap-2"><Link href="/revisoes" className="rounded-full border border-cyan-300/50 bg-cyan-300/10 px-3 py-1 hover:bg-cyan-300/20">Habeas Release</Link><Link href="/" className="rounded-full border border-white/20 px-3 py-1 hover:bg-white/10">Abrir atendente →</Link></div>
           </div>
           <div className="flex flex-wrap items-end justify-between gap-7">
           <div>
