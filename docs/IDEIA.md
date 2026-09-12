@@ -106,14 +106,44 @@ acordo"), decisão sobre valor/negociação, caso emocionalmente sensível, ou
 prazo urgente e específico do processo real da pessoa — isso é para o
 advogado responder, não a IA, mesmo que a IA "soubesse" a resposta.
 
-**Como encaixaria, tecnicamente** (não implementado — mexe em `lib/`,
-pendência para o Eduardo, ver `docs/CEREBRO.md`): um campo novo na
-`Analise` (`lib/etapas.ts`), algo como `encaminhar_advogado: boolean` +
-`motivo`, populado na etapa "analisando" com regras explícitas do tipo
-acima. Na interface, quando `encaminhar_advogado` for verdadeiro, mostrar
-"essa parte é melhor perguntar direto ao seu advogado" em vez de uma
-resposta gerada — inclusive como o ponto de contato pelo WhatsApp
-registrado em `docs/entregas/3-testes-externos.md`.
+**O filtro, definido em duas partes** (não implementado — mexe em `lib/`,
+pendência para o Eduardo, ver `docs/CEREBRO.md`):
+
+**A. Sinais que já existem no pipeline hoje**, sem precisar de nada novo:
+
+- `verificacao.confiavel === false` (`lib/etapas.ts`, etapa "verificar") —
+  já significa que uma afirmação central ficou `sem_base` ou `contradiz`:
+  o caso é mais complexo do que a base jurídica carregada cobre com
+  segurança.
+- `analise.sem_base.length > 0` em `motivo_juizado` ou `orientacao` —
+  mesma lógica, pontos centrais sem fundamento.
+- `analise.area` fora do escopo do produto (`familia`, `trabalho`) — já
+  existe `encaminhamento`, só falta deixar mais visível na interface.
+
+**B. Um sinal novo, que exige julgamento** — a natureza do pedido, não a
+fonte legal. A IA não distingue isso por regra fixa, precisa ser
+instruída a reconhecer o padrão. São perguntas de **decisão pessoal ou
+estratégica**, não "o que diz a lei":
+
+- Estratégia: "devo processar ou não", "vale a pena entrar com isso".
+- Negociação de valor: "quanto eu peço", "aceito o que ofereceram".
+- Situação de risco pessoal (segurança, ameaça).
+- Prazo real e específico do caso da pessoa (não a regra geral da lei).
+
+Campo novo na `Analise` (`lib/etapas.ts`, etapa "analisar"):
+`encaminhar_advogado: boolean` + `motivo_encaminhar: string | null`,
+com instrução explícita no prompt de análise: se o que a pessoa quer
+(`o_que_quer`) ou o relato pedir uma decisão estratégica, negociação de
+valor, avaliação de risco pessoal, ou envolver urgência real de um
+processo já em andamento, marcar `encaminhar_advogado: true` e **não**
+preencher `orientacao` com uma recomendação de mérito — só sinalizar que
+aquele ponto precisa do advogado.
+
+Na interface: quando `encaminhar_advogado` for verdadeiro (sinal B) ou
+`confiavel` for falso (sinal A), mostrar "essa parte é melhor perguntar
+direto ao seu advogado" em vez de uma resposta gerada — inclusive como o
+ponto de contato pelo WhatsApp registrado em
+`docs/entregas/3-testes-externos.md`.
 
 ## Proposta: acompanhamento real do processo (aguardando aprovação do Eduardo)
 
