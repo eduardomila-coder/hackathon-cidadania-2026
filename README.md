@@ -7,6 +7,8 @@ caminhos sem processo, lista documentos e monta o pedido.
 Categoria: **Inovação Aberta e Cidadania** · OAB/PR · 12 e 13/09/2026 · Licença MIT.
 
 **Demo ao vivo:** https://hackathon.eduardomila.adv.br (acompanha `main`, atualiza a cada minuto)
+
+O painel da equipe em `/painel` é privado e pede usuário e senha. As credenciais ficam somente no `.env.local` do servidor, nunca no repositório.
 **Painel da equipe:** https://hackathon.eduardomila.adv.br/painel (regras, cronograma, tarefas e responsáveis, lidos do `docs/TAREFAS.md`)
 
 ## Como funciona (arquitetura)
