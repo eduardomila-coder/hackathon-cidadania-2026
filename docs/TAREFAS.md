@@ -7,15 +7,15 @@ Pontuação e horários em `docs/EVENTO.md`.
 
 ## Sexta 11/09, à noite
 
-- [ ] Anotar em `docs/EVENTO.md` o que a abertura explicar (repositório oficial, formato das entregas, critérios da auditoria)
+- [x] Anotar em `docs/EVENTO.md` o que a abertura explicou (repositório = pasta no Drive, padrinho, formato livre do canvas)
 - [ ] @maria **Foto no banner com alguém da organização**, postar com #hackathonoabpr, print em `docs/entregas/prints/` **até 10h de sábado** — 15 pts
-- [ ] Os três com o projeto rodando (`docs/ONBOARDING.md`) e chave no `.env.local`
+- [ ] Os três com o projeto rodando (`docs/ONBOARDING.md`); a Maria pelo claude.ai/code no tablet
 
 ## Sábado 12/09
 
-### Até 8h30 — check-in dos três (10 pts)
+### Até 8h30 — check-in dos três (10 pts); dizer que o líder é o Eduardo; anotar o padrinho
 
-### 9h–12h — Entrega 1: Canvas (100 pts)
+### 9h–12h — Entrega 1: Canvas (100 pts) — **não entregar desclassifica**
 - [ ] @maria @eduardo Preencher o canvas no workshop; base em `docs/IDEIA.md`
 - [ ] @maria Salvar em `docs/entregas/1-canvas.pdf` (ou link no `docs/entregas/1-canvas.md`)
 - [ ] @eduardo Confirmar a divisão de áreas sugerida na tabela do `CLAUDE.md`

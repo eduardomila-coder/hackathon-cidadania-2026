@@ -140,6 +140,6 @@ auditoria + extras + pitch.
 
 ## Ainda sem resposta (ver transcrição da abertura em `docs/privado/`)
 
-- [ ] Onde é o repositório oficial e como se sobe a pasta da equipe
-- [ ] Formato do canvas (o workshop de sábado 9h deve dar o modelo)
-- [ ] Quem é a pessoa líder registrada (Eduardo se ofereceu no grupo)
+- [ ] Link da pasta do Drive (vem pelo grupo dos inscritos)
+- [ ] Quem é o padrinho/madrinha da equipe (sábado cedo)
+- [ ] Líder: Eduardo, comunicar no check-in

@@ -68,7 +68,8 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 
 ### Pendências críticas
 
-- [ ] Confirmar onde é o repositório oficial da OAB/PR e como se sobe a pasta da equipe (critérios da auditoria já estão em `docs/EVENTO.md`).
+- [ ] Pegar o link da pasta do Drive no grupo dos inscritos e colar aqui. É lá que toda evidência entra, com o horário do Drive como prova.
+- [ ] Descobrir quem é o padrinho/madrinha da equipe e confirmar cada entrega com ele na hora.
 - [ ] Definir e comunicar a pessoa líder à organização (obrigatório para premiação).
 - [ ] Definir divisão de áreas entre os três integrantes.
 - [ ] Completar conversa em turnos.
