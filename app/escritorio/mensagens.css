@@ -1,0 +1,106 @@
+/* Módulo 3: Mensagens (WhatsApp) e a página do canal profissional.
+   Paleta do Ponto Dativo: azul #143b65, vermelho #a12434, creme #faf6f0.
+   O componente Conversa também é usado na página do caso (módulo 2), que
+   importa este arquivo junto com o dela. */
+
+/* ---- Tela de mensagens: cabeçalho e duas colunas ---- */
+.pd-mensagens-cabecalho{margin-bottom:22px}
+.pd-mensagens-cabecalho h1{margin:0;font:700 36px/1.03 Georgia,serif;letter-spacing:-.04em}
+.pd-mensagens-cabecalho p:last-child{max-width:720px;margin:10px 0 0;color:#506075;font-size:15px;line-height:1.5}
+.pd-aviso-conexao{margin:0 0 18px;padding:12px 15px;border-left:3px solid #a12434;border-radius:4px;background:#fbefed;color:#7f1d2a;font-size:13px;line-height:1.45}
+.pd-aviso-conexao a{color:#8b1f2d;font-weight:bold}
+.pd-mensagens-colunas{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:18px;align-items:start}
+
+/* ---- Lista de conversas ---- */
+.pd-conversas{overflow:hidden;border:1px solid #dedbd3;border-radius:14px;background:#fffefa;box-shadow:0 9px 25px #342f2510}
+.pd-conversas ul{margin:0;padding:0;list-style:none;max-height:min(70vh,720px);overflow:auto}
+.pd-conversas li+li{border-top:1px solid #ece8e1}
+.pd-conversas-nota{margin:0;padding:22px 20px;color:#687184;font-size:13px;line-height:1.5}
+.pd-conversa-item{display:grid;gap:5px;width:100%;padding:14px 16px;border:0;border-left:3px solid transparent;background:none;color:#143b65;font:inherit;text-align:left;cursor:pointer}
+.pd-conversa-item:hover{background:#f7f3ee}
+.pd-conversa-ativa{border-left-color:#a12434;background:#f2e1df55}
+.pd-conversa-topo{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.pd-conversa-topo strong{overflow:hidden;font-size:14px;text-overflow:ellipsis;white-space:nowrap}
+.pd-conversa-topo time{flex:none;color:#7a8698;font-size:11px}
+.pd-conversa-previa{display:-webkit-box;overflow:hidden;color:#526278;font-size:13px;line-height:1.35;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.pd-conversa-rodape{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:18px}
+.pd-conversa-rodape em{color:#143b65;font-size:10px;font-style:normal;font-weight:bold;letter-spacing:.08em;text-transform:uppercase}
+.pd-conversa-rodape .pd-sem-caso{color:#8b9099}
+.pd-conversa-rodape b{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 7px;border-radius:999px;background:#a12434;color:#fff;font-size:11px}
+
+/* ---- Painel da conversa aberta ---- */
+.pd-painel{min-width:0;border:1px solid #dedbd3;border-radius:14px;background:#fffefa;box-shadow:0 9px 25px #342f2510}
+.pd-painel-vazio{padding:40px 30px}
+.pd-painel-vazio h2{margin:0;font:700 28px/1.05 Georgia,serif;letter-spacing:-.04em}
+.pd-painel-vazio p:last-child{max-width:520px;margin:12px 0 0;color:#506075;font-size:14px;line-height:1.5}
+.pd-painel-cabecalho{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid #ece8e1}
+.pd-painel-cabecalho>div{flex:1;min-width:0}
+.pd-painel-cabecalho strong,.pd-painel-cabecalho small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd-painel-cabecalho strong{font:700 19px Georgia,serif}
+.pd-painel-cabecalho small{margin-top:2px;color:#687184;font-size:12px}
+.pd-voltar{display:none;padding:8px 10px;border:1px solid #ccd2d3;border-radius:7px;background:#fff;color:#143b65;font-size:12px;font-weight:bold;cursor:pointer}
+.pd-caso-ligado{flex:none;max-width:40%;overflow:hidden;padding:8px 12px;border-radius:999px;background:#e3edf4;color:#143b65;font-size:12px;font-weight:bold;text-decoration:none;text-overflow:ellipsis;white-space:nowrap}
+.pd-caso-ligado:hover{background:#143b65;color:#fff}
+.pd-caso-nenhum{background:#f3efe9;color:#687184}
+.pd-caso-nenhum:hover{background:#f3efe9;color:#687184}
+.pd-vincular{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 20px;border-bottom:1px solid #ece8e1;background:#f7f3ee}
+.pd-vincular-forma{display:grid;gap:6px}
+.pd-vincular-forma label{font-size:12px;font-weight:bold}
+.pd-vincular-forma>div{display:flex;gap:8px}
+.pd-vincular-forma select,.pd-vincular-forma input{flex:1;min-width:0;padding:9px 11px;border:1px solid #ccd2d3;border-radius:6px;background:#fff;color:#143b65;font-size:13px}
+.pd-vincular-forma button{flex:none;padding:9px 13px;font-size:12px}
+.pd-vincular-forma button:disabled{opacity:.45;cursor:not-allowed}
+.pd-painel>.pd-resposta-aviso{margin:14px 20px 0}
+
+/* ---- Conversa (balões + caixa de resposta); vale também na página do caso ---- */
+.pd-conversa{display:grid;gap:0}
+.pd-conversa-vazia{padding:24px 20px;color:#687184;font-size:14px;line-height:1.5}
+.pd-conversa-vazia p{margin:0}
+.pd-baloes{display:flex;flex-direction:column;gap:6px;max-height:min(52vh,560px);min-height:200px;padding:18px 20px;overflow:auto;background:#f4efe8}
+.pd-conversa-nota,.pd-conversa-erro{margin:auto 0;color:#687184;font-size:13px;text-align:center}
+.pd-conversa-erro{color:#7f1d2a}
+.pd-dia{display:flex;justify-content:center;margin:10px 0 6px}
+.pd-dia span{padding:4px 10px;border-radius:999px;background:#fffefa;color:#687184;font-size:11px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase}
+.pd-balao{position:relative;width:fit-content;max-width:min(78%,620px);padding:9px 12px 20px;border-radius:12px;font-size:14px;line-height:1.45;box-shadow:0 1px 2px #342f2514}
+.pd-balao p{margin:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.pd-balao time{position:absolute;right:10px;bottom:5px;font-size:10px;opacity:.65}
+.pd-balao-dele{border-bottom-left-radius:3px;background:#fffefa;color:#143b65}
+.pd-balao-meu{margin-left:auto;border-bottom-right-radius:3px;background:#143b65;color:#fff}
+.pd-resposta{display:grid;gap:8px;padding:16px 20px 20px;border-top:1px solid #ece8e1}
+.pd-resposta label{font-size:12px;font-weight:bold}
+.pd-resposta textarea{width:100%;min-height:96px;padding:11px 13px;border:1px solid #ccd2d3;border-radius:8px;background:#fff;color:#143b65;font:inherit;font-size:14px;line-height:1.45;resize:vertical;outline-color:#a12434}
+.pd-resposta textarea:disabled{opacity:.6}
+.pd-motivo{margin:0;padding:10px 13px;border-radius:7px;background:#f7f3ee;color:#56677c;font-size:12px;line-height:1.45}
+.pd-motivo b{display:block;margin-bottom:4px;color:#8b1f2d;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.pd-resposta-acoes{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.pd-resposta-acoes button{padding:11px 15px;font-size:13px}
+.pd-resposta-acoes button:disabled{opacity:.45;cursor:not-allowed}
+.pd-resposta-acoes small{flex-basis:100%;color:#687184;font-size:11px;line-height:1.4}
+.pd-resposta-aviso{margin:0;padding:10px 13px;border-left:3px solid #143b65;border-radius:4px;background:#e3edf4;color:#143b65;font-size:13px;line-height:1.45}
+.pd-aviso-erro{border-color:#a12434;background:#fbefed;color:#7f1d2a}
+
+/* ---- Página do canal profissional (/escritorio/whatsapp) ---- */
+.pd-whatsapp .md-status{margin:0 0 18px}
+.pd-whatsapp .md-whatsapp{margin-top:0}
+.pd-whatsapp .md-whatsapp-corpo p a{color:#8b1f2d;font-weight:bold}
+.pd-whatsapp-dica{margin-top:14px!important}
+.pd-whatsapp-dica a{color:#8b1f2d;font-weight:bold}
+.pd-whatsapp-limite{max-width:760px;margin:18px 0 0;color:#7d5960;font-size:12px;line-height:1.45}
+
+@media (max-width:850px){
+  .pd-mensagens-cabecalho h1{font-size:30px}
+  .pd-mensagens-colunas{grid-template-columns:1fr}
+  .pd-mensagens-aberta .pd-conversas{display:none}
+  .pd-mensagens:not(.pd-mensagens-aberta) .pd-painel{display:none}
+  .pd-voltar{display:inline-block}
+  .pd-painel-cabecalho{flex-wrap:wrap}
+  .pd-caso-ligado{max-width:100%}
+  .pd-vincular{grid-template-columns:1fr}
+  .pd-balao{max-width:88%}
+  .pd-baloes{max-height:none}
+}
+@media (max-width:470px){
+  .pd-painel-cabecalho,.pd-vincular,.pd-baloes,.pd-resposta{padding-left:14px;padding-right:14px}
+  .pd-vincular-forma>div{flex-direction:column}
+  .pd-resposta-acoes button{flex:1}
+}
