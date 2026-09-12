@@ -18,7 +18,14 @@ aponta caminhos sem processo, lista documentos e monta o pedido. Detalhes em
   `node_modules/next/dist/docs/` antes de escrever código Next: a versão
   mudou em relação ao que você aprendeu.
 - Claude API pelo `@anthropic-ai/sdk`. Todo acesso ao modelo passa por
-  `lib/claude.ts`. Não crie outro cliente, não chame `fetch` na API direto.
+  `perguntarJson` em `lib/claude.ts`. Não crie outro cliente, não chame
+  `fetch` na API direto.
+- A análise é uma cadeia (`lib/analise.ts`): extrair → buscar na lei (RAG
+  em `docs/juridico/`) → analisar citando trechos → verificar. Não junte
+  etapas num prompt só e não deixe o modelo afirmar lei sem id de trecho:
+  é isso que a auditoria pontua (ver `docs/EVENTO.md`).
+- Fonte jurídica nova entra como `docs/juridico/<nome>.md`, um `## Art. N`
+  por trecho; o índice carrega a pasta inteira.
 - Sem banco de dados até alguém precisar de verdade. Estado em memória ou
   arquivo JSON em `data/`.
 - Roda local: `npm run dev`, porta 3000. Não há deploy.

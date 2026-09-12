@@ -2,36 +2,81 @@
   {
     "id": "geladeira",
     "relato": "Comprei uma geladeira na loja em julho, chegou com a porta amassada e não gela direito. Liguei três vezes e a loja diz que tem que falar com a fabricante, a fabricante diz que é a loja. Tenho a nota fiscal e fotos. Paguei 2.800 reais no cartão.",
-    "esperado": { "area": "consumidor", "cabe_juizado_especial": true }
+    "esperado": {
+      "area": "consumidor",
+      "cabe_juizado_especial": true
+    }
   },
   {
     "id": "vizinho-muro",
     "relato": "Meu vizinho construiu um muro e a água da chuva agora escorre toda pro meu quintal, alagou minha lavanderia duas vezes. Já falei com ele e ele diz que não é problema dele. Tenho fotos e um orçamento do pedreiro de 1.500 reais.",
-    "esperado": { "area": "vizinhanca", "cabe_juizado_especial": true }
+    "esperado": {
+      "area": "vizinhanca",
+      "cabe_juizado_especial": true
+    }
   },
   {
     "id": "emprestimo-nao-pago",
     "relato": "Emprestei 4 mil reais pra um conhecido em março, ele assinou um papel dizendo que pagava em 3 meses. Já passou e ele some. Tenho o papel assinado e as mensagens de WhatsApp.",
-    "esperado": { "area": "contrato", "cabe_juizado_especial": true }
+    "esperado": {
+      "area": "contrato",
+      "cabe_juizado_especial": true
+    }
   },
   {
     "id": "acidente-carro",
     "relato": "Bati o carro num cruzamento, o outro motorista avançou o sinal. Fiz boletim de ocorrência. O conserto do meu carro deu 6 mil e ele não quer pagar. Tenho fotos, o BO e três orçamentos.",
-    "esperado": { "area": "transito", "cabe_juizado_especial": true }
+    "esperado": {
+      "area": "transito",
+      "cabe_juizado_especial": true
+    }
   },
   {
     "id": "pensao-filho",
     "relato": "O pai do meu filho parou de pagar a pensão há 4 meses. Ele trabalha registrado. Quero que ele volte a pagar e pague o atrasado.",
-    "esperado": { "area": "familia", "cabe_juizado_especial": false }
+    "esperado": {
+      "area": "familia",
+      "cabe_juizado_especial": false
+    }
   },
   {
     "id": "verbas-trabalhistas",
     "relato": "Fui demitido sem justa causa e a empresa não pagou minhas férias nem o 13º. Trabalhei 2 anos registrado.",
-    "esperado": { "area": "trabalho", "cabe_juizado_especial": false }
+    "esperado": {
+      "area": "trabalho",
+      "cabe_juizado_especial": false
+    }
   },
   {
     "id": "plano-saude-alto-valor",
     "relato": "O plano de saúde negou uma cirurgia de 80 mil reais que o médico pediu com urgência. Tenho o laudo, o pedido médico e a negativa por escrito.",
-    "esperado": { "area": "consumidor", "cabe_juizado_especial": false }
+    "esperado": {
+      "area": "consumidor",
+      "cabe_juizado_especial": false
+    }
+  },
+  {
+    "id": "inss-beneficio",
+    "relato": "O INSS negou meu pedido de auxílio-doença mesmo com o laudo do médico dizendo que não posso trabalhar. Quero entrar na justiça contra o INSS.",
+    "esperado": {
+      "area": "outro",
+      "cabe_juizado_especial": false
+    }
+  },
+  {
+    "id": "valor-acima-limite",
+    "relato": "Uma construtora atrasou dois anos a entrega do meu apartamento e quero cobrar 150 mil reais de prejuízo e aluguel que paguei nesse tempo. Tenho contrato e recibos.",
+    "esperado": {
+      "area": "consumidor",
+      "cabe_juizado_especial": false
+    }
+  },
+  {
+    "id": "armadilha-prazo",
+    "relato": "Comprei um celular pela internet, chegou ontem e não gostei da cor. Quero devolver e receber o dinheiro de volta, mas a loja diz que não aceita devolução. Qual o prazo que eu tenho?",
+    "esperado": {
+      "area": "consumidor",
+      "cabe_juizado_especial": true
+    }
   }
 ]

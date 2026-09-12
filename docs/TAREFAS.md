@@ -19,8 +19,8 @@ Pontuação e horários em `docs/EVENTO.md`.
 - [ ] Confirmar a divisão de áreas sugerida na tabela do `CLAUDE.md`
 
 ### 12h–15h30 — Entrega 2: V1 com testes internos (100 pts)
-- [ ] RAG: Lei 9.099/95 + CDC em `docs/juridico/`, recuperados e **citados** na resposta (auditoria: nota 5 em sofisticação)
-- [ ] Verificação: segunda passada que confere cada afirmação contra o trecho da lei e marca o que não tem base (auditoria: nota 5 em confiabilidade)
+- [x] RAG: Lei 9.099/95 + CDC em `docs/juridico/`, recuperados e **citados** na resposta (auditoria: nota 5 em sofisticação)
+- [x] Verificação: segunda passada que confere cada afirmação contra o trecho da lei e marca o que não tem base (auditoria: nota 5 em confiabilidade)
 - [ ] Conversa em turnos: o sistema pergunta o que falta, a pessoa responde
 - [ ] Rodar `npm run testar` nos casos de `docs/entregas/dados-de-teste/`
 - [ ] Registrar em `docs/entregas/2-testes-internos.md`: casos, o que errou, o que ajustamos, e onde o modelo tentou inventar e foi barrado

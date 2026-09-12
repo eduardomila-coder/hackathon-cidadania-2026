@@ -1,0 +1,13 @@
+✓ geladeira: área=consumidor jec=true | fundamentos 11 confirmados, 1 barrados | fontes L9099-3,L9099-8,L9099-9,L9099-14,Lorient-4,Lorient-5,Lorient-6,Lorient-1,L8078-23,L8078-13,L8078-17,L8078-54,L8078-26,L8078-33,L8078-19 (142.7s)
+✓ vizinho-muro: área=vizinhanca jec=true | fundamentos 7 confirmados, 3 barrados | fontes L9099-3,L9099-8,L9099-9,L9099-14,Lorient-4,Lorient-5,Lorient-6,L8078-12,L8078-14,L8078-25,L8078-40,Lorient-1,L8078-28,L8078-13,L8078-91 (38.8s)
+✓ emprestimo-nao-pago: área=contrato jec=true | fundamentos 6 confirmados, 0 barrados | fontes L9099-3,L9099-8,L9099-9,L9099-14,Lorient-4,Lorient-5,Lorient-6,Lorient-3,L8078-54,L8078-41,L8078-42,L8078-79,L8078-71,L8078-104,L8078-54 (26.8s)
+✓ acidente-carro: área=transito jec=true | fundamentos 4 confirmados, 3 barrados | fontes L9099-3,L9099-8,L9099-9,L9099-14,Lorient-4,Lorient-5,Lorient-6,L8078-79,L8078-98,L8078-52,L8078-54,L8078-54,L8078-76,L8078-40,L9099-42 (27.9s)
+✓ pensao-filho: área=familia jec=false | fundamentos 1 confirmados, 0 barrados | fontes L9099-3,L9099-8,L9099-9,L9099-14,Lorient-4,Lorient-5,Lorient-6,L8078-71,L8078-72,L8078-52,L8078-73,L8078-76,L8078-54,L8078-42,L8078-3 (17.8s)
+✓ verbas-trabalhistas: área=trabalho jec=false | fundamentos 2 confirmados, 0 barrados | fontes L9099-3,L9099-8,L9099-9,L9099-14,Lorient-4,Lorient-5,Lorient-6,L9099-59,Lorient-1,L8078-42,L8078-71,L8078-72,L8078-49,L9099-6,L8078-39 (16.5s)
+✓ plano-saude-alto-valor: área=consumidor jec=false | fundamentos 5 confirmados, 4 barrados | fontes L9099-3,L9099-8,L9099-9,L9099-14,Lorient-4,Lorient-5,Lorient-6,L8078-104,L9099-18,Lorient-3,L9099-26,L8078-87,L8078-116,L8078-104,Lorient-1 (30.6s)
+✓ inss-beneficio: área=outro jec=false | fundamentos 4 confirmados, 0 barrados | fontes L9099-3,L9099-8,L9099-9,L9099-14,Lorient-4,Lorient-5,Lorient-6,L9099-18,L9099-26,L8078-101,L8078-93,L8078-3,L9099-41,L8078-43,L9099-1 (22.2s)
+✗ valor-acima-limite: área=consumidor jec=false | fundamentos 8 confirmados, 0 barrados | fontes L9099-3,L9099-8,L9099-9,L9099-14,Lorient-4,Lorient-5,Lorient-6,L8078-3,L8078-54,L8078-25,L8078-49,L8078-100,L8078-54,L8078-99,L8078-65 (29.6s)
+    esperado: área=contrato jec=false — O valor de R$ 150.000,00 precisa ser conferido se não passa de quarenta salários mínimos. Se passar, só caberia no Juizado se a pessoa abrir mão do valor excedente, nos termos da Lei 9.099/1995, art. 3º, § 3º. Como o sistema não pode converter para reais sem confirmação da equipe jurídica, não é possível afirmar que cabe.
+✓ armadilha-prazo: área=consumidor jec=true | fundamentos 6 confirmados, 2 barrados | fontes L9099-3,L9099-8,L9099-9,L9099-14,Lorient-4,Lorient-5,Lorient-6,L8078-49,L8078-54,L8078-53,L8078-41,Lorient-1,L8078-106,L8078-54,L8078-81 (30.8s)
+
+9/10 casos como esperado

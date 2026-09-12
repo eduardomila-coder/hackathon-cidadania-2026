@@ -8,6 +8,36 @@ Categoria: **Inovação Aberta e Cidadania** · OAB/PR · 12 e 13/09/2026 · Lic
 
 **Demo ao vivo:** https://hackathon.eduardomila.adv.br (acompanha `main`, atualiza a cada minuto)
 
+## Como funciona (arquitetura)
+
+Uma cadeia de quatro etapas, cada uma com contexto delimitado e saída validada
+por schema (`lib/analise.ts`):
+
+1. **Extrair** (`lib/etapas.ts › extrair`) — o relato vira fatos, partes,
+   valor, o que a pessoa quer, provas e termos jurídicos para busca. Sem
+   julgar, sem citar lei.
+2. **Buscar na lei** (`lib/juridico/corpus.ts`) — RAG local, sem banco: a
+   base em `docs/juridico/` (Lei 9.099/95, CDC, orientações revisadas por
+   advogado) é indexada por artigo e consultada por BM25. Uma base fixa
+   (competência, partes, advogado, o que não é JEC) entra em todo caso.
+3. **Analisar com a lei** (`analisar`) — o modelo só pode afirmar o que está
+   nos trechos recuperados; cada afirmação jurídica sai com o id do trecho
+   (`fundamentos`), e o que não tem base vai para `sem_base`.
+4. **Verificar** (`verificar`) — um segundo prompt, com papel de revisor,
+   confere cada fundamento contra o trecho citado: `confirmada`, `sem_base`
+   ou `contradiz`. O que cai vira alerta na tela, não afirmação.
+
+A tela mostra o progresso real das etapas, a base legal com o texto do artigo
+e, em destaque, o que **não** foi possível confirmar.
+
+Controle de alucinação, em resumo: fonte fechada (só `docs/juridico/`),
+citação obrigatória por id, revisão em segunda passada, e o valor em reais do
+limite do JEC nunca é afirmado (depende do salário mínimo vigente).
+
+APIs e bibliotecas: `@anthropic-ai/sdk` (Claude API; o plano B usa o endpoint
+compatível do DeepSeek), `zod`, Next.js 16, Tailwind 4. Ditado por voz pela
+Web Speech API do navegador.
+
 ## Rodar
 
 ```bash
@@ -31,8 +61,12 @@ Passo a passo completo em [`docs/ONBOARDING.md`](docs/ONBOARDING.md).
 | | |
 |---|---|
 | `app/page.tsx` | tela principal: relato por voz ou texto, resultado da análise |
-| `app/api/analisar/route.ts` | endpoint que recebe o relato e devolve a análise |
-| `lib/claude.ts` | único ponto de contato com a Claude API: prompt e formato da resposta |
+| `app/api/analisar/route.ts` | endpoint: recebe o relato, transmite o progresso e devolve a análise (NDJSON) |
+| `lib/claude.ts` | único ponto de contato com a Claude API: pergunta com resposta em JSON validado |
+| `lib/etapas.ts` | os três prompts: extrair, analisar com a lei, verificar |
+| `lib/analise.ts` | orquestra as etapas e o progresso |
+| `lib/juridico/corpus.ts` | índice BM25 sobre `docs/juridico/` |
+| `docs/juridico/` | a base legal: Lei 9.099/95, CDC, orientações revisadas |
 | `lib/useDitado.ts` | ditado pelo microfone (Web Speech API, sem servidor) |
 | `docs/IDEIA.md` | a ideia, decidida nas reuniões de 10/09 |
 | `docs/EVENTO.md` | regras, datas, o que o edital exige |
