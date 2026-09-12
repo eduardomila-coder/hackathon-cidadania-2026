@@ -121,6 +121,10 @@ export default function Home() {
       )}
 
       {resultado && <Painel r={resultado} />}
+
+      <footer className="mt-auto pt-6 text-center text-sm text-zinc-500">
+        Equipe Habeas Titas · Hackathon da Cidadania 2026 · <a href="/painel" className="underline">painel da equipe</a>
+      </footer>
     </main>
   );
 }
