@@ -31,12 +31,12 @@ testes, slides). Aqui no repositório fica a cópia em `docs/entregas/`.
 ### 12h–15h30 — Entrega 2: V1 com testes internos (100 pts)
 - [x] RAG: Lei 9.099/95 + CDC em `docs/juridico/`, recuperados e **citados** na resposta (auditoria: nota 5 em sofisticação)
 - [x] Verificação: segunda passada que confere cada afirmação contra o trecho da lei e marca o que não tem base (auditoria: nota 5 em confiabilidade)
-- [ ] @fernando Conversa em turnos: o sistema pergunta o que falta, a pessoa responde
+- [x] @fernando Conversa em turnos: o sistema pergunta o que falta, a pessoa responde
 - [ ] @eduardo Rodar `npm run testar` nos casos de `docs/entregas/dados-de-teste/`
 - [ ] @maria Registrar em `docs/entregas/2-testes-internos.md`: casos, o que errou, o que ajustamos, e onde o modelo tentou inventar e foi barrado drive:testes-internos|2-testes
 
 ### 15h30–17h30 — Entrega 3: V2 com testes externos (100 pts)
-- [ ] @eduardo Upload de foto de documento → o modelo lê e extrai
+- [x] @eduardo Upload de foto de documento → o modelo lê e extrai
 - [ ] @fernando Acessibilidade: contraste, fonte grande, rótulos `aria`, funciona só com teclado (auditoria: nota 5 em usabilidade)
 - [ ] @maria Pedir a 3+ pessoas de fora (outra equipe, organização) que abram https://habeastitas.eduardomila.adv.br no celular e contem um caso
 - [ ] @maria **Depoimento em rede social** de quem testou, com #hackathonoabpr; link em `docs/entregas/3-testes-externos.md` (o Manual pede isso como evidência) drive:depoimento

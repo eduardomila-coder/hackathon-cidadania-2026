@@ -90,8 +90,10 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 - [ ] Descobrir quem é o padrinho/madrinha da equipe e confirmar cada entrega com ele na hora.
 - [ ] Definir e comunicar a pessoa líder à organização (obrigatório para premiação).
 - [ ] Definir divisão de áreas entre os três integrantes.
-- [ ] Completar conversa em turnos.
-- [ ] Implementar leitura de foto de documento.
+- [x] Completar conversa em turnos: o dossiê recebe as respostas pendentes e
+      refaz a triagem usando o relato anterior.
+- [x] Implementar leitura de foto de documento: JPG, PNG ou WebP até 5 MB é
+      lido apenas na chamada atual, sem ser gravado.
 - [ ] Gerar pedido no formato do TJPR.
 - [ ] Preparar pitch e caso fictício da demonstração.
 - [ ] @eduardo Aprovar ou recusar a proposta de acompanhamento real do
