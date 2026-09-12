@@ -8,11 +8,13 @@ no projeto e atualize quando uma decisão ou tarefa mudar.
 Ponto Dativo é um escritório de apoio demonstrativo para a advocacia dativa. A
 triagem de casos é um módulo: o cliente relata (texto ou voz), a ferramenta
 organiza requisitos, documentos, cabimento no JEC e caminhos extrajudiciais,
-com fonte em cada ponto. A rota `/escritorio` organiza atendimentos, checklist
-e agenda apenas no estado do navegador. Não dá parecer: quem orienta e assina
-é o advogado. A base técnica de WhatsApp e consulta pública DataJud existe,
-mas associação institucional com a OAB, acesso ao Portal e operação com dados
-reais não estão implementados — ver `docs/INTEGRACOES.md`.
+com fonte em cada ponto. A rota `/escritorio` é a plataforma do advogado:
+ele entra com login e senha (conta criada pela equipe) e trabalha nos casos
+dele, com tudo gravado no servidor em `data/` e isolado por advogado. Não dá
+parecer: quem orienta e assina é o advogado. A base técnica de WhatsApp e
+consulta pública DataJud existe, mas associação institucional com a OAB,
+acesso ao Portal e operação com dados reais não estão implementados — ver
+`docs/INTEGRACOES.md`. A especificação da plataforma é `docs/PLATAFORMA.md`.
 
 Equipe: Habeas Titas, Eduardo, Maria e Fernando.
 
@@ -24,6 +26,14 @@ Equipe: Habeas Titas, Eduardo, Maria e Fernando.
 - Força do caso: requisitos comprovados sobre aplicáveis, cada um com a fonte.
 - Custo real por triagem, medido pelos tokens da resposta do modelo.
 - Registro de triagens em `data/casos.json` (só medida, sem relato nem nome).
+- Plataforma do advogado: contas (`lib/contas.ts`), sessão por cookie assinado
+  (`lib/sessao.ts`), banco em JSON (`lib/banco.ts`) e o escritório com casos,
+  documentos, tarefas, registros, triagens, mensagens e processos
+  (`lib/escritorio.ts`), tudo filtrado por `advogadoId`.
+- Contas criadas pela equipe no `/painel` (seção Advogados), por
+  `POST /api/advogados` ou por `node scripts/advogado.mjs criar`.
+- Processos do advogado em `/escritorio/processos`: consulta pontual ao
+  DataJud, resultado guardado por advogado e vinculado ao caso.
 - Sete casos fictícios disponíveis em `docs/entregas/dados-de-teste/`.
 - Teste principal: `node scripts/testar-casos.mjs`.
 - Desenvolvimento local: `npm run dev`, porta 3000.
@@ -35,7 +45,13 @@ Equipe: Habeas Titas, Eduardo, Maria e Fernando.
 | Caminho | Papel |
 |---|---|
 | `app/page.tsx` | tela de triagem e dossiê do advogado |
-| `app/escritorio/page.tsx` | escritório de apoio: WhatsApp, DataJud, atendimento, documentos e agenda demonstrativos |
+| `docs/PLATAFORMA.md` | contrato da plataforma: nomes, rotas, tipos e arquivos de cada módulo |
+| `lib/banco.ts`, `lib/contas.ts`, `lib/sessao.ts` | banco em JSON, contas dos advogados e sessão assinada |
+| `lib/escritorio.ts` | modelo e CRUD do escritório, tudo por `advogadoId` |
+| `proxy.ts` | Basic Auth da equipe no painel; sessão do advogado no escritório |
+| `app/entrar/`, `app/escritorio/` | login e as telas do escritório (casos, mensagens, WhatsApp, processos) |
+| `app/painel/Advogados.tsx` | criação e desativação das contas de advogado pela equipe |
+| `scripts/advogado.mjs` | contas de advogado pelo terminal |
 | `lib/evolution.ts` | conector servidor Evolution API v2: estado, QR e webhook mínimo |
 | `lib/datajud.ts` | consulta pontual de metadados públicos do TJPR por número CNJ |
 | `docs/INTEGRACOES.md` | configuração técnica, fluxo OAB/PR e limites de produção |
@@ -70,6 +86,12 @@ Equipe: Habeas Titas, Eduardo, Maria e Fernando.
 10. Dados de clientes reais não entram no protótipo. Antes de produção, definir
     base legal, transparência, retenção, acesso, incidentes, fornecedor de IA e
     instrumentos para transferência internacional de dados.
+11. Contas de advogado só a equipe cria; não há cadastro livre. Cada rota do
+    escritório filtra por `advogadoId`: um advogado nunca vê dado de outro.
+12. Nenhuma mensagem sai ao cliente sem clique do advogado. A IA redige; o
+    advogado envia.
+13. Estado da plataforma só em `data/` via `lib/banco.ts`; nenhuma
+    dependência nova; todo acesso ao modelo por `perguntarJson`.
 
 ## Ordem de prioridade
 
@@ -128,3 +150,4 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 | 2026-09-12 | Custo por triagem medido pelos tokens reais + registro de desfecho em `data/casos.json` | Responder se a ferramenta se paga e se a força medida aponta para o mesmo lado do resultado |
 | 2026-09-12 | Claude segue principal; DeepSeek continua alternativa por `MODEL` e `ANTHROPIC_BASE_URL` | Trocar o modelo a uma hora da Entrega 2 arriscaria a demo; DeepSeek entra como argumento de custo |
 | 2026-09-12 | Produto passa a se chamar Ponto Dativo, escritório de apoio demonstrativo | Direção do Eduardo: foco no fluxo da Advocacia Dativa OAB/PR, com atendimento, documentos, agenda, WhatsApp e assistente sem presumir parceria formal ou uso da marca OAB |
+| 2026-09-12 (18h) | O escritório deixa de ser tela de demonstração com estado no navegador e vira plataforma com login por advogado, tudo gravado no servidor (`docs/PLATAFORMA.md`); contas criadas pela equipe no painel; base + 3 módulos (casos, mensagens, painel/processos/documentação) em paralelo | Decisão do Eduardo: o advogado precisa trabalhar nos casos dele de verdade, e a auditoria precisa ver isolamento entre contas e envio só com clique. Continua rotulado como ambiente de demonstração, sem marca da OAB nem promessa de produção |
