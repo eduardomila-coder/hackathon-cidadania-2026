@@ -23,19 +23,24 @@ const PERGUNTAS: { pergunta: string; resposta: string }[] = [
 export default function Home() {
   const [relato, setRelato] = useState("");
   const [andamento, setAndamento] = useState("");
+  const [documento, setDocumento] = useState<File | null>(null);
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [caso, setCaso] = useState<{ id: string } | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [etapa, setEtapa] = useState<Etapa | null>(null);
   const ditado = useDitado((texto) => setRelato((anterior) => (anterior ? `${anterior} ${texto}` : texto)));
 
-  async function enviar() {
+  async function enviar(complemento?: string) {
     setErro(null); setResultado(null); setCaso(null); setEtapa("extraindo");
-    const texto = andamento.trim()
+    const textoBase = andamento.trim()
       ? `${relato}\n\nAndamento do processo em curso, informado pelo advogado:\n"""\n${andamento}\n"""`
       : relato;
+    const texto = complemento?.trim() ? `${textoBase}\n\nInformações complementares respondidas depois da triagem:\n"""\n${complemento.trim()}\n"""` : textoBase;
     try {
-      const resposta = await fetch("/api/analisar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ relato: texto }) });
+      const corpo = new FormData();
+      corpo.append("relato", texto);
+      if (documento) corpo.append("documento", documento);
+      const resposta = await fetch("/api/analisar", { method: "POST", body: corpo });
       if (!resposta.ok || !resposta.body) { setErro((await resposta.json()).erro ?? "Não consegui analisar agora."); return; }
       const leitor = resposta.body.getReader(); const decodificador = new TextDecoder(); let pendente = "";
       for (;;) {
@@ -58,7 +63,7 @@ export default function Home() {
   const carregando = etapa !== null;
   return <main className="cf-publico">
     <Cabecalho />
-    {carregando ? <AnaliseAndamento etapa={etapa} /> : resultado ? <Dossie resultado={resultado} caso={caso} /> : <>
+    {carregando ? <AnaliseAndamento etapa={etapa} /> : resultado ? <Dossie resultado={resultado} caso={caso} aoContinuar={enviar} /> : <>
       <section className="cf-hero" id="inicio">
         <div className="cf-hero-conteudo">
           <p className="cf-sobrelinha">Habeas Titas</p>
@@ -69,8 +74,9 @@ export default function Home() {
             <summary>O processo já está em andamento?</summary>
             <label><span className="sr-only">Andamento do processo</span><textarea value={andamento} onChange={(evento) => setAndamento(evento.target.value)} maxLength={4000} placeholder="Cole o andamento, a decisão ou o que já aconteceu no processo" /></label>
           </details>
+          <label className="cf-documento"><span>Foto do documento <small>opcional, JPG, PNG ou WebP, até 5 MB</small></span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={(evento) => setDocumento(evento.target.files?.[0] ?? null)} />{documento && <em>{documento.name} será lido só nesta triagem.</em>}</label>
           <div className="cf-acoes">
-            <button type="button" className="cf-botao-escuro" onClick={enviar} disabled={relato.trim().length < 10}>Triar o caso <span>→</span></button>
+            <button type="button" className="cf-botao-escuro" onClick={() => enviar()} disabled={relato.trim().length < 10}>Triar o caso <span>→</span></button>
             {ditado.suportado && <button type="button" className="cf-botao-texto" onClick={ditado.gravando ? ditado.parar : ditado.iniciar} aria-pressed={ditado.gravando}>{ditado.gravando ? "Parar de ditar" : "Ditar o relato"}</button>}
             <small>Sem cadastro · O relato não fica gravado</small>
           </div>
@@ -99,7 +105,7 @@ function AnaliseAndamento({ etapa }: { etapa: Etapa | null }) {
 
 const SITUACAO: Record<string, string> = { comprovado: "comprovado", falta_documento: "falta documento", nao_se_aplica: "não se aplica" };
 
-function Dossie({ resultado, caso }: { resultado: Resultado; caso: { id: string } | null }) {
+function Dossie({ resultado, caso, aoContinuar }: { resultado: Resultado; caso: { id: string } | null; aoContinuar: (complemento: string) => void }) {
   const { analise, forca, custo, extracao } = resultado;
   const naoConfirmadas = resultado.verificacao.itens.filter((item) => item.situacao !== "confirmada");
   const faltando = analise.requisitos.filter((r) => r.situacao === "falta_documento");
@@ -132,7 +138,7 @@ function Dossie({ resultado, caso }: { resultado: Resultado; caso: { id: string 
     <aside className="cf-coluna-resultados">
       {faltando.length > 0 && <article className="cf-cartao"><h2>Pedir ao cliente</h2><p>Documentos que fecham os requisitos ainda em aberto.</p><ul>{[...new Set([...faltando.map((r) => r.o_que_comprova), ...analise.documentos_necessarios])].map((item) => <li key={item}>▤ {item}</li>)}</ul></article>}
       {faltando.length === 0 && analise.documentos_necessarios.length > 0 && <article className="cf-cartao"><h2>Pedir ao cliente</h2><ul>{analise.documentos_necessarios.map((item) => <li key={item}>▤ {item}</li>)}</ul></article>}
-      {analise.perguntas_pendentes.length > 0 && <article className="cf-cartao"><h2>Perguntar na consulta</h2><ul>{analise.perguntas_pendentes.map((item) => <li key={item}>? {item}</li>)}</ul></article>}
+      {analise.perguntas_pendentes.length > 0 && <Conversa perguntas={analise.perguntas_pendentes} aoEnviar={aoContinuar} />}
       {analise.custos_do_processo.length > 0 && <article className="cf-cartao"><h2>Custas nesta via</h2><p>Só o que os trechos recuperados dizem.</p><ul>{analise.custos_do_processo.map((item) => <li key={item}>◷ {item}</li>)}</ul></article>}
       {analise.caminhos_extrajudiciais.length > 0 && <article className="cf-cartao"><h2>Antes de processar</h2><ul>{analise.caminhos_extrajudiciais.map((item) => <li key={item}>→ {item}</li>)}</ul></article>}
       <details className="cf-link-legal"><summary>⚖ Fundamentos citados <span>›</span></summary><ul>{analise.fundamentos.map((f) => <li key={f.afirmacao}>{f.afirmacao} <code>[{f.fonte}]</code></li>)}</ul></details>
@@ -140,6 +146,11 @@ function Dossie({ resultado, caso }: { resultado: Resultado; caso: { id: string 
       <Medidor custo={custo} tempos={resultado.tempos_ms} caso={caso} />
     </aside>
   </section>;
+}
+
+function Conversa({ perguntas, aoEnviar }: { perguntas: string[]; aoEnviar: (texto: string) => void }) {
+  const [respostas, setRespostas] = useState("");
+  return <article className="cf-cartao cf-conversa"><h2>Completar a conversa</h2><p>Leve estas perguntas para o cliente e cole as respostas. A próxima triagem considera o relato anterior e estas informações.</p><ul>{perguntas.map((item) => <li key={item}>? {item}</li>)}</ul><label><span className="sr-only">Respostas do cliente</span><textarea value={respostas} onChange={(evento) => setRespostas(evento.target.value)} placeholder="Cole aqui as respostas do cliente" /></label><button type="button" onClick={() => aoEnviar(respostas)} disabled={respostas.trim().length < 3}>Atualizar dossiê</button></article>;
 }
 
 function ForcaDoCaso({ forca }: { forca: Resultado["forca"] }) {

@@ -1,7 +1,7 @@
 import { contexto, type Trecho } from "./juridico/corpus";
 import { analisar, extrair, verificar, type Analise, type Extracao, type Verificacao } from "./etapas";
 import { somarCusto, type Custo } from "./custo";
-import type { Uso } from "./claude";
+import type { ImagemDocumento, Uso } from "./claude";
 
 // Orquestra as etapas e avisa o progresso a quem quiser mostrar na tela.
 export type Etapa = "extraindo" | "buscando" | "analisando" | "verificando" | "pronto";
@@ -27,6 +27,7 @@ export type Resultado = {
 export async function analisarRelato(
   relato: string,
   aoProgredir: (etapa: Etapa) => void = () => {},
+  imagem?: ImagemDocumento,
 ): Promise<Resultado> {
   const tempos: Partial<Record<Etapa, number>> = {};
   const usos: Uso[] = [];
@@ -38,7 +39,7 @@ export async function analisarRelato(
     return r;
   };
 
-  const extracao = await cronometrar("extraindo", () => extrair(relato));
+  const extracao = await cronometrar("extraindo", () => extrair(relato, imagem));
   usos.push(extracao.uso);
   const consulta = [...extracao.dados.temas, ...extracao.dados.fatos, ...extracao.dados.o_que_quer].join(" ");
   const fontes = await cronometrar("buscando", () => contexto(consulta, 8));

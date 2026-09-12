@@ -160,6 +160,7 @@ button, input, textarea { font:inherit; }
 .cf-opcional{margin-top:14px;border:1px solid var(--linha);border-radius:7px;background:rgba(255,255,255,.6)}
 .cf-opcional summary{padding:14px 18px;cursor:pointer;color:var(--azul);font-weight:bold}
 .cf-opcional textarea{width:100%;min-height:110px;resize:vertical;border:0;border-top:1px solid var(--linha);border-radius:0 0 7px 7px;background:#fffefd;padding:18px;color:var(--azul);outline-color:var(--verde)}
+.cf-documento{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:14px;color:var(--azul);font-weight:bold}.cf-documento span small{display:block;margin-top:3px;color:var(--texto);font-size:12px;font-weight:normal}.cf-documento input{max-width:250px;font-size:13px}.cf-documento em{width:100%;color:var(--verde);font-size:13px;font-style:normal}
 .cf-forca{display:grid;grid-template-columns:1fr;gap:16px;margin-top:25px;padding:25px;border:1px solid #cfd9cf;border-radius:10px;background:linear-gradient(110deg,#eef3ec,#f7f5ee)}
 .cf-forca strong{display:block;margin:8px 0 6px;font:700 34px Georgia,serif;letter-spacing:-.03em}
 .cf-forca small{color:var(--texto);line-height:1.45}
@@ -179,5 +180,6 @@ button, input, textarea { font:inherit; }
 .cf-desfecho div{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .cf-desfecho button{padding:9px 15px;border:1px solid var(--azul);border-radius:999px;background:#fffdfa;color:var(--azul);cursor:pointer}
 .cf-desfecho button:hover{background:var(--azul);color:#fff}
+.cf-conversa textarea{width:100%;min-height:110px;margin-top:14px;padding:12px;border:1px solid var(--linha);border-radius:6px;resize:vertical}.cf-conversa button{margin-top:10px;padding:10px 14px;border:0;border-radius:6px;background:var(--azul);color:#fff;font-weight:bold;cursor:pointer}.cf-conversa button:disabled{opacity:.45;cursor:not-allowed}
 .cf-link-legal code{color:#bcd4ea;font-size:13px}
 @media (max-width:800px){.cf-forca strong{font-size:27px}.cf-requisitos li{grid-template-columns:1fr}}

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { perguntarJson } from "./claude";
+import { perguntarJson, type ImagemDocumento } from "./claude";
 import { formatarContexto, type Trecho } from "./juridico/corpus";
 
 // As três etapas da análise. Cada uma tem um prompt curto, um contexto
@@ -25,7 +25,7 @@ export const ExtracaoSchema = z.object({
 });
 export type Extracao = z.infer<typeof ExtracaoSchema>;
 
-export function extrair(relato: string) {
+export function extrair(relato: string, imagem?: ImagemDocumento) {
   return perguntarJson({
     schema: ExtracaoSchema,
     maxTokens: 12000,
@@ -44,7 +44,8 @@ Formato:
   "perguntas_pendentes": string[],
   "tipo_caso": "novo" | "em_andamento" | "indefinido"
 }`,
-    usuario: `Relato do cliente:\n"""\n${relato}\n"""`,
+    usuario: `Relato do cliente:\n"""\n${relato}\n"""\n\n${imagem ? "A imagem anexada é um documento deste caso. Inclua apenas fatos e provas que estejam visíveis nela." : ""}`,
+    imagem,
   });
 }
 

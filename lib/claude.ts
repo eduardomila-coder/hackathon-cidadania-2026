@@ -20,6 +20,12 @@ export type Uso = {
   cache_leitura: number;
 };
 
+// A foto só acompanha a chamada atual. Não é gravada nem entra nas métricas.
+export type ImagemDocumento = {
+  mime: "image/jpeg" | "image/png" | "image/webp";
+  dadosBase64: string;
+};
+
 // Tira cercas de código caso o modelo embrulhe o JSON em ```json ... ```.
 function extrairJson(texto: string): string {
   const m = texto.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -34,7 +40,14 @@ export async function perguntarJson<T>(opts: {
   usuario: string;
   schema: ZodType<T>;
   maxTokens?: number;
+  imagem?: ImagemDocumento;
 }): Promise<{ dados: T; uso: Uso }> {
+  const conteudo = opts.imagem
+    ? [
+        { type: "image" as const, source: { type: "base64" as const, media_type: opts.imagem.mime, data: opts.imagem.dadosBase64 } },
+        { type: "text" as const, text: opts.usuario },
+      ]
+    : opts.usuario;
   const resposta = await client.messages
     .stream({
       model: MODEL,
@@ -42,7 +55,7 @@ export async function perguntarJson<T>(opts: {
       max_tokens: opts.maxTokens ?? 16000,
       ...(RACIOCINIO_OFF ? { thinking: { type: "disabled" as const } } : {}),
       system: opts.system,
-      messages: [{ role: "user", content: opts.usuario }],
+      messages: [{ role: "user", content: conteudo }],
     })
     .finalMessage();
 
