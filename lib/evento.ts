@@ -77,18 +77,23 @@ export const REGRAS = [
   { titulo: "Presença", texto: "Mínimo de 50% da equipe na sede o tempo todo. Somos 3: dois sempre lá. Menos que isso desclassifica." },
   { titulo: "Pessoa líder", texto: "Definida e comunicada à organização. Obrigatório para receber prêmio." },
   { titulo: "Licença MIT", texto: "Tudo publicado no repositório oficial da OAB/PR, aberto. Nada proprietário." },
-  { titulo: "Evidência no prazo", texto: "\"Sem evidência, o checkpoint não existe.\" Cada entrega precisa estar publicada na pasta da equipe antes da hora." },
+  { titulo: "Evidência no prazo", texto: "\"Sem evidência, o checkpoint não existe.\" Cada entrega precisa estar na pasta da equipe no Drive (HabeasTITAS_Cidadania) antes da hora." },
   { titulo: "Ferramentas", texto: "IA de mercado permitida (Claude, GPT, Gemini, Copilot). APIs e frameworks externos: permitidos, desde que referenciados." },
   { titulo: "Auditor testa sozinho", texto: "Documentação e dados de teste têm que deixar o auditor rodar no nosso laptop sem ajuda." },
 ];
 
 export const PREMIOS = ["1º lugar: R$ 10.000", "2º lugar: R$ 5.000", "3º lugar: R$ 3.000"];
 
+// Pasta da equipe no Drive da OAB/PR: é o repositório oficial do evento. Toda
+// entrega, print e atividade sobe lá; docs/entregas/ é a cópia no git.
+export const DRIVE = { nome: "HabeasTITAS_Cidadania", url: "https://drive.google.com/drive/folders/1Gi9xWrC9v3ia5M2JJHLKsvi1SpZswOfO" };
+
 export const LINKS = [
   { nome: "Demo ao vivo", url: "https://habeastitas.eduardomila.adv.br", desc: "acompanha main, atualiza a cada minuto" },
   { nome: "Repositório", url: "https://github.com/eduardomila-coder/hackathon-cidadania-2026", desc: "código, docs, entregas" },
   { nome: "Onboarding", url: "https://github.com/eduardomila-coder/hackathon-cidadania-2026/blob/main/docs/ONBOARDING.md", desc: "como entrar e trabalhar" },
   { nome: "Site do evento", url: "https://eventos.oabpr.org.br/hackathon-cidadania", desc: "OAB/PR" },
+  { nome: "Pasta oficial (Drive)", url: DRIVE.url, desc: "arquivos e atividades de cada entrega" },
 ];
 
 export const LOCAL = "Auditório da OAB/PR — Rua Coronel Brasilino Moura, 253, Ahú, Curitiba";

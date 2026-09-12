@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AUDITORIA, EQUIPE, LINKS, MARCOS, PITCH, PREMIOS, REGRAS } from "@/lib/evento";
+import { AUDITORIA, DRIVE, EQUIPE, LINKS, MARCOS, PITCH, PREMIOS, REGRAS } from "@/lib/evento";
 import { lerTarefas } from "@/lib/tarefas";
 import { Relogio } from "./Relogio";
 
@@ -94,10 +94,10 @@ export default function Painel() {
             <div className="cfp-grade-2">
               <Relogio marcos={MARCOS} />
               <article className="cfp-cartao cfp-foco">
-                <span className="cfp-eyebrow">Foco sugerido</span>
-                <h3>Fechar a evidência da próxima entrega</h3>
-                <p>Antes de começar algo novo, confirme arquivo, responsável e onde ficará o registro.</p>
-                <a href="#tarefas">Abrir lista da entrega</a>
+                <span className="cfp-eyebrow">Onde entregar</span>
+                <h3>Arquivos e atividades vão para a pasta da equipe no Drive</h3>
+                <p>É o repositório oficial da OAB/PR. Canvas, prints, testes e slides sobem lá antes do prazo; o git guarda a cópia em docs/entregas.</p>
+                <a href={DRIVE.url} target="_blank" rel="noreferrer">Abrir {DRIVE.nome} ↗</a>
               </article>
             </div>
             <h2 className="cfp-subtitulo">Linha do tempo</h2>
@@ -201,6 +201,7 @@ export default function Painel() {
                 <h2>Pasta de evidências</h2>
                 <p>Deixe uma única rota para o auditor encontrar tudo.</p>
                 <div className="cfp-evidencia-lista">
+                  <a href={DRIVE.url} target="_blank" rel="noreferrer">Pasta oficial no Drive ({DRIVE.nome}) ↗</a>
                   <Link href="/">Produto rodando ↗</Link>
                   <Link href="/revisoes">Habeas Release ↗</Link>
                   <a href="https://github.com/eduardomila-coder/hackathon-cidadania-2026" target="_blank" rel="noreferrer">README e casos de teste ↗</a>
@@ -310,7 +311,8 @@ export default function Painel() {
             <div className="cfp-tres">
               <CartaoLink rotulo="Produto" titulo="Demo ao vivo" desc="Acompanha a main, atualiza a cada minuto." href={LINKS[0].url} />
               <CartaoLink rotulo="Código" titulo="Repositório" desc="Código, documentação e licença MIT." href={LINKS[1].url} />
-              <CartaoLink rotulo="Entrega" titulo="Materiais" desc="Canvas, slides e evidências da equipe." href={`${LINKS[1].url}/tree/main/docs/entregas`} />
+              <CartaoLink rotulo="Entrega" titulo="Pasta oficial (Drive)" desc="Repositório oficial: arquivos e atividades de cada entrega." href={DRIVE.url} />
+              <CartaoLink rotulo="Cópia" titulo="Materiais no git" desc="Canvas, prints e evidências em docs/entregas." href={`${LINKS[1].url}/tree/main/docs/entregas`} />
               <CartaoLink rotulo="Equipe" titulo="Onboarding" desc="Como entrar no projeto e trabalhar." href={LINKS[2].url} />
               <CartaoLink rotulo="Evento" titulo="Regulamento" desc="Critérios e programação da OAB/PR." href={LINKS[3].url} />
               <CartaoLink rotulo="Revisão" titulo="Habeas Release" desc="Mudanças aguardando aprovação." href="/revisoes" />
@@ -342,7 +344,7 @@ function Tarefa({ texto, contexto, dono, feita }: { texto: string; contexto: str
       <span className={feita ? "cfp-badge" : "cfp-badge ambar"}>{feita ? "Concluída" : contexto}</span>
       <h3>{texto}</h3>
       {dono && <p className="cfp-muted">Responsável: <strong>{dono}</strong></p>}
-      <div className="cfp-ev">Anexar evidência ou link da entrega</div>
+      <div className="cfp-ev">Evidência: arquivo na pasta do Drive e cópia em docs/entregas</div>
     </article>
   );
 }

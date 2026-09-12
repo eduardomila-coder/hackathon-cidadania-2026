@@ -6,10 +6,15 @@ enviam a própria branch com `/enviar-revisao`. Para assumir uma tarefa, escreva
 https://habeastitas.eduardomila.adv.br/painel lê este arquivo ao vivo.
 Pontuação e horários em `docs/EVENTO.md`.
 
+**Repositório oficial da OAB/PR = nossa pasta no Drive, `HabeasTITAS_Cidadania`:**
+https://drive.google.com/drive/folders/1Gi9xWrC9v3ia5M2JJHLKsvi1SpZswOfO
+É lá que sobem os arquivos e as atividades de cada entrega (canvas, prints,
+testes, slides). Aqui no repositório fica a cópia em `docs/entregas/`.
+
 ## Sexta 11/09, à noite
 
 - [x] Anotar em `docs/EVENTO.md` o que a abertura explicou (repositório = pasta no Drive, padrinho, formato livre do canvas)
-- [ ] @maria **Foto no banner com alguém da organização**, postar com #hackathonoabpr, print em `docs/entregas/prints/` **até 10h de sábado** — 15 pts
+- [x] @maria **Foto no banner com alguém da organização**, postar com #hackathonoabpr, print em `docs/entregas/prints/` **até 10h de sábado** — 15 pts (story às 9h12, print no Drive e em `prints/2026-09-12-foto-banner-story-maria.jpg`)
 - [ ] Os três com o projeto rodando (`docs/ONBOARDING.md`); a Maria pelo claude.ai/code no tablet
 
 ## Sábado 12/09
@@ -17,8 +22,8 @@ Pontuação e horários em `docs/EVENTO.md`.
 ### Até 8h30 — check-in dos três (10 pts); dizer que o líder é o Eduardo; anotar o padrinho
 
 ### 9h–12h — Entrega 1: Canvas (100 pts) — **não entregar desclassifica**
-- [ ] @maria @eduardo Preencher o canvas no workshop; base em `docs/IDEIA.md`
-- [ ] @maria Salvar em `docs/entregas/1-canvas.pdf` (ou link no `docs/entregas/1-canvas.md`)
+- [x] @maria @eduardo Preencher o canvas no workshop; base em `docs/IDEIA.md`
+- [x] @maria Salvar em `docs/entregas/1-canvas.pdf` (ou link no `docs/entregas/1-canvas.md`) — `ai-canvas.pdf` no Drive e cópia em `docs/entregas/1-canvas.pdf`
 - [ ] @eduardo Confirmar a divisão de áreas sugerida na tabela do `CLAUDE.md`
 
 ### 12h–15h30 — Entrega 2: V1 com testes internos (100 pts)
@@ -36,7 +41,7 @@ Pontuação e horários em `docs/EVENTO.md`.
 - [ ] @maria Registrar o que cada um disse e o que mudou
 
 ### Durante o dia
-- [ ] @maria Foto da equipe nas redes + print no repositório — 5 pts
+- [x] @maria Foto da equipe nas redes + print no repositório — 5 pts (mesmo story da foto no banner)
 - [ ] @maria @eduardo **Live ou vídeo explicando a ideia com alguém da organização** — 15 pts
 - [ ] @eduardo Antes de ir embora: `npm run build` passa em `main`, tudo commitado
 

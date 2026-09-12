@@ -18,8 +18,10 @@ mercado já existentes) voltadas à advocacia" e ao acesso à Justiça.
 
 - Equipe de 3 a 6, com pelo menos 2 da área do Direito. Somos 3.
 - **Licença MIT**, repositório aberto. Nada proprietário.
-- Há um **repositório oficial** onde se registram links e prints das redes.
-  Onde fica e como se entrega: anotar na abertura de sexta.
+- Há um **repositório oficial** onde se registram links e prints das redes:
+  é a pasta da equipe no Google Drive, `HabeasTITAS_Cidadania`
+  (https://drive.google.com/drive/folders/1Gi9xWrC9v3ia5M2JJHLKsvi1SpZswOfO).
+  Cada entrega sobe lá antes da hora; `docs/entregas/` guarda a cópia.
 
 ## Programação e pontuação
 
@@ -140,6 +142,6 @@ auditoria + extras + pitch.
 
 ## Ainda sem resposta (ver transcrição da abertura em `docs/privado/`)
 
-- [ ] Link da pasta do Drive (vem pelo grupo dos inscritos)
+- [x] Link da pasta do Drive: `HabeasTITAS_Cidadania`, https://drive.google.com/drive/folders/1Gi9xWrC9v3ia5M2JJHLKsvi1SpZswOfO (é o repositório oficial; arquivos e atividades sobem lá)
 - [ ] Quem é o padrinho/madrinha da equipe (sábado cedo)
 - [ ] Líder: Eduardo, comunicar no check-in

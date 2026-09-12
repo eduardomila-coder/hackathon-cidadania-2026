@@ -2,6 +2,10 @@
 
 Uma pasta por item pontuado. Os nomes seguem a numeração da programação.
 
+O que vale para a organização é a pasta da equipe no Drive (repositório
+oficial): https://drive.google.com/drive/folders/1Gi9xWrC9v3ia5M2JJHLKsvi1SpZswOfO
+Suba lá primeiro, no prazo; depois copie para cá.
+
 | Arquivo | Entrega | Quando |
 |---|---|---|
 | `1-canvas.md` ou `.pdf` | Canvas de IA preenchido | sáb 12h |
