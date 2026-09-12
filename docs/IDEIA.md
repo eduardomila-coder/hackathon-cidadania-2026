@@ -139,11 +139,21 @@ processo já em andamento, marcar `encaminhar_advogado: true` e **não**
 preencher `orientacao` com uma recomendação de mérito — só sinalizar que
 aquele ponto precisa do advogado.
 
-Na interface: quando `encaminhar_advogado` for verdadeiro (sinal B) ou
-`confiavel` for falso (sinal A), mostrar "essa parte é melhor perguntar
-direto ao seu advogado" em vez de uma resposta gerada — inclusive como o
-ponto de contato pelo WhatsApp registrado em
-`docs/entregas/3-testes-externos.md`.
+**Como responder quando cai no filtro** (ajuste da Maria em 12/09/2026):
+não é recusa seca. É o que uma secretária de verdade faz quando a
+pergunta passa do que ela pode responder — resposta **genérica, sem
+compromisso**, seguida de um próximo passo concreto de contato humano,
+não "isso eu não sei" e ponto:
+
+> "Essa decisão é sua, com orientação do seu advogado — cada caso pesa
+> diferente. Posso já agendar uma conversa, ou prefere que ele te ligue
+> depois?"
+
+Ou seja, `motivo_encaminhar` não vira só um aviso — vira o texto de uma
+resposta padrão nesse tom (reconhece a pergunta, não avalia o mérito,
+oferece agendar/ligar), reaproveitando o canal de WhatsApp já registrado
+em `docs/entregas/3-testes-externos.md` como o "agendar conversa" de
+verdade.
 
 ## Proposta: acompanhamento real do processo (aguardando aprovação do Eduardo)
 
