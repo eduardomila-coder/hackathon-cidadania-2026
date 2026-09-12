@@ -14,9 +14,9 @@ const ETAPAS: { chave: Etapa; titulo: string; texto: string }[] = [
 ];
 
 const PERGUNTAS: { pergunta: string; resposta: string }[] = [
-  { pergunta: "A ferramenta dá parecer ou decide se aceito o caso?", resposta: "Não. Ela organiza o relato do cliente, mostra quais requisitos legais já estão comprovados e qual documento falta para cada um, sempre com o trecho da lei ao lado. Analisar, decidir e assinar continua sendo atividade privativa da advocacia: o dossiê é insumo, não conclusão." },
+  { pergunta: "O assistente substitui o advogado dativo?", resposta: "Não. Ele organiza o relato, mostra requisitos e documentos com o trecho da lei ao lado. Analisar, decidir, orientar o cliente e assinar continua sendo atividade privativa da advocacia: o dossiê é insumo, não conclusão." },
   { pergunta: "O que significa a força do caso?", resposta: "É a contagem dos requisitos legais que já estão comprovados por um documento ou fato que o cliente tem, sobre o total de requisitos que se aplicam. Não é probabilidade de ganhar: é o quanto do que a lei exige já está provado hoje. Cada requisito traz o id do trecho que o exige, para você conferir." },
-  { pergunta: "O relato do meu cliente fica guardado?", resposta: "Não. O relato é usado para montar a triagem e não fica gravado. O que fica registrado é só medida: área do caso, quantos requisitos ficaram comprovados, custo e tempo daquela análise. Sem nome, sem relato e sem número de processo." },
+  { pergunta: "O relato do cliente fica guardado?", resposta: "O aplicativo não grava relato, nome ou número de processo no seu próprio registro. Nesta demonstração, use apenas casos fictícios: uma operação com clientes reais precisa de aviso de privacidade, controle de acesso, definição de retenção e governança do fornecedor de IA." },
   { pergunta: "Quanto custa cada triagem?", resposta: "Aparece no fim de cada dossiê, calculado com os tokens realmente usados nas chamadas ao modelo e o preço de tabela. Em \"Eficiência\" você vê o custo acumulado e pode anotar no que deu cada caso, para saber se a ferramenta está se pagando." },
 ];
 
@@ -66,9 +66,9 @@ export default function Home() {
     {carregando ? <AnaliseAndamento etapa={etapa} /> : resultado ? <Dossie resultado={resultado} caso={caso} aoContinuar={enviar} /> : <>
       <section className="cf-hero" id="inicio">
         <div className="cf-hero-conteudo">
-          <p className="cf-sobrelinha">Habeas Titas</p>
-          <h1>O caso triado<br />antes da consulta.</h1>
-          <p className="cf-intro">Seu cliente conta o que aconteceu, por escrito ou falando. Você recebe o caso organizado: requisitos que já estão comprovados, documentos que faltam pedir e cada afirmação com o trecho da lei que a sustenta.</p>
+          <p className="cf-sobrelinha">Ponto Dativo · Habeas Titas</p>
+          <h1>Atendimento melhor.<br />Caso sob controle.</h1>
+          <p className="cf-intro">A triagem é um módulo do escritório de apoio para a advocacia dativa. Organize o relato, os documentos e os próximos passos antes da conversa com o cliente, com fonte em cada afirmação jurídica.</p>
           <label className="cf-relato"><span className="sr-only">Relato do cliente</span><textarea value={relato} onChange={(evento) => setRelato(evento.target.value)} maxLength={4000} placeholder="Cole ou dite o que o cliente contou" /><small>{relato.length}/4000</small></label>
           <details className="cf-opcional">
             <summary>O processo já está em andamento?</summary>
@@ -76,26 +76,26 @@ export default function Home() {
           </details>
           <label className="cf-documento"><span>Foto do documento <small>opcional, JPG, PNG ou WebP, até 5 MB</small></span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={(evento) => setDocumento(evento.target.files?.[0] ?? null)} />{documento && <em>{documento.name} será lido só nesta triagem.</em>}</label>
           <div className="cf-acoes">
-            <button type="button" className="cf-botao-escuro" onClick={() => enviar()} disabled={relato.trim().length < 10}>Triar o caso <span>→</span></button>
+            <button type="button" className="cf-botao-escuro" onClick={() => enviar()} disabled={relato.trim().length < 10}>Organizar relato <span>→</span></button>
             {ditado.suportado && <button type="button" className="cf-botao-texto" onClick={ditado.gravando ? ditado.parar : ditado.iniciar} aria-pressed={ditado.gravando}>{ditado.gravando ? "Parar de ditar" : "Ditar o relato"}</button>}
-            <small>Sem cadastro · O relato não fica gravado</small>
+            <Link href="/escritorio" className="cf-botao-texto">Abrir escritório de apoio</Link>
           </div>
         </div>
         <aside className="cf-hero-lateral"><span>Quem atende<br />o Juizado<br />atende sozinho</span><div className="cf-arquitetura"><i aria-hidden="true" /><img src="/arquitetura-cidadania.png" alt="Arquitetura modernista em concreto" /></div><p>Mais tempo<br />no caso</p></aside>
       </section>
       {erro && <p role="alert" className="cf-erro">{erro}</p>}
-      <section className="cf-passos" id="como-funciona"><Passo numero="1" titulo="Receba">Manda o link para o cliente ou cola o relato você mesmo, em texto ou por voz.</Passo><Passo numero="2" titulo="Confira">Requisitos comprovados, documentos que faltam e o trecho da lei de cada ponto.</Passo><Passo numero="3" titulo="Assuma">Decide com o caso já organizado, e anota depois no que deu para medir a ferramenta.</Passo></section>
-      <section className="cf-conteudo" id="sobre"><p className="cf-sobrelinha">Para quem atende no Juizado</p><h2>A triagem que hoje você faz de graça.</h2><p>72% da advocacia brasileira atua sozinha, sem secretaria e sem sistema. Antes de fechar contrato, é o próprio advogado que ouve o cliente, separa documento por documento e decide se o caso vale. O Cidadania Fácil faz essa primeira volta e devolve o caso organizado, com fonte em cada afirmação.</p></section>
+      <section className="cf-passos" id="como-funciona"><Passo numero="1" titulo="Acolha">Registre o essencial do atendimento e o próximo compromisso no escritório de apoio.</Passo><Passo numero="2" titulo="Organize">Estruture relato, requisitos e documentos com apoio do assistente, sempre com fonte legal.</Passo><Passo numero="3" titulo="Decida">O advogado dativo confere, orienta e assume o próximo ato. A ferramenta não toma a decisão.</Passo></section>
+      <section className="cf-conteudo" id="sobre"><p className="cf-sobrelinha">Para a advocacia dativa</p><h2>Um escritório de apoio para quem atende com poucos recursos e muita responsabilidade.</h2><p>Ponto Dativo reúne atendimento, checklist de documentos, agenda, WhatsApp profissional e triagem com fonte jurídica. É orientado ao fluxo dativo da OAB/PR; a vinculação institucional, a marca oficial e qualquer integração ao Portal dependem de autorização.</p></section>
       <section className="cf-duvidas" id="perguntas"><p className="cf-sobrelinha">Antes de usar</p><h2>Perguntas frequentes</h2>{PERGUNTAS.map(({ pergunta, resposta }) => <details key={pergunta}><summary>{pergunta}<span>⌄</span></summary><p>{resposta}</p></details>)}</section>
-      <section className="cf-contato" id="contato"><div><p className="cf-sobrelinha">Contato</p><h2>Fale com a gente.</h2><p>Estamos à disposição para esclarecer dúvidas e ouvir sugestões durante o Hackathon da Cidadania.</p></div><div className="cf-cartao"><h3>Habeas Titas · OAB/PR</h3><p><strong>Atendimento no Hackathon da Cidadania</strong><br />OAB/PR, Curitiba/PR</p><p><strong>Horário</strong><br />Durante o período do evento.</p></div></section>
+      <section className="cf-contato" id="contato"><div><p className="cf-sobrelinha">Ponto Dativo</p><h2>Da primeira conversa ao próximo ato.</h2><p>O protótipo foi pensado para apoiar o atendimento dativo sem confundir o apoio de organização com a atuação profissional do advogado.</p></div><div className="cf-cartao"><h3>Habeas Titas</h3><p><strong>Protótipo para advocacia dativa</strong><br />Demonstração durante o Hackathon da Cidadania.</p><p><strong>Relação com a OAB</strong><br />Proposta institucional em desenvolvimento, sem integração oficial neste ambiente.</p></div></section>
       <Versoes />
     </>}
     <Rodape />
   </main>;
 }
 
-function Cabecalho() { return <header className="cf-cabecalho"><Link href="/" className="cf-marca">Cidadania Fácil <small>Habeas Titas · OAB/PR</small></Link><nav aria-label="Navegação principal"><a href="#inicio">Início</a><a href="#sobre">Sobre</a><a href="#como-funciona">Como funciona</a><a href="#perguntas">Perguntas</a><a href="#contato">Contato</a></nav><Link href="/painel" className="cf-equipe">Área da equipe →</Link></header>; }
-function Rodape() { return <footer className="cf-rodape"><strong>Cidadania Fácil</strong><span>Habeas Titas · OAB/PR</span><small>Triagem com fonte. Decisão do advogado.</small></footer>; }
+function Cabecalho() { return <header className="cf-cabecalho"><Link href="/" className="cf-marca">Ponto Dativo <small>Habeas Titas · protótipo dativo</small></Link><nav aria-label="Navegação principal"><a href="#inicio">Início</a><a href="#sobre">Sobre</a><a href="#como-funciona">Como funciona</a><a href="#perguntas">Perguntas</a><a href="#contato">Contato</a></nav><Link href="/escritorio" className="cf-equipe">Escritório de apoio →</Link></header>; }
+function Rodape() { return <footer className="cf-rodape"><strong>Ponto Dativo</strong><span>Habeas Titas · protótipo para advocacia dativa</span><small>Triagem com fonte. Decisão humana.</small></footer>; }
 function Passo({ numero, titulo, children }: { numero: string; titulo: string; children: React.ReactNode }) { return <article><span>{numero}</span><div><h3>{titulo}</h3><p>{children}</p></div></article>; }
 
 function AnaliseAndamento({ etapa }: { etapa: Etapa | null }) {

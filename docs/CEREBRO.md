@@ -5,12 +5,14 @@ no projeto e atualize quando uma decisão ou tarefa mudar.
 
 ## Norte do produto
 
-Triagem de casos para o advogado que atua sozinho no Juizado Especial. O
-cliente conta o que aconteceu (texto ou voz), a ferramenta devolve o caso
-organizado: requisitos legais já comprovados, documentos que faltam pedir,
-cabimento no JEC e caminhos extrajudiciais, com o trecho da lei em cada ponto.
-Mede o próprio custo e se está acertando. Não dá parecer: quem assina é o
-advogado. Direção fechada em 12/09 — ver `docs/IDEIA.md`.
+Ponto Dativo é um escritório de apoio demonstrativo para a advocacia dativa. A
+triagem de casos é um módulo: o cliente relata (texto ou voz), a ferramenta
+organiza requisitos, documentos, cabimento no JEC e caminhos extrajudiciais,
+com fonte em cada ponto. A rota `/escritorio` organiza atendimentos, checklist
+e agenda apenas no estado do navegador. Não dá parecer: quem orienta e assina
+é o advogado. A base técnica de WhatsApp e consulta pública DataJud existe,
+mas associação institucional com a OAB, acesso ao Portal e operação com dados
+reais não estão implementados — ver `docs/INTEGRACOES.md`.
 
 Equipe: Habeas Titas, Eduardo, Maria e Fernando.
 
@@ -33,6 +35,10 @@ Equipe: Habeas Titas, Eduardo, Maria e Fernando.
 | Caminho | Papel |
 |---|---|
 | `app/page.tsx` | tela de triagem e dossiê do advogado |
+| `app/escritorio/page.tsx` | escritório de apoio: WhatsApp, DataJud, atendimento, documentos e agenda demonstrativos |
+| `lib/evolution.ts` | conector servidor Evolution API v2: estado, QR e webhook mínimo |
+| `lib/datajud.ts` | consulta pontual de metadados públicos do TJPR por número CNJ |
+| `docs/INTEGRACOES.md` | configuração técnica, fluxo OAB/PR e limites de produção |
 | `app/api/analisar/route.ts` | endpoint de análise |
 | `app/api/casos/route.ts` | desfecho anotado pelo advogado e agregado de eficiência |
 | `lib/claude.ts` | cliente, formato da resposta e uso de tokens |
@@ -61,6 +67,9 @@ Equipe: Habeas Titas, Eduardo, Maria e Fernando.
    número de processo.
 9. Preço de modelo e cotação de moeda vêm de tabela ou do ambiente. Sem valor
    na tabela, o custo aparece como não calculado.
+10. Dados de clientes reais não entram no protótipo. Antes de produção, definir
+    base legal, transparência, retenção, acesso, incidentes, fornecedor de IA e
+    instrumentos para transferência internacional de dados.
 
 ## Ordem de prioridade
 
@@ -96,9 +105,9 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
       lido apenas na chamada atual, sem ser gravado.
 - [ ] Gerar pedido no formato do TJPR.
 - [ ] Preparar pitch e caso fictício da demonstração.
-- [ ] @eduardo Aprovar ou recusar a proposta de acompanhamento real do
-      processo via API DataJud (mexe em `lib/`) — detalhes em
-      `docs/IDEIA.md`, seção "Proposta: acompanhamento real do processo".
+- [ ] @eduardo Decidir se haverá monitoramento contínuo de processos após o
+      hackathon. A consulta pontual do DataJud já existe; recorrência exige
+      autenticação, autorização e armazenamento protegido.
 - [ ] @eduardo Decidir sobre o campo `encaminhar_advogado` na `Analise`
       (mexe em `lib/etapas.ts` e `lib/analise.ts`) — reconhecer quando a
       pergunta não é para a IA responder e sim o advogado. Detalhes em
@@ -113,8 +122,9 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 | 2026-09-12 | Roadmap técnico passa a seguir a rubrica da auditoria: RAG sobre a lei, verificação de fontes, cadeia de prompts, acessibilidade | Manual, seção 8: é o que dá nota 5 nas três dimensões (300 pts) |
 | 2026-09-12 | Adicionado dado sobre tamanho do público (72% dos ~1,3 mi de advogados no Brasil são autônomos) em `docs/IDEIA.md` | Reforça o problema para o pitch: advogado autônomo sem estrutura de escritório é público-alvo direto |
 | 2026-09-12 | Registrado requisito (não implementado) de reconhecer quando uma pergunta deve ir para o advogado humano em vez da IA responder, com proposta de campo `encaminhar_advogado` | Pedido da Maria: no modelo B2B2C, o advogado só dá um norte pontual; a IA precisa saber os próprios limites |
-| 2026-09-12 | Registrada proposta (não implementada) de acompanhamento real do processo via API pública DataJud/CNJ, aguardando aprovação do Eduardo | Pedido da Maria; mexe em `lib/`, área do Eduardo, e tem limitações (só processo não sigiloso, dados não em tempo real) que pedem decisão dele antes de codar |
+| 2026-09-12 | Implementada base de consulta pontual via API pública DataJud/CNJ para TJPR | Número CNJ somente, sem lotes, sigilos ou cálculo de prazo; monitoramento contínuo depende de autenticação e armazenamento protegido |
 | 2026-09-12 | Produto vira triagem para o advogado: tela, prompts e cadeia falam com o profissional, não com o leigo | Canvas da Entrega 1 fechou na linha Advocacia e a leitura B2B2C foi adotada |
 | 2026-09-12 | "Força do caso" (requisitos comprovados sobre aplicáveis, com fonte) em vez de probabilidade de êxito | Sem base histórica de julgados, percentual seria alucinação — e é o que a rubrica de confiabilidade pune |
 | 2026-09-12 | Custo por triagem medido pelos tokens reais + registro de desfecho em `data/casos.json` | Responder se a ferramenta se paga e se a força medida aponta para o mesmo lado do resultado |
 | 2026-09-12 | Claude segue principal; DeepSeek continua alternativa por `MODEL` e `ANTHROPIC_BASE_URL` | Trocar o modelo a uma hora da Entrega 2 arriscaria a demo; DeepSeek entra como argumento de custo |
+| 2026-09-12 | Produto passa a se chamar Ponto Dativo, escritório de apoio demonstrativo | Direção do Eduardo: foco no fluxo da Advocacia Dativa OAB/PR, com atendimento, documentos, agenda, WhatsApp e assistente sem presumir parceria formal ou uso da marca OAB |

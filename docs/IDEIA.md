@@ -1,11 +1,38 @@
 # A ideia
 
-Direção atual, fechada em 12/09/2026 depois da mentoria das 11h e registrada no
-canvas da Entrega 1 (`docs/entregas/1-canvas.md`): **ferramenta de triagem
-contratada pelo advogado**, que recebe o relato do cliente e devolve o caso
-organizado, com a fonte legal de cada ponto. O foco original (o cidadão leigo
-usando sozinho) está preservado no fim deste arquivo, em "Como chegamos aqui":
-o público mudou, o problema de acesso à Justiça é o mesmo.
+## Direção atual: Ponto Dativo
+
+Definida pelo Eduardo em 12/09/2026: **um escritório de apoio para a advocacia
+dativa do Paraná**, pensado para qualificar o atendimento do cliente no fluxo
+da OAB/PR. A triagem jurídica com fonte deixa de ser o produto inteiro e passa
+a ser um módulo junto de atendimento, documentos, agenda, WhatsApp profissional
+e consulta pontual de andamento público.
+
+O protótipo atual é explicitamente demonstrativo: usa casos fictícios, mantém
+os dados apenas na sessão do navegador e não pressupõe parceria, integração ou
+credenciamento oficial pela OAB. Produção depende de instrumento institucional,
+governança de acesso, aviso de privacidade, retenção, resposta a incidentes,
+regras de fornecedor de IA e avaliação de impacto compatível com o risco.
+
+### Princípios do produto
+
+1. **Humano no comando.** O assistente organiza, resume e aponta pendências; o
+   advogado dativo acolhe, decide, orienta e assina.
+2. **Atendimento não é só triagem.** Cada caso precisa de histórico de contato,
+   documentos, compromisso e próximo responsável visíveis no mesmo fluxo.
+3. **Segurança antes de automação.** O conector de WhatsApp não envia mensagem
+   automática; DataJud consulta somente um número CNJ público por vez; não há
+   login ou raspagem do Portal da OAB sem autorização e desenho de privacidade.
+4. **Encaminhar quando importa.** Estratégia, negociação, urgência real,
+   sofrimento ou risco pessoal recebem atenção humana, não resposta autônoma
+   de IA.
+
+## Histórico: direção anterior — triagem para advogado autônomo
+
+O trecho abaixo registra a decisão de 12/09 após a mentoria das 11h: uma
+**ferramenta de triagem contratada pelo advogado**, que recebe o relato do
+cliente e devolve o caso organizado, com a fonte legal de cada ponto. Esse
+módulo foi preservado no Ponto Dativo; o foco deixou de ser somente a triagem.
 
 ## O problema
 
@@ -60,9 +87,9 @@ declarado em `lib/casos.ts`.
 ## O que fica de fora (por enquanto)
 
 - Integração real com o tribunal: exigiria convênio. O andamento entra colado
-  ou digitado pelo advogado, não puxado do PROJUDI. Há uma proposta de
-  acompanhamento público via DataJud/CNJ, ainda não implementada e aguardando
-  aprovação do Eduardo.
+  ou digitado pelo advogado, não puxado do PROJUDI. A consulta pública e
+  pontual pelo número CNJ via DataJud/CNJ foi adicionada ao protótipo; não há
+  monitoramento contínuo, acesso ao PROJUDI, busca por nome ou cálculo de prazo.
 - Parecer jurídico: a ferramenta organiza e cita a fonte; quem analisa, decide
   e assina é o advogado. Isso é atividade privativa da advocacia.
 - Estimativa de honorário ou de valor de condenação: sem base, não se afirma.
@@ -214,14 +241,15 @@ nem promete resultado) sem soar fria — reconhecer o que a pessoa está
 sentindo antes de encaminhar, principalmente quando o assunto é
 delicado.
 
-## Proposta: acompanhamento real do processo (aguardando aprovação do Eduardo)
+## Histórico: proposta de acompanhamento real do processo
 
 Pedido da Maria em 12/09/2026: a ferramenta atualizar o cliente sobre em que
 fase o processo real dele está e quais os próximos andamentos, em linguagem
 simples. Já tinha sido levantado e deixado de lado (ver "Outras pautas"
 abaixo) assumindo que precisaria de convênio com o tribunal. Pesquisando de
-novo, achei um caminho sem convênio — **registrando para o Eduardo decidir,
-não implementado**, porque mexe em `lib/` (área dele) e no núcleo do produto.
+novo, achei um caminho sem convênio. Em 12/09 foi implementada somente a
+consulta pontual de metadados públicos por número CNJ; acompanhamento contínuo
+continua deliberadamente fora do protótipo.
 
 **O que existe:** a **API Pública do DataJud**, do CNJ, gratuita e
 documentada, cobre todos os tribunais do Brasil, inclusive o TJPR, sem exigir

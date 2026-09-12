@@ -1,12 +1,24 @@
-# Hackathon da Cidadania 2026 — Equipe Habeas Titas
+# Ponto Dativo — Equipe Habeas Titas
 
-Atendente virtual do Juizado Especial Cível. A pessoa conta o que aconteceu,
-falando ou escrevendo; o sistema entende o caso, diz se cabe no JEC, aponta
-caminhos sem processo, lista documentos e monta o pedido.
+Protótipo de escritório de apoio para a advocacia dativa no Paraná. Reúne
+ficha de nomeação, atendimento, checklist de documentos, agenda, WhatsApp profissional e triagem
+com fontes jurídicas. O assistente organiza informação como um estagiário
+virtual; decisão, orientação e assinatura são sempre do advogado dativo.
+
+`/escritorio` é uma demonstração com dados fictícios e estado local do
+navegador, sem persistência de conteúdo do cliente. Ela não representa parceria
+ou integração oficial com a OAB. Antes de produção, o projeto exige definição
+institucional, controles de acesso, aviso de privacidade, retenção, resposta a
+incidentes e governança dos fornecedores de tecnologia.
+
+Há conectores técnicos para Evolution API v2 (QR e webhook mínimo) e DataJud
+público do TJPR (consulta por número CNJ), mas eles só são ativados por variáveis
+de ambiente no servidor. O detalhamento do fluxo da OAB/PR e das barreiras de
+produção está em [`docs/INTEGRACOES.md`](docs/INTEGRACOES.md).
 
 Categoria: **Inovação Aberta e Cidadania** · OAB/PR · 12 e 13/09/2026 · Licença MIT.
 
-**Demo ao vivo:** https://habeastitas.eduardomila.adv.br (acompanha `main`, atualiza a cada minuto)
+**Demo ao vivo:** https://habeastitas.eduardomila.adv.br (triagem) e https://habeastitas.eduardomila.adv.br/escritorio (escritório demonstrativo; acompanha `main`, atualiza a cada minuto)
 
 O painel da equipe em `/painel` é privado e pede usuário e senha. As credenciais ficam somente no `.env.local` do servidor, nunca no repositório.
 **Painel da equipe:** https://habeastitas.eduardomila.adv.br/painel (regras, cronograma, tarefas e responsáveis, lidos do `docs/TAREFAS.md`)
@@ -71,6 +83,10 @@ Passo a passo completo em [`docs/ONBOARDING.md`](docs/ONBOARDING.md).
 | `lib/juridico/corpus.ts` | índice BM25 sobre `docs/juridico/` |
 | `docs/juridico/` | a base legal: Lei 9.099/95, CDC, orientações revisadas |
 | `lib/useDitado.ts` | ditado pelo microfone (Web Speech API, sem servidor) |
+| `app/escritorio/page.tsx` | ficha de nomeação, atendimento, WhatsApp profissional, DataJud, documentos e agenda demonstrativos |
+| `lib/evolution.ts` | conector servidor da Evolution API v2, sem expor chave ao navegador |
+| `lib/datajud.ts` | consulta pontual de metadados públicos do TJPR por número CNJ |
+| `docs/INTEGRACOES.md` | configuração, fluxo dativo da OAB/PR e limites de produção |
 | `docs/IDEIA.md` | a ideia, decidida nas reuniões de 10/09 |
 | `docs/EVENTO.md` | regras, datas, o que o edital exige |
 | `docs/TAREFAS.md` | quem faz o quê, na ordem das entregas |

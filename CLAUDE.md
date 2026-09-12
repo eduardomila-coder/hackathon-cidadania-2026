@@ -7,16 +7,15 @@ dois dias. Estas regras existem para os três Claudes não se atropelarem.
 
 ## O projeto
 
-Triagem de casos do Juizado Especial Cível **para o advogado que atua
-sozinho**. O cliente conta o que aconteceu (falando ou escrevendo); a
-ferramenta devolve ao advogado o caso organizado: quais requisitos legais já
-estão comprovados e por qual documento, o que falta pedir, se cabe no JEC e
-quais são os caminhos sem processo — com o trecho da lei em cada afirmação.
-Mede o próprio custo por triagem e se a força que mediu bate com o resultado
-real do caso. Não dá parecer: quem analisa e assina é o advogado.
+**Ponto Dativo** é um protótipo de escritório de apoio para a advocacia dativa
+no Paraná. Reúne atendimento, documentos, agenda, WhatsApp profissional,
+consulta pontual de andamento público e a triagem de casos do Juizado Especial
+Cível. Não dá parecer: quem analisa, orienta e assina é o advogado. O ambiente
+é demonstrativo, usa casos fictícios e não persiste conteúdo de cliente.
 
-A direção mudou em 12/09/2026 (antes era o cidadão leigo usando sozinho); o
-histórico e o motivo estão em `docs/IDEIA.md`, em "Como chegamos aqui".
+A direção mudou em 12/09/2026: da ferramenta ao leigo para o apoio ao
+profissional e, depois, para o escritório de apoio dativo. O histórico e os
+limites institucionais estão em `docs/IDEIA.md`.
 Regras do evento em `docs/EVENTO.md`.
 
 ## Stack (não trocar sem combinar com a equipe)
@@ -44,6 +43,12 @@ Regras do evento em `docs/EVENTO.md`.
   por trecho; o índice carrega a pasta inteira.
 - Sem banco de dados até alguém precisar de verdade. Estado em memória ou
   arquivo JSON em `data/`.
+- A rota `/escritorio` é apenas uma demonstração local no navegador. Não ligar
+  a sistemas da OAB, tribunais, mensageria, agenda ou prontuário sem convênio,
+  autorização, avaliação de LGPD e controles de acesso definidos.
+- `lib/evolution.ts` e `lib/datajud.ts` são conectores de servidor. Nunca
+  exponha suas chaves, automatize login no Portal da Advocacia Dativa, faça
+  raspagem ampla ou trate consulta pública como intimação/prazo oficial.
 - Roda local: `npm run dev`, porta 3000. Não há deploy.
 
 ## Idioma e nomes

@@ -30,4 +30,7 @@ export function proxy(request: NextRequest) {
   });
 }
 
-export const config = { matcher: ["/painel/:path*", "/api/tarefas"] };
+// O escritório e a configuração do WhatsApp não podem ficar públicos. O
+// webhook é deixado fora do Basic Auth porque a Evolution o chama diretamente
+// e ele já valida um segredo exclusivo no servidor.
+export const config = { matcher: ["/painel/:path*", "/api/tarefas", "/escritorio/:path*", "/api/whatsapp/conexao", "/api/processos"] };
