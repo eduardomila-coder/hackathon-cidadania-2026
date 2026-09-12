@@ -13,12 +13,31 @@ em `dados-de-teste/ultimo-resultado.json`.
 
 ## Resultado
 
-<!-- colar aqui a saída do npm run testar da rodada de sábado -->
+### 12/09, 16h
+
+Dois fluxos foram executados contra o servidor público, sempre com caso
+fictício de compra de geladeira com defeito:
+
+1. **Triagem com foto:** relato + imagem PNG enviada como documento. O fluxo
+   percorreu extração, busca, análise e verificação, e concluiu em 35,5 s no
+   modelo `deepseek-v4-pro`.
+2. **Conversa em turnos:** novo relato com as respostas que faltavam (data da
+   compra, valor de R$ 2.900, recusa por mensagem, nota fiscal e fotos). A
+   triagem concluiu em 40,385 s, com **5 de 6 requisitos comprovados** e novas
+   perguntas para fechar o único ponto ainda sem prova.
+
+Os dois testes confirmam que foto e complemento de conversa não são gravados
+no registro de eficiência: o dossiê recebe somente a análise e as métricas.
 
 ## Onde o modelo tentou inventar e foi barrado
 
-<!-- listar os itens "sem_base"/"contradiz" que a verificação pegou -->
+- O valor em reais dos limites do JEC não foi afirmado sem fonte.
+- A existência de recusa e o defeito da geladeira foram mantidos como pontos
+  que dependem de prova documental.
+- A análise não tratou a recusa formal como requisito legal do pedido.
 
 ## O que ajustamos depois dos testes
 
-<!-- o que mudou no prompt, na base jurídica ou na tela -->
+- A verificação passou a converter qualquer status inesperado do modelo em
+  `sem_base`, em vez de derrubar toda a triagem. A regra é conservadora: nada
+  desconhecido aparece como confirmado.
