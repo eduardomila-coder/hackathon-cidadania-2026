@@ -29,28 +29,52 @@ aponta caminhos sem processo, lista documentos e monta o pedido. Detalhes em
   commits, textos da interface. Termos técnicos ficam como são (`route`, `hook`).
 - Interface em linguagem simples, sem juridiquês: o usuário final é leigo.
 
-## Git: como não quebrar o trabalho dos outros
+## Como o trabalho circula entre os três
 
-- `main` sempre roda. Antes de qualquer commit em `main`: `npm run build` passa.
-- Cada pessoa trabalha em branch própria: `eduardo/<o-que>`, `maria/<o-que>`,
-  `fernando/<o-que>`. Junta em `main` por merge rápido (`git merge`), sem PR
-  formal: não há tempo.
-- Antes de começar e antes de juntar: `git pull --rebase origin main`.
-- Commits pequenos e frequentes, mensagem em português no imperativo:
-  `adiciona upload de foto ao relato`.
-- Nunca `git push --force` em `main`. Nunca reescreva histórico de outra pessoa.
-- Conflito em arquivo que outra pessoa está mexendo: pergunte antes de resolver.
+Três comandos dentro do Claude Code, que a pessoa digita como `/comecar`:
+
+| Comando | O que faz |
+|---|---|
+| `/comecar` | atualiza com o que os outros enviaram, cria ou retoma a branch da pessoa, lista as tarefas abertas na área dela |
+| `/entregar` | commit, atualiza com `main`, `npm run build`, junta em `main`, push. Se o build quebra, nada sobe |
+| `/situacao` | quem enviou o quê, o que está aberto, próxima entrega com hora |
+
+Por baixo, `npm run pegar` e `npm run enviar -- "mensagem"` (`scripts/git.mjs`,
+funciona igual em Mac e Windows). Use-os quando o usuário pedir para
+"atualizar" ou "enviar"; não invente sequências de git à mão.
+
+Regras que os comandos já cumprem e você não pode contornar:
+
+- `main` sempre roda: só entra em `main` o que passou no `npm run build`.
+- Cada pessoa em branch própria: `eduardo/<o-que>`, `maria/<o-que>`,
+  `fernando/<o-que>`. Merge rápido, sem PR: não há tempo.
+- Commits pequenos, em português, no imperativo: `adiciona upload de foto`.
+- Nunca `git push --force`, nunca `git reset --hard`, nunca reescreva
+  histórico de outra pessoa.
+- Conflito em arquivo de outra área: pergunte antes de resolver.
+
+## Servidor compartilhado
+
+`https://hackathon.eduardomila.adv.br` roda no Mac do Eduardo e **puxa `main`
+sozinho a cada minuto**. Tudo que entra em `main` aparece lá em até 60 s, sem
+ninguém fazer deploy. É a URL que vai no celular de quem testa (Entrega 3) e
+na tela do pitch. A chave do modelo está só nesse servidor: quem trabalha no
+código não precisa de chave para ver o app funcionando; `npm run dev` local
+sem `.env.local` só falha no botão Analisar.
 
 ## Divisão de áreas (evita conflito de merge)
 
 | Área | Pasta | Quem |
 |---|---|---|
-| Interface (telas, componentes) | `app/`, `components/` | a combinar |
-| Cérebro (prompts, análise, pedido) | `lib/` | a combinar |
-| Conteúdo jurídico (regras do JEC, modelos de pedido) | `docs/juridico/` | a combinar |
+| Interface (telas, componentes, fluxo da conversa) | `app/`, `components/` | Fernando (sugestão) |
+| Cérebro (prompts, análise, pedido, leitura de documento) | `lib/` | Eduardo (sugestão) |
+| Conteúdo jurídico e entregas (regras do JEC, modelo do pedido, canvas, testes, pitch) | `docs/juridico/`, `docs/entregas/` | Maria (sugestão) |
 
-Atualize esta tabela quando a equipe decidir. Se precisar mexer fora da sua
-área, avise no grupo antes.
+É sugestão até a equipe confirmar no sábado de manhã; troque os nomes aqui.
+Se precisar mexer fora da sua área, avise no grupo antes.
+
+Decisões rápidas e pendências do evento ficam em `docs/CEREBRO.md`; leia-o no
+início da sessão e anote lá o que mudar.
 
 ## O que não fazer
 

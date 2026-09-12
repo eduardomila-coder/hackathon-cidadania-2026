@@ -21,7 +21,9 @@
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(curl localhost:*)",
-      "Bash(curl http://localhost:*)"
+      "Bash(curl http://localhost:*)",
+      "Bash(node scripts/*)",
+      "Bash(curl -s -o /dev/null -w * https://hackathon.eduardomila.adv.br*)"
     ],
     "deny": [
       "Bash(git push --force:*)",
@@ -29,6 +31,20 @@
       "Bash(git reset --hard:*)",
       "Read(./.env.local)",
       "Read(./.env)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git fetch origin --quiet && git log --oneline HEAD..origin/main | head -5 | sed 's/^/[novo em main] /'",
+            "timeout": 15
+          }
+        ]
+      }
     ]
   }
 }

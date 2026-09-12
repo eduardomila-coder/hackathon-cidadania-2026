@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "pegar": "node scripts/git.mjs pegar",
+    "enviar": "node scripts/git.mjs enviar",
+    "testar": "node scripts/testar-casos.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.125.0",

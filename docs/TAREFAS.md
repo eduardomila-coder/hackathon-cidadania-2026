@@ -16,7 +16,7 @@ Pontuação e horários em `docs/EVENTO.md`.
 ### 9h–12h — Entrega 1: Canvas (100 pts)
 - [ ] Preencher o canvas no workshop; base em `docs/IDEIA.md`
 - [ ] Salvar em `docs/entregas/1-canvas.pdf` (ou link no `docs/entregas/1-canvas.md`)
-- [ ] Decidir a divisão de áreas e preencher a tabela do `CLAUDE.md`
+- [ ] Confirmar a divisão de áreas sugerida na tabela do `CLAUDE.md`
 
 ### 12h–15h30 — Entrega 2: V1 com testes internos (100 pts)
 - [ ] Conversa em turnos: o sistema pergunta o que falta, a pessoa responde
@@ -25,7 +25,7 @@ Pontuação e horários em `docs/EVENTO.md`.
 
 ### 15h30–17h30 — Entrega 3: V2 com testes externos (100 pts)
 - [ ] Upload de foto de documento → o modelo lê e extrai
-- [ ] Pedir a 3 pessoas de fora (outra equipe, organização) que usem e contem um caso
+- [ ] Pedir a 3 pessoas de fora (outra equipe, organização) que abram https://hackathon.eduardomila.adv.br no celular e contem um caso
 - [ ] Registrar em `docs/entregas/3-testes-externos.md`: quem testou, o que disse, o que mudou
 
 ### Durante o dia

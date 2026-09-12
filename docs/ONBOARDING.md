@@ -60,8 +60,10 @@ npm install
 cp .env.example .env.local
 ```
 
-Abre o `.env.local` e cola a `ANTHROPIC_API_KEY` que o Eduardo mandou no privado.
-**Nunca cole a chave no grupo nem no git.**
+O `.env.local` pode ficar vazio: a chave do modelo mora só no servidor
+compartilhado (https://hackathon.eduardomila.adv.br). Localmente, tudo abre e
+funciona, menos o botão Analisar. Se o Eduardo te mandar uma chave no
+privado, cola ali. **Nunca cole chave no grupo nem no git.**
 
 ## 6. Testar
 
@@ -78,23 +80,18 @@ Sempre que sentar pra trabalhar:
 
 ```bash
 cd ~/hackathon-cidadania-2026
-git pull --rebase origin main
-git switch -c seunome/o-que-vai-fazer
 claude
 ```
 
-Dentro do Claude Code, ele já lê o `CLAUDE.md` e sabe as regras. Diz o que
-quer fazer em português. Quando algo estiver funcionando:
+Dentro do Claude Code, digita `/comecar`. Ele atualiza o projeto, cria sua
+branch e diz o que está aberto pra você. Aí é só pedir em português o que
+quer fazer: "adiciona um botão pra tirar foto do documento".
 
-```bash
-git add -A
-git commit -m "descreve o que fez"
-git switch main
-git pull --rebase origin main
-git merge seunome/o-que-vai-fazer
-npm run build
-git push origin main
-```
+Quando algo estiver funcionando, digita `/entregar`. Ele testa, junta com o
+trabalho dos outros e sobe. Em até 1 minuto aparece em
+https://hackathon.eduardomila.adv.br — abre no celular e confere.
 
-Se o `npm run build` falhar, não faz push: conserta primeiro (ou pede pro
-Claude Code consertar).
+Quer saber o que os outros fizeram? `/situacao`.
+
+Não precisa saber git. Se o Claude Code perguntar algo sobre "conflito",
+chama no grupo antes de responder.

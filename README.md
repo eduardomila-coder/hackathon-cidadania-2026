@@ -6,6 +6,8 @@ caminhos sem processo, lista documentos e monta o pedido.
 
 Categoria: **Inovação Aberta e Cidadania** · OAB/PR · 12 e 13/09/2026 · Licença MIT.
 
+**Demo ao vivo:** https://hackathon.eduardomila.adv.br (acompanha `main`, atualiza a cada minuto)
+
 ## Rodar
 
 ```bash
@@ -38,3 +40,5 @@ Passo a passo completo em [`docs/ONBOARDING.md`](docs/ONBOARDING.md).
 | `docs/entregas/` | o que se entrega em cada horário, dados de teste, prints |
 | `scripts/testar-casos.mjs` | roda os casos de teste contra o app |
 | `CLAUDE.md` | regras que o Claude Code de cada um segue |
+| `.claude/commands/` | `/comecar`, `/entregar`, `/situacao` — o fluxo da equipe sem saber git |
+| `docs/CEREBRO.md` | decisões rápidas e pendências durante o evento |
