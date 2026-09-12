@@ -46,6 +46,9 @@ Três comandos dentro do Claude Code, que a pessoa digita como `/comecar`:
 | `/entregar` | commit, atualiza com `main`, `npm run build`, junta em `main`, push. Se o build quebra, nada sobe |
 | `/situacao` | quem enviou o quê, o que está aberto, próxima entrega com hora |
 
+Quem não for Eduardo não junta alterações em `main`: envia para revisão numa
+branch. Eduardo aprova pelo Habeas Release em `/revisoes` e faz a publicação.
+
 Por baixo, `npm run pegar` e `npm run enviar -- "mensagem"` (`scripts/git.mjs`,
 funciona igual em Mac e Windows). Use-os quando o usuário pedir para
 "atualizar" ou "enviar"; não invente sequências de git à mão.

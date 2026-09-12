@@ -101,9 +101,13 @@ Dentro do Claude Code, digita `/comecar`. Ele atualiza o projeto, cria sua
 branch e diz o que está aberto pra você. Aí é só pedir em português o que
 quer fazer: "adiciona um botão pra tirar foto do documento".
 
-Quando algo estiver funcionando, digita `/entregar`. Ele testa, junta com o
-trabalho dos outros e sobe. Em até 1 minuto aparece em
-https://habeastitas.eduardomila.adv.br — abre no celular e confere.
+Quando algo estiver funcionando, peça ao Claude Code: **"envie para revisão,
+sem juntar na main"**. Ele cria uma mudança separada no GitHub. O Eduardo vê
+no Habeas Release, confere e publica quando estiver certo:
+https://habeastitas.eduardomila.adv.br/revisoes
+
+Não junte nem publique em `main` por conta própria. Em até um minuto depois da
+aprovação, a mudança aparece em https://habeastitas.eduardomila.adv.br.
 
 Quer saber o que os outros fizeram? `/situacao`.
 
