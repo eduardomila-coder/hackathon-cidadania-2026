@@ -101,9 +101,10 @@ Dentro do Claude Code, digita `/comecar`. Ele atualiza o projeto, cria sua
 branch e diz o que está aberto pra você. Aí é só pedir em português o que
 quer fazer: "adiciona um botão pra tirar foto do documento".
 
-Quando algo estiver funcionando, peça ao Claude Code: **"envie para revisão,
-sem juntar na main"**. Ele cria uma mudança separada no GitHub. O Eduardo vê
-no Habeas Release, confere e publica quando estiver certo:
+Quando algo estiver funcionando, basta descrever a próxima tarefa em português.
+O agente cria a branch, testa, faz o commit, envia a mudança e abre a Pull
+Request sozinho. O Eduardo vê no Habeas Release, confere e publica quando
+estiver certo:
 https://habeastitas.eduardomila.adv.br/revisoes
 
 Não junte nem publique em `main` por conta própria. Em até um minuto depois da
