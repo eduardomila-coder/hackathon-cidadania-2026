@@ -16,6 +16,7 @@ const SECOES = [
   ["pitch", "Pitch"],
   ["regras", "Regras"],
   ["equipe", "Equipe"],
+  ["acesso", "Acesso da equipe"],
   ["links", "Links"],
 ] as const;
 
@@ -218,6 +219,34 @@ export default function Painel() {
             ))}
           </div>
           <p className="mt-3 text-sm text-zinc-600">Quem mexe fora da sua área avisa no grupo antes. Pelo menos dois dos três na sede o tempo todo.</p>
+        </section>
+
+        <section id="acesso" aria-labelledby="acesso-t">
+          <Titulo id="acesso-t">Acesso à pasta compartilhada</Titulo>
+          <div className="rounded-2xl border-2 border-blue-200 bg-blue-50 p-5 text-slate-900">
+            <p className="text-lg font-semibold">Pasta: <code>hackathon</code></p>
+            <p className="mt-1">O Mac do Eduardo compartilha a pasta pela rede Wi-Fi do evento.</p>
+            <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <div className="rounded-xl bg-white p-4">
+                <h3 className="font-semibold">Windows</h3>
+                <p className="mt-1 text-sm">Abra o Explorador e digite:</p>
+                <code className="mt-2 block break-all text-sm">\\\\192.168.2.1\\hackathon</code>
+              </div>
+              <div className="rounded-xl bg-white p-4">
+                <h3 className="font-semibold">Mac</h3>
+                <p className="mt-1 text-sm">Finder, menu Ir, Conectar ao servidor:</p>
+                <code className="mt-2 block break-all text-sm">smb://192.168.2.1/hackathon</code>
+              </div>
+              <div className="rounded-xl bg-white p-4">
+                <h3 className="font-semibold">Android</h3>
+                <p className="mt-1 text-sm">No Cx File Explorer ou Solid Explorer, escolha SMB e informe:</p>
+                <code className="mt-2 block text-sm">servidor: 192.168.2.1<br />pasta: hackathon</code>
+              </div>
+            </div>
+            <p className="mt-4"><strong>Login:</strong> Maria usa <code>maria</code>; Fernando usa <code>fernando</code>.</p>
+            <p className="mt-2 text-sm font-semibold text-red-800">A senha é enviada individualmente. Não publique nem compartilhe a senha neste site.</p>
+            <p className="mt-3 text-sm text-slate-700">Use esta pasta para canvas, fotos, prints, slides e materiais. O código continua no GitHub, para evitar edição simultânea e perda de trabalho.</p>
+          </div>
         </section>
 
         <section id="links" aria-labelledby="links-t">
