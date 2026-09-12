@@ -34,6 +34,37 @@ no registro de eficiência: o dossiê recebe somente a análise e as métricas.
 - `prints/2026-09-12-teste-triagem-inicial-app.png`
 - `prints/2026-09-12-teste-triagem-inicial.mov` (10 s)
 
+### 12/09, 17h35 — fluxo completo gravado no site público
+
+Antes do teste, o endereço público estava com o formulário morto: a página
+chegava sem hidratar (contador preso em `0/4000`, botão desabilitado), enquanto
+em `127.0.0.1:3100` funcionava. Causa: o Next 16 em modo `dev` bloqueia os
+recursos pedidos por outro domínio. Correção em `next.config.ts`
+(`allowedDevOrigins`), commit `3046884`, com reinício do servidor.
+
+Teste automatizado com Playwright (Chromium 1280×900) contra
+`https://habeastitas.eduardomila.adv.br`, mesmo caso fictício da geladeira,
+modelo `deepseek-v4-pro`:
+
+| Etapa | Tempo | Resultado |
+|---|---|---|
+| Triagem por texto | 30,6 s | dossiê com 1 de 6 requisitos comprovados e 5 perguntas pendentes |
+| Segundo turno (respostas do cliente) | 33,1 s | 4 de 4 requisitos comprovados, 3 chamadas, 12.463 tokens de entrada |
+
+O segundo turno recebeu data da compra, nota fiscal, recusa por WhatsApp e
+fotos; o dossiê passou a citar `L9099-3`, `L9099-8`, `L8078-18` e `L8078-26`
+como fonte de cada requisito.
+
+**Evidências desta rodada:**
+
+- `prints/2026-09-12-1735-gravacao-triagem.mp4` (1 min 22 s, do relato ao
+  dossiê atualizado)
+- `prints/2026-09-12-1735-01-relato.png` a `05-dossie-atualizado.png`
+
+**Pendência vista no teste:** o cartão "Esta triagem" mostra "sem preço de
+tabela para deepseek-v4-pro"; o custo só é calculado para modelos com preço em
+`lib/`.
+
 ## Onde o modelo tentou inventar e foi barrado
 
 - O valor em reais dos limites do JEC não foi afirmado sem fonte.
