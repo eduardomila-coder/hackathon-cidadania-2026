@@ -30,4 +30,4 @@ export function proxy(request: NextRequest) {
   });
 }
 
-export const config = { matcher: ["/painel/:path*"] };
+export const config = { matcher: ["/painel/:path*", "/api/tarefas"] };

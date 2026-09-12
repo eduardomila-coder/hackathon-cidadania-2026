@@ -68,11 +68,33 @@ button, input, textarea { font:inherit; }
 .cfp-evento{display:grid;grid-template-columns:74px 1fr auto;align-items:center;gap:14px;padding:16px;border:1px solid var(--linha);border-radius:10px;background:#fffdfa}
 .cfp-evento-hora{color:#315743;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums}
 .cfp-evento-ev{color:#41506a;font-size:13px;margin-top:2px}
-.cfp-colunas{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px;align-items:start}
-.cfp-coluna h3{margin:0 0 12px;font:700 20px Georgia,serif}
-.cfp-tarefa{min-height:120px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
-.cfp-ev{display:flex;align-items:center;gap:8px;margin-top:auto;padding:12px;background:#f3f7f2;border-radius:9px;font-size:13px;color:#315743}
-.cfp-ev:before{content:"□"}
+.cfp-blocos{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:24px;align-items:start}
+.cfp-bloco-cabeca{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.cfp-bloco h3{margin:4px 0 0;font:700 20px Georgia,serif}
+.cfp-prog{height:6px;margin:14px 0 12px;border-radius:999px;background:#e9ece6;overflow:hidden}
+.cfp-prog i{display:block;height:100%;border-radius:999px;background:var(--verde);transition:width .3s}
+.cfp-itens{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.cfp-itens li{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-top:1px solid var(--linha);line-height:1.45}
+.cfp-itens li:first-child{border-top:0}
+.cfp-itens li.feita .cfp-item-texto{color:#8a93a3;text-decoration:line-through}
+.cfp-item-texto{flex:1;color:#1f2a44}
+.cfp-check{flex:0 0 auto;width:28px;height:28px;margin-top:1px;border:2px solid #8fa596;border-radius:7px;background:#fffdfa;color:#fff;font-size:16px;font-weight:700;cursor:pointer;display:grid;place-items:center;transition:background .15s,border-color .15s}
+.cfp-check:hover{border-color:var(--verde)}
+.cfp-check[aria-pressed="true"]{background:var(--verde);border-color:var(--verde)}
+.cfp-check:disabled{opacity:.5;cursor:wait}
+.cfp-check:focus-visible{outline:3px solid #7ba887;outline-offset:2px}
+.cfp-drive{display:block;margin-top:3px;font-size:12px;color:#315743;text-decoration:none;font-weight:700}
+.cfp-itens li.feita .cfp-drive{text-decoration:none}
+.cfp-drive:hover{text-decoration:underline}
+.cfp-avs{display:flex;gap:4px;flex:0 0 auto}
+.cfp-av{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;color:#fff;font-size:12px;font-weight:700}
+.cfp-erro{margin:16px 0 0;padding:12px 14px;border:1px solid #e0a0a4;border-radius:9px;background:#fbeeee;color:#8a2b30}
+.cfp-drive-lista{margin-top:18px}
+.cfp-drive-lista>p a{color:var(--azul);font-weight:700}
+.cfp-drive-lista ul{list-style:none;margin:12px 0 0;padding:0}
+.cfp-drive-lista li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--linha)}
+.cfp-drive-lista li a{color:var(--azul);text-decoration:none;font-weight:700;word-break:break-all}
+.cfp-drive-lista li a:hover{text-decoration:underline}
 .cfp-risco{border-left:4px solid #dc3f46}
 .cfp-risco h2{font-size:24px}
 .cfp-criterio h3{margin:12px 0 8px;font:700 22px Georgia,serif}
@@ -117,7 +139,7 @@ button, input, textarea { font:inherit; }
   .cfp-main{padding:32px 18px 70px;gap:52px}
   .cfp-titulo{flex-direction:column}
   .cfp-placar{width:100%;min-width:0}
-  .cfp-grade-2,.cfp-roteiro,.cfp-tres,.cfp-colunas{grid-template-columns:1fr}
+  .cfp-grade-2,.cfp-roteiro,.cfp-tres,.cfp-blocos{grid-template-columns:1fr}
   .cfp-linha-tempo{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px}
   .cfp-linha-tempo:before{display:none}
   .cfp-marco{flex:0 0 116px}

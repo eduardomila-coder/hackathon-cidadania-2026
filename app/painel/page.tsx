@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AUDITORIA, DRIVE, EQUIPE, LINKS, MARCOS, PITCH, PREMIOS, REGRAS } from "@/lib/evento";
 import { lerTarefas } from "@/lib/tarefas";
+import { acharNoDrive, listarDrive, type ArquivoDrive } from "@/lib/drive";
 import { Relogio } from "./Relogio";
+import { Tarefas } from "./Tarefas";
 
 export const metadata: Metadata = { title: "Painel — Habeas Titas · Hackathon da Cidadania 2026" };
 // As tarefas vêm do TAREFAS.md a cada pedido: nada fica em cache.
@@ -21,7 +23,7 @@ const SECOES = [
 
 const LINHA_DO_TEMPO = ["Início", "Canvas", "V1 com testes", "Auditoria", "Pitch final"];
 const ROTEIRO = [
-  ["20 s", "O problema", "Histórias difíceis não viram próximo passo claro."],
+  ["20 s", "O problema", "Advogados perdem muito tempo com o que não é advocacia: lapidando e estruturando informação."],
   ["20 s", "A solução", "Um atendente que organiza, explica e aponta caminhos."],
   ["60 s", "A demo", "Conte um caso, veja a análise e os fundamentos."],
   ["20 s", "O impacto", "Acesso replicável, baixo custo e aplicável a outros ramos."],
@@ -38,17 +40,19 @@ function diaDe(iso: string) {
 function primeiroNome(nome: string) {
   return nome.split(" ")[0];
 }
-function nomeDe(id: string) {
-  return primeiroNome(EQUIPE.find((p) => p.id === id)?.nome ?? id);
-}
 
-export default function Painel() {
+export default async function Painel() {
   const blocos = lerTarefas();
-  const tarefas = blocos.flatMap((b) => b.tarefas.map((t) => ({ ...t, contexto: b.titulo || b.dia })));
-  const feitas = tarefas.filter((t) => t.feita);
-  const pendentes = tarefas.filter((t) => !t.feita);
-  const emAndamento = pendentes.filter((t) => t.responsaveis.length > 0);
-  const aFazer = pendentes.filter((t) => t.responsaveis.length === 0);
+  const arquivos = await listarDrive();
+  // Tarefa com `drive:` casada com um arquivo da pasta: concluída por evidência.
+  const noDrive: Record<number, ArquivoDrive> = {};
+  for (const t of blocos.flatMap((b) => b.tarefas)) {
+    const a = acharNoDrive(t.dicas, arquivos);
+    if (a) noDrive[t.linha] = a;
+  }
+  const tarefas = blocos.flatMap((b) => b.tarefas);
+  const feitas = tarefas.filter((t) => t.feita || noDrive[t.linha]).length;
+  const pessoas = Object.fromEntries(EQUIPE.map((p) => [p.id, { nome: primeiroNome(p.nome), cor: p.cor }]));
 
   const riscos = REGRAS.filter((r) => r.titulo === "Presença" || r.titulo === "Pessoa líder");
   const essenciais = REGRAS.filter((r) => r.titulo !== "Presença" && r.titulo !== "Pessoa líder");
@@ -84,7 +88,7 @@ export default function Painel() {
                 <h1>Agora</h1>
                 <p className="cfp-lead">O que a equipe precisa fazer, provar e decidir em seguida.</p>
               </div>
-              <aside className="cfp-placar">Pontuação máxima<br /><strong>810</strong> pontos no total</aside>
+              <aside className="cfp-placar">Tarefas concluídas<br /><strong>{feitas}/{tarefas.length}</strong> {arquivos.length} {arquivos.length === 1 ? "arquivo" : "arquivos"} na pasta do Drive</aside>
             </div>
             <div className="cfp-acoes">
               <a href="#tarefas">Ver tarefas críticas</a>
@@ -150,23 +154,29 @@ export default function Painel() {
               <div>
                 <span className="cfp-eyebrow">Execução e responsáveis</span>
                 <h1>Tarefas</h1>
-                <p className="cfp-lead">Lido de docs/TAREFAS.md a cada abertura. Marque [x] e faça /entregar para concluir.</p>
+                <p className="cfp-lead">Clique na caixinha para concluir ou reabrir: vale para todo mundo. Tarefa com arquivo esperado no Drive fecha sozinha quando ele aparece na pasta.</p>
               </div>
+              <aside className="cfp-placar"><strong>{feitas}/{tarefas.length}</strong> concluídas</aside>
             </div>
-            <div className="cfp-colunas">
-              <Coluna titulo="A fazer">
-                {aFazer.map((t, i) => <Tarefa key={`af-${i}`} texto={t.texto} contexto={t.contexto} feita={false} />)}
-                {aFazer.length === 0 && <p className="cfp-vazio">Nada pendente sem dono.</p>}
-              </Coluna>
-              <Coluna titulo="Em andamento">
-                {emAndamento.map((t, i) => <Tarefa key={`ea-${i}`} texto={t.texto} contexto={t.contexto} dono={t.responsaveis.map(nomeDe).join(" · ")} />)}
-                {emAndamento.length === 0 && <p className="cfp-vazio">Nada em andamento.</p>}
-              </Coluna>
-              <Coluna titulo="Concluídas">
-                {feitas.map((t, i) => <Tarefa key={`fe-${i}`} texto={t.texto} contexto={t.contexto} feita />)}
-                {feitas.length === 0 && <p className="cfp-vazio">Nada concluído ainda.</p>}
-              </Coluna>
-            </div>
+            <Tarefas blocos={blocos} pessoas={pessoas} drive={noDrive} />
+            <h2 className="cfp-subtitulo">Na pasta do Drive agora</h2>
+            <article className="cfp-cartao cfp-drive-lista">
+              <p>
+                <a href={DRIVE.url} target="_blank" rel="noreferrer">{DRIVE.nome} ↗</a> — repositório oficial. Suba aqui o arquivo de cada entrega; a lista atualiza a cada abertura.
+              </p>
+              {arquivos.length === 0 ? (
+                <p className="cfp-vazio">Ainda não consegui ler a pasta, ou ela está vazia.</p>
+              ) : (
+                <ul>
+                  {arquivos.map((a) => (
+                    <li key={a.id}>
+                      <a href={a.url} target="_blank" rel="noreferrer">{a.nome}</a>
+                      <span className="cfp-muted">{a.tipo}{a.modificado ? ` · ${a.modificado}` : ""}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </article>
           </section>
 
           <section id="auditoria" className="cfp-secao">
@@ -326,26 +336,6 @@ export default function Painel() {
         </main>
       </div>
     </div>
-  );
-}
-
-function Coluna({ titulo, children }: { titulo: string; children: React.ReactNode }) {
-  return (
-    <div className="cfp-coluna">
-      <h3>{titulo}</h3>
-      {children}
-    </div>
-  );
-}
-
-function Tarefa({ texto, contexto, dono, feita }: { texto: string; contexto: string; dono?: string; feita?: boolean }) {
-  return (
-    <article className="cfp-cartao cfp-tarefa">
-      <span className={feita ? "cfp-badge" : "cfp-badge ambar"}>{feita ? "Concluída" : contexto}</span>
-      <h3>{texto}</h3>
-      {dono && <p className="cfp-muted">Responsável: <strong>{dono}</strong></p>}
-      <div className="cfp-ev">Evidência: arquivo na pasta do Drive e cópia em docs/entregas</div>
-    </article>
   );
 }
 
