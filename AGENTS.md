@@ -34,16 +34,17 @@ fonte de verdade sobre objetivo, prioridade, divisão da equipe e entregas.
 ## Como cada pessoa abre o agente
 
 Desde 12/09: Fernando e Maria não clonam mais o repositório nem usam GitHub.
-Os três apontam o Claude Code para a mesma pasta do projeto, física no
-MacBook do Eduardo e compartilhada por SMB (`smb://192.168.2.1/hackathon`,
-ver `CLAUDE.md`).
+Os três apontam o Claude Code para a mesma pasta do projeto, dentro de
+`/Users/eduardomila/Claude` no MacBook do Eduardo, compartilhada por SMB
+inteira (`smb://192.168.2.1/Claude`, ver `CLAUDE.md`) — não só a pasta do
+projeto, a `Claude/` toda.
 
 - **Eduardo:** abre este repositório no Codex, Claude Code ou DeepCode no Mac
-  (é a pasta original, a mesma que está compartilhada).
-- **Fernando:** no Windows, mapeia o drive de rede e abre o Claude Code
-  direto dentro dele — não é mais um clone local próprio. Pode usar
-  `/comecar` e `/situacao`; `/enviar-revisao` e `/entregar` não fazem mais
-  sentido pra ele (não há push nem Pull Request).
+  (é a pasta original, dentro de `~/Claude`, a mesma que está compartilhada).
+- **Fernando:** no Windows, mapeia o drive de rede (`smb://192.168.2.1/Claude`)
+  e abre o Claude Code dentro da subpasta do projeto — não é mais um clone
+  local próprio. Pode usar `/comecar` e `/situacao`; `/enviar-revisao` e
+  `/entregar` não fazem mais sentido pra ele (não há push nem Pull Request).
 - **Maria:** idem, pelo computador ou pelo tablet conectado à mesma rede;
   se usar o aplicativo Claude no Android sem acesso a essa pasta, peça para
   alguém aplicar a mudança dela na pasta compartilhada.

@@ -77,22 +77,23 @@ privado, cola ali. **Nunca cole chave no grupo nem no git.**
 
 ## 5b. Fernando e Maria: entrar pela pasta compartilhada (desde 12/09)
 
-Vocês não clonam nada. A pasta do projeto inteira, código incluso, está
-compartilhada por SMB direto do MacBook do Eduardo. Usuário e senha ele manda
-no privado.
+Vocês não clonam nada. O que está compartilhado por SMB não é só a pasta do
+projeto: é a pasta `Claude` inteira do Mac do Eduardo
+(`/Users/eduardomila/Claude`), com o projeto e o vault do Obsidian/segundo
+cérebro dentro dela. Usuário e senha ele manda no privado.
 
 - **Windows:** Explorador → Este Computador → Mapear unidade de rede →
-  `\\192.168.2.1\hackathon`, marcar "conectar usando outras credenciais".
-- **Mac:** Finder → Ir → Conectar ao Servidor → `smb://192.168.2.1/hackathon`.
+  `\\192.168.2.1\Claude`, marcar "conectar usando outras credenciais".
+- **Mac:** Finder → Ir → Conectar ao Servidor → `smb://192.168.2.1/Claude`.
 - **Android (tablet):** app Cx File Explorer ou Solid Explorer → Rede →
-  SMB → host `192.168.2.1`, pasta `hackathon`, usuário e senha (só pra ver
+  SMB → host `192.168.2.1`, pasta `Claude`, usuário e senha (só pra ver
   arquivos; para editar código, prefira computador).
 
-Depois de mapear, abra o Claude Code apontando para esse caminho de rede (no
-Windows, o drive mapeado, ex. `Z:\hackathon-cidadania-2026`) — não é mais um
-clone local. Se houver um vault do Obsidian compartilhado (pasta de notas do
-Eduardo), ele deve aparecer na mesma pasta de rede; abra o Obsidian apontando
-pra lá.
+Depois de mapear, entre na subpasta do projeto (`hackathon-cidadania-2026`,
+dentro do drive mapeado — pergunte ao Eduardo o nome exato se não achar de
+primeira) e abra o Claude Code apontando pra ela — não é mais um clone
+local. O vault do Obsidian deve estar em outra subpasta ali dentro; abra o
+Obsidian apontando pra lá.
 
 **Duas coisas importantes para não travar:**
 

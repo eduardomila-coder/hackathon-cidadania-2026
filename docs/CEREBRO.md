@@ -68,9 +68,11 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 
 ### Pendências críticas
 
-- [ ] @eduardo Confirmar o caminho do vault do Obsidian (se houver) dentro da
-      pasta compartilhada `smb://192.168.2.1/hackathon`, para Fernando e Maria
-      acessarem pelo Obsidian local deles.
+- [ ] @eduardo Confirmar o nome exato da subpasta do repositório dentro de
+      `/Users/eduardomila/Claude` (assumimos `hackathon-cidadania-2026` em
+      `docs/ONBOARDING.md`) e o caminho do vault do Obsidian/segundo cérebro
+      dentro dessa mesma pasta compartilhada (`smb://192.168.2.1/Claude`),
+      para Fernando e Maria acharem as duas de primeira.
 - [ ] Avaliar se `/revisoes` (Habeas Release) precisa passar a ler commits
       locais em vez de Pull Request do GitHub — desde 12/09 Fernando e Maria
       não abrem mais PR (ver `CLAUDE.md`), então a tela de revisão só mostra
@@ -103,3 +105,4 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 | 2026-09-12 | Registrado requisito (não implementado) de reconhecer quando uma pergunta deve ir para o advogado humano em vez da IA responder, com proposta de campo `encaminhar_advogado` | Pedido da Maria: no modelo B2B2C, o advogado só dá um norte pontual; a IA precisa saber os próprios limites |
 | 2026-09-12 | Registrada proposta (não implementada) de acompanhamento real do processo via API pública DataJud/CNJ, aguardando aprovação do Eduardo | Pedido da Maria; mexe em `lib/`, área do Eduardo, e tem limitações (só processo não sigiloso, dados não em tempo real) que pedem decisão dele antes de codar |
 | 2026-09-12 | Fernando e Maria passam a trabalhar direto na pasta compartilhada por SMB no MacBook do Eduardo (código incluso), sem clone próprio, sem GitHub, sem branch nem Pull Request; só o Eduardo publica em `main` no GitHub | Pedido do Eduardo, pra equipe não depender de conta/PR no GitHub no meio do hackathon; risco assumido: sem clone próprio não há mais cópia de segurança individual, e `.git`/`node_modules` compartilhados por SMB entre SOs diferentes podem corromper — ver `CLAUDE.md` |
+| 2026-09-12 | O compartilhamento SMB passa a expor `/Users/eduardomila/Claude` inteira (`smb://192.168.2.1/Claude`), não só a pasta do projeto — o repositório e o vault do Obsidian/segundo cérebro ficam como subpastas dela | Pedido do Eduardo, pra não precisar de um compartilhamento por pasta; risco assumido: qualquer outra coisa guardada em `~/Claude` também fica visível na rede pros três |

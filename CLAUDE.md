@@ -91,22 +91,33 @@ agora do que antes.
 
 ## Pasta compartilhada na rede (Wi-Fi do Eduardo)
 
-A pasta do projeto inteira — código incluso — está compartilhada por SMB na
-rede que o Mac do Eduardo distribui (`smb://192.168.2.1/hackathon`, usuário e
-senha individuais). **Desde 12/09, Fernando e Maria abrem o Claude Code
-direto nessa pasta de rede**, sem clone próprio: é a mesma pasta física do
-Mac do Eduardo, só acessada por outro computador. Isso substitui a regra
-antiga (que dizia para nunca rodar `git`/`npm`/Claude Code a partir do drive
-de rede); ver o aviso de risco na seção acima — o Eduardo decidiu assumir
-isso pelo resto do hackathon, pela simplicidade de não depender de GitHub
-para os três.
+Desde 12/09, o que está compartilhado por SMB não é mais só a pasta do
+projeto: é a pasta inteira `/Users/eduardomila/Claude` do Mac do Eduardo
+(`smb://192.168.2.1/Claude`, usuário e senha individuais). Dentro dela está
+o repositório deste projeto (código incluso) e, se existir, o vault do
+Obsidian/segundo cérebro — tudo na mesma pasta de rede, sem precisar montar
+vários compartilhamentos separados.
+
+**Fernando e Maria abrem o Claude Code direto na subpasta do projeto dentro
+desse compartilhamento**, sem clone próprio: é a mesma pasta física do Mac
+do Eduardo, só acessada por outro computador. Isso substitui a regra antiga
+(que dizia para nunca rodar `git`/`npm`/Claude Code a partir do drive de
+rede); ver o aviso de risco na seção acima — o Eduardo decidiu assumir isso
+pelo resto do hackathon, pela simplicidade de não depender de GitHub para os
+três.
 
 A mesma pasta também serve para arquivos que não são código: prints, fotos,
 canvas, PDFs, depoimentos — quem está no tablet joga direto em
-`docs/entregas/`. Se houver um vault do Obsidian (segundo cérebro,
-anotações), compartilhe a pasta dele também pela mesma rede e registre o
-caminho em `docs/CEREBRO.md`; qualquer Claude Code lendo daquela pasta pode
-consultar as notas de lá.
+`docs/entregas/`. Se o vault do Obsidian estiver em outra subpasta de
+`Claude/`, registre o caminho exato em `docs/CEREBRO.md` para todo mundo
+saber onde procurar.
+
+**Atenção:** compartilhar `Claude/` inteira (em vez de só a pasta do
+projeto) expõe pela rede tudo que o Eduardo guarda ali, incluindo outros
+projetos ou anotações que não sejam deste hackathon. Foi decisão dele, pela
+simplicidade — mas vale conferir de vez em quando se não há nada sensível
+solto naquela pasta antes de deixar o compartilhamento ligado por dois dias
+seguidos.
 
 ## Servidor compartilhado
 
