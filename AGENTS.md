@@ -28,6 +28,16 @@ fonte de verdade sobre objetivo, prioridade, divisão da equipe e entregas.
 | Fernando | `app/`, componentes e acessibilidade | Não, envia para revisão |
 | Maria | `docs/juridico/`, `docs/entregas/`, testes e evidências | Não, envia para revisão |
 
+## Como cada pessoa abre o agente
+
+- **Eduardo:** abre este repositório no Codex, Claude Code ou DeepCode no Mac.
+- **Fernando:** abre o Claude Code no Windows dentro do clone local e pode usar
+  `/comecar` e `/enviar-revisao`.
+- **Maria:** abre a área Code do aplicativo Claude no Android, seleciona este
+  repositório conectado ao GitHub e escreve a tarefa em português. Não depende
+  de terminal nem dos comandos com barra. Quando terminar, ela pede: "envie
+  para revisão em uma branch, sem juntar na main, e diga como testar".
+
 ## Entrega correta
 
 - Toda alteração deve passar por `npm run build` antes de ser enviada.
@@ -35,7 +45,8 @@ fonte de verdade sobre objetivo, prioridade, divisão da equipe e entregas.
 - Maria e Fernando nunca usam `npm run enviar`: fazem commit na própria branch,
   fazem `git push -u origin HEAD` e abrem ou pedem uma Pull Request para a
   `main`. A mudança aparece no Habeas Release em `/revisoes` para Eduardo
-  aprovar.
+  aprovar. Maria pede isso ao Claude no aplicativo; Fernando pode usar
+  `/enviar-revisao`.
 - Nunca faça `push --force`, `reset --hard`, merge na `main` em nome de Maria
   ou Fernando, nem leia ou envie `.env.local`, chaves ou `docs/privado/`.
 

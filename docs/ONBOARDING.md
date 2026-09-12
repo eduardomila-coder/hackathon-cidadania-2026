@@ -113,3 +113,16 @@ Quer saber o que os outros fizeram? `/situacao`.
 
 Não precisa saber git. Se o Claude Code perguntar algo sobre "conflito",
 chama no grupo antes de responder.
+
+## 7b. Maria no aplicativo Claude para Android
+
+No aplicativo Claude, abra a área **Code**, conecte o GitHub se for pedido e
+escolha o repositório `hackathon-cidadania-2026`. O projeto entrega as regras
+automaticamente para o Claude. Para começar, escreva somente o que quer fazer,
+por exemplo:
+
+> Sou Maria. Faça o registro dos testes externos em `docs/entregas/3-testes-externos.md`. Envie para revisão em uma branch, sem juntar na main, e diga como testar.
+
+Não use `/comecar` nem `/enviar-revisao` no tablet: eles são comandos do Claude
+Code do computador. O Claude no aplicativo cria a branch e envia para o Eduardo
+revisar.
