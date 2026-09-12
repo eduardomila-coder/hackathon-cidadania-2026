@@ -88,6 +88,15 @@ profissional habilitado, que assina a peça por cima — não é o sistema
 dando parecer para quem não é advogado. Vale como resposta pronta no
 pitch para a pergunta "e o risco com a OAB?".
 
+> **Correção após pesquisa em 12/09/2026 (ver seção "Pesquisa" abaixo):**
+> essa frase está incompleta. O **Provimento 205/2021 da OAB** regula
+> exatamente chatbot de advogado/escritório, e proíbe citar artigo de lei
+> ou emitir parecer sobre o caso — que é o que `motivo_juizado` e
+> `fundamentos` fazem hoje. Ou seja: **se o produto virar o chatbot de um
+> advogado específico (o modelo B2B2C), o risco pode aumentar, não
+> diminuir.** O risco só é baixo enquanto a ferramenta for genérica, sem
+> vínculo com um advogado ou escritório determinado — como é hoje.
+
 ### Requisito, se essa leitura virar produto: reconhecer quando é hora de um humano
 
 Precisão da Maria em 12/09/2026, complementando a ideia acima: nesse
@@ -204,6 +213,56 @@ acima ("percebo que isso pesa muito pra você...") já segue essa regra —
 fala do assunto ("isso pesa", "situação delicada"), nunca da pessoa
 ("você é vulnerável"). Vale como instrução explícita no prompt também,
 para não escapar em nenhuma variação de resposta que o modelo gerar.
+
+### Pesquisa: contato com o cliente e como melhorar essas diretrizes (12/09/2026)
+
+Pedido da Maria: pesquisar prática de mercado e regra da OAB para
+melhorar o que está registrado acima. Três frentes:
+
+**1. Handoff de IA para humano (prática geral de atendimento) confirma o
+desenho, com números:**
+
+- Taxa saudável de encaminhamento para humano: **15–25%** das conversas.
+  Abaixo de 10%, sinal de que a pessoa não está achando a opção de
+  humano; acima de 30%, sinal de que a IA está encaminhando demais ou não
+  resolvendo sozinha. Dá pra usar como meta quando o produto tiver uso
+  real.
+- **80% das pessoas só usam um chatbot se souberem que existe opção de
+  humano.** Isso é mais forte que só disparar o sinal quando algo dá
+  errado: **mostrar sempre**, num canto fixo da tela, que dá pra falar
+  com o advogado quando quiser — não só nos gatilhos A/B/C.
+- Transferência "morna" (o humano recebe um resumo do que já foi
+  conversado antes de entrar) em vez de "fria" (a pessoa repete tudo) —
+  bate com reaproveitar o `resumo` que a etapa "analisar" já gera, como
+  contexto pro advogado quando ele entrar pelo WhatsApp.
+
+**2. IA em situação de crise/saúde sensível (pesquisa acadêmica) confirma
+o sinal C:**
+
+- A checagem do sinal de sofrimento deve rodar **antes** de gerar
+  qualquer resposta de mérito — bate com a decisão já registrada de
+  colocar `sinal_de_sofrimento` na etapa "extrair" (primeira etapa da
+  cadeia), não depois.
+- A IA deve deixar claro que é IA, sem fingir ser humana — vale conferir
+  se isso já está explícito na tela hoje.
+
+**3. Provimento 205/2021 da OAB — corrige a leitura do risco no modelo
+B2B2C** (ver aviso na seção "Leitura B2B2C" acima): chatbot de
+advogado/escritório específico não pode citar artigo de lei nem emitir
+parecer sobre o caso — hoje o produto faz as duas coisas
+(`fundamentos`/`fonte` e `motivo_juizado`). **Enquanto a ferramenta for
+genérica** (sem vínculo com um advogado determinado, como é hoje), essas
+regras de publicidade não se aplicam. Se o modelo B2B2C avançar, isso
+precisa ser resolvido antes — por exemplo, uma versão do resultado que o
+advogado vê (com artigo citado) diferente da que o cliente vê (sem
+citação, só "seu advogado vai avaliar isso com base na lei").
+
+Fontes: [Provimento 205/2021 — contexto geral](https://jurisoft.com.br/blog/provimento-205-2021-da-oab-contexto-geral-do-regramento/),
+[chatbot de advocacia e o que o Provimento permite/proíbe](https://kivohub.ai/blog/chatbot-advocacia-conformidade-oab),
+[compliance com o Provimento 205/2021](https://chatjuridico.com.br/ia-sem-violar-etica-oab/),
+[handoff de IA para humano — taxas e boas práticas](https://www.bluetweak.com/blog/ai-to-human-handoff),
+[handoff em atendimento — pesquisa Zendesk 2026 citada](https://www.getmacha.com/blog/ai-chatbot-human-handoff),
+[chatbots de saúde mental — detecção de crise e empatia (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC11420590/).
 
 ## Proposta: acompanhamento real do processo (aguardando aprovação do Eduardo)
 

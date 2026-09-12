@@ -84,6 +84,13 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
       pergunta não é para a IA responder e sim o advogado. Detalhes em
       `docs/IDEIA.md`, seção "Requisito, se essa leitura virar produto:
       reconhecer quando é hora de um humano".
+- [ ] @eduardo **Ler antes de avançar no modelo B2B2C**: pesquisa achou
+      que o Provimento 205/2021 da OAB proíbe chatbot de advogado
+      específico citar artigo de lei ou emitir parecer — o produto faz as
+      duas coisas hoje (`fundamentos`, `motivo_juizado`). Risco pode
+      *aumentar*, não diminuir, se um advogado adotar a ferramenta como
+      própria. Detalhes em `docs/IDEIA.md`, seção "Pesquisa: contato com o
+      cliente e como melhorar essas diretrizes".
 
 ### Log curto
 
