@@ -79,6 +79,11 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 - [ ] @eduardo Aprovar ou recusar a proposta de acompanhamento real do
       processo via API DataJud (mexe em `lib/`) — detalhes em
       `docs/IDEIA.md`, seção "Proposta: acompanhamento real do processo".
+- [ ] @eduardo Decidir sobre o campo `encaminhar_advogado` na `Analise`
+      (mexe em `lib/etapas.ts` e `lib/analise.ts`) — reconhecer quando a
+      pergunta não é para a IA responder e sim o advogado. Detalhes em
+      `docs/IDEIA.md`, seção "Requisito, se essa leitura virar produto:
+      reconhecer quando é hora de um humano".
 
 ### Log curto
 
@@ -87,4 +92,5 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 | 2026-09-12 | Criado o cérebro local do projeto | Centralizar contexto sem misturar com outros projetos |
 | 2026-09-12 | Roadmap técnico passa a seguir a rubrica da auditoria: RAG sobre a lei, verificação de fontes, cadeia de prompts, acessibilidade | Manual, seção 8: é o que dá nota 5 nas três dimensões (300 pts) |
 | 2026-09-12 | Adicionado dado sobre tamanho do público (72% dos ~1,3 mi de advogados no Brasil são autônomos) em `docs/IDEIA.md` | Reforça o problema para o pitch: advogado autônomo sem estrutura de escritório é público-alvo direto |
+| 2026-09-12 | Registrado requisito (não implementado) de reconhecer quando uma pergunta deve ir para o advogado humano em vez da IA responder, com proposta de campo `encaminhar_advogado` | Pedido da Maria: no modelo B2B2C, o advogado só dá um norte pontual; a IA precisa saber os próprios limites |
 | 2026-09-12 | Registrada proposta (não implementada) de acompanhamento real do processo via API pública DataJud/CNJ, aguardando aprovação do Eduardo | Pedido da Maria; mexe em `lib/`, área do Eduardo, e tem limitações (só processo não sigiloso, dados não em tempo real) que pedem decisão dele antes de codar |

@@ -88,6 +88,33 @@ profissional habilitado, que assina a peça por cima — não é o sistema
 dando parecer para quem não é advogado. Vale como resposta pronta no
 pitch para a pergunta "e o risco com a OAB?".
 
+### Requisito, se essa leitura virar produto: reconhecer quando é hora de um humano
+
+Precisão da Maria em 12/09/2026, complementando a ideia acima: nesse
+formato a ferramenta é o **canal de contato com o cliente**. O advogado
+entra pouco — responde perguntas pontuais, dá um norte, sem escrever muito
+material. A IA fica só **repassando informação organizada**. Isso só
+funciona se o sistema souber **reconhecer quando a pergunta não é para IA
+responder, e sim encaminhar para o advogado**.
+
+Isso não é o mesmo mecanismo que já existe: hoje `lib/etapas.ts` verifica
+se uma **afirmação sobre a lei** tem base no trecho citado (`sem_base` /
+`confirmada` / `contradiz` — controle de alucinação). O que falta é outra
+checagem, sobre a **natureza da pergunta**, não sobre a fonte legal:
+perguntas de estratégia ("devo processar ou não", "vale a pena aceitar o
+acordo"), decisão sobre valor/negociação, caso emocionalmente sensível, ou
+prazo urgente e específico do processo real da pessoa — isso é para o
+advogado responder, não a IA, mesmo que a IA "soubesse" a resposta.
+
+**Como encaixaria, tecnicamente** (não implementado — mexe em `lib/`,
+pendência para o Eduardo, ver `docs/CEREBRO.md`): um campo novo na
+`Analise` (`lib/etapas.ts`), algo como `encaminhar_advogado: boolean` +
+`motivo`, populado na etapa "analisando" com regras explícitas do tipo
+acima. Na interface, quando `encaminhar_advogado` for verdadeiro, mostrar
+"essa parte é melhor perguntar direto ao seu advogado" em vez de uma
+resposta gerada — inclusive como o ponto de contato pelo WhatsApp
+registrado em `docs/entregas/3-testes-externos.md`.
+
 ## Proposta: acompanhamento real do processo (aguardando aprovação do Eduardo)
 
 Pedido da Maria em 12/09/2026: a ferramenta atualizar o cliente sobre em que
