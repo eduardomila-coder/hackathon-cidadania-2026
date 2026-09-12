@@ -58,7 +58,7 @@ export default function Home() {
             <small>Gratuito · Seguro · Sem cadastro</small>
           </div>
         </div>
-        <aside className="cf-hero-lateral" aria-hidden="true"><span>Informação<br />também<br />é um direito</span><div className="cf-arco" /><p>Mais cidadania<br />uma sociedade<br />mais justa</p></aside>
+        <aside className="cf-hero-lateral"><span>Informação<br />também<br />é um direito</span><div className="cf-arquitetura"><i aria-hidden="true" /><img src="/arquitetura-cidadania.png" alt="Arquitetura modernista em concreto" /></div><p>Mais cidadania<br />uma sociedade<br />mais justa</p></aside>
       </section>
       {erro && <p role="alert" className="cf-erro">{erro}</p>}
       <section className="cf-passos" id="como-funciona"><Passo numero="1" titulo="Conte">Descreva sua situação de forma simples e objetiva, no seu jeito de falar.</Passo><Passo numero="2" titulo="Entenda">Receba uma análise inicial, com linguagem clara e orientação confiável.</Passo><Passo numero="3" titulo="Aja">Saiba quais são os próximos passos e como buscar ajuda, se necessário.</Passo></section>
