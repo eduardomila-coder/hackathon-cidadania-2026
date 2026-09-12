@@ -11,6 +11,15 @@ export const MODEL = process.env.MODEL ?? "claude-opus-5";
 // com DeepSeek, que pensa longo por padrão e estoura o max_tokens só pensando).
 const RACIOCINIO_OFF = process.env.RACIOCINIO === "off";
 
+// O que a etapa gastou. Cada chamada devolve o seu; lib/custo.ts soma e põe
+// preço. É o que permite dizer ao advogado quanto custou aquela triagem.
+export type Uso = {
+  modelo: string;
+  entrada: number;
+  saida: number;
+  cache_leitura: number;
+};
+
 // Tira cercas de código caso o modelo embrulhe o JSON em ```json ... ```.
 function extrairJson(texto: string): string {
   const m = texto.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -25,7 +34,7 @@ export async function perguntarJson<T>(opts: {
   usuario: string;
   schema: ZodType<T>;
   maxTokens?: number;
-}): Promise<T> {
+}): Promise<{ dados: T; uso: Uso }> {
   const resposta = await client.messages
     .stream({
       model: MODEL,
@@ -42,8 +51,15 @@ export async function perguntarJson<T>(opts: {
     .map((b) => b.text)
     .join("");
 
+  const uso: Uso = {
+    modelo: resposta.model,
+    entrada: resposta.usage.input_tokens,
+    saida: resposta.usage.output_tokens,
+    cache_leitura: resposta.usage.cache_read_input_tokens ?? 0,
+  };
+
   try {
-    return opts.schema.parse(JSON.parse(extrairJson(texto)));
+    return { dados: opts.schema.parse(JSON.parse(extrairJson(texto))), uso };
   } catch (e) {
     // Diagnóstico útil: truncou (max_tokens), veio vazio, ou veio fora do formato.
     const tipos = resposta.content.map((b) => b.type).join(",");
