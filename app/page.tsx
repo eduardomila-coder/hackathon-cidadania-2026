@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { Etapa, Resultado } from "@/lib/analise";
 import { useDitado } from "@/lib/useDitado";
+import { Versoes } from "./Versoes";
 
 const ETAPAS: { chave: Etapa; texto: string }[] = [
   { chave: "extraindo", texto: "Lendo o que você contou" },
@@ -137,6 +138,8 @@ export default function Home() {
       )}
 
       {resultado && <Painel r={resultado} />}
+
+      <Versoes />
 
       <footer className="mt-auto pt-12 text-center text-sm text-slate-500">
         Equipe Habeas Titas · Hackathon da Cidadania 2026 · <a href="/painel" className="underline">painel da equipe</a>
