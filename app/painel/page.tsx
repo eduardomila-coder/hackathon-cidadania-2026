@@ -41,7 +41,7 @@ export default function Painel() {
   const dias = Array.from(new Set(MARCOS.map((m) => diaDe(m.quando))));
 
   return (
-    <div className="min-h-screen bg-[#f5f7fb] text-slate-950">
+    <div className="cf-painel min-h-screen bg-[#f5f7fb] text-slate-950">
       <header className="relative overflow-hidden bg-[#101b3d] text-white">
         <div className="absolute -right-24 -top-32 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl" aria-hidden />
         <div className="absolute -bottom-40 left-1/3 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl" aria-hidden />
