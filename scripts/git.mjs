@@ -49,7 +49,7 @@ if (modo === "pegar") {
   }
   git("push origin main");
   if (branch !== "main") git(`switch ${branch}`);
-  console.log(`\n✓ enviado para main. Em até 1 minuto está em https://hackathon.eduardomila.adv.br`);
+  console.log(`\n✓ enviado para main. Em até 1 minuto está em https://habeastitas.eduardomila.adv.br`);
 } else {
   falhar("uso: node scripts/git.mjs pegar | enviar \"mensagem\"");
 }

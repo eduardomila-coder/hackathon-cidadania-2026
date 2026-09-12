@@ -2,7 +2,7 @@
 
 Marque `[x]` ao terminar e faça `/entregar`. Para assumir uma tarefa, escreva
 `@eduardo`, `@maria` ou `@fernando` na linha. O painel em
-https://hackathon.eduardomila.adv.br/painel lê este arquivo ao vivo.
+https://habeastitas.eduardomila.adv.br/painel lê este arquivo ao vivo.
 Pontuação e horários em `docs/EVENTO.md`.
 
 ## Sexta 11/09, à noite
@@ -30,7 +30,7 @@ Pontuação e horários em `docs/EVENTO.md`.
 ### 15h30–17h30 — Entrega 3: V2 com testes externos (100 pts)
 - [ ] @eduardo Upload de foto de documento → o modelo lê e extrai
 - [ ] @fernando Acessibilidade: contraste, fonte grande, rótulos `aria`, funciona só com teclado (auditoria: nota 5 em usabilidade)
-- [ ] @maria Pedir a 3+ pessoas de fora (outra equipe, organização) que abram https://hackathon.eduardomila.adv.br no celular e contem um caso
+- [ ] @maria Pedir a 3+ pessoas de fora (outra equipe, organização) que abram https://habeastitas.eduardomila.adv.br no celular e contem um caso
 - [ ] @maria **Depoimento em rede social** de quem testou, com #hackathonoabpr; link em `docs/entregas/3-testes-externos.md` (o Manual pede isso como evidência)
 - [ ] @maria Registrar o que cada um disse e o que mudou
 

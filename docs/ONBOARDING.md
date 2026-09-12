@@ -61,7 +61,7 @@ cp .env.example .env.local
 ```
 
 O `.env.local` pode ficar vazio: a chave do modelo mora só no servidor
-compartilhado (https://hackathon.eduardomila.adv.br). Localmente, tudo abre e
+compartilhado (https://habeastitas.eduardomila.adv.br). Localmente, tudo abre e
 funciona, menos o botão Analisar. Se o Eduardo te mandar uma chave no
 privado, cola ali. **Nunca cole chave no grupo nem no git.**
 
@@ -103,7 +103,7 @@ quer fazer: "adiciona um botão pra tirar foto do documento".
 
 Quando algo estiver funcionando, digita `/entregar`. Ele testa, junta com o
 trabalho dos outros e sobe. Em até 1 minuto aparece em
-https://hackathon.eduardomila.adv.br — abre no celular e confere.
+https://habeastitas.eduardomila.adv.br — abre no celular e confere.
 
 Quer saber o que os outros fizeram? `/situacao`.
 
