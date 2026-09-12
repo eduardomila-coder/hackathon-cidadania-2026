@@ -1,0 +1,44 @@
+/* Tela /escritorio/processos (módulo 4): consulta pontual ao DataJud e a lista
+   de processos do advogado. Reaproveita .pd-cartao, .md-eyebrow, .md-status,
+   .md-retorno-processo e os botões .md-botao-* de globals.css. */
+
+.pd-processos{display:grid;gap:18px}
+.pd-processos-cabeca p+p{margin-top:8px;color:#7d5960;font-size:13px}
+
+.pd-processos-consulta h2,.pd-processos-lista h2{font-size:24px}
+.pd-processos-form{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:16px;align-items:end;margin-top:18px}
+.pd-processos-campo{display:grid;gap:6px;min-width:0}
+.pd-processos-campo label{font-size:12px;font-weight:bold}
+.pd-processos-campo input,.pd-processos-campo select{width:100%;padding:11px 12px;border:1px solid #ccd2d3;border-radius:7px;background:#fff;color:#143b65;font-size:15px;outline-color:#a12434}
+.pd-processos-campo input{letter-spacing:.03em}
+.pd-processos-campo small{min-height:16px;color:#687487;font-size:11px;line-height:1.4}
+.pd-processos-form button{align-self:end;margin-bottom:22px;white-space:nowrap}
+.pd-processos-form button:disabled{opacity:.45;cursor:not-allowed}
+.pd-processos-consulta .md-status{margin:14px 0 0}
+.pd-processos-erro{margin:14px 0 0;padding:11px 13px;border-left:3px solid #a12434;border-radius:4px;background:#fbefed;color:#7f1d2a;font-size:13px;line-height:1.4}
+
+.pd-processos-lista-cabeca{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pd-processos-contagem{color:#687184;font-size:12px}
+.pd-processos-vazio{margin:12px 0 0;padding:22px;border:1px dashed #cfd3d6;border-radius:10px;color:#506075;font-size:14px;line-height:1.5;text-align:center}
+.pd-processos-itens{display:grid;gap:12px;margin:14px 0 0;padding:0;list-style:none}
+.pd-processo{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr) minmax(0,1fr) auto;gap:18px;align-items:start;padding:18px;border:1px solid #e5ded7;border-radius:10px;background:#fffdfa}
+.pd-processo b{display:block;margin-bottom:4px;color:#8b1f2d;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.pd-processo-numero strong{display:block;font:700 17px Georgia,serif;letter-spacing:.01em;color:#143b65;overflow-wrap:anywhere}
+.pd-processo-numero span{display:block;margin-top:5px;color:#506075;font-size:12px;line-height:1.4}
+.pd-processo-andamento p{margin:0;color:#143b65;font-size:14px;line-height:1.45}
+.pd-processo-andamento small,.pd-processo-caso small{display:block;margin-top:6px;color:#687487;font-size:11px}
+.pd-processo-caso a{color:#8b1f2d;font-size:14px;font-weight:bold;text-decoration:none}
+.pd-processo-caso a:hover{text-decoration:underline}
+.pd-processo-caso span{color:#687184;font-size:14px}
+.pd-processo-acoes button{padding:9px 12px;font-size:12px}
+.pd-processo-acoes button:disabled{opacity:.45;cursor:not-allowed}
+
+@media (max-width:900px){
+  .pd-processos-form{grid-template-columns:1fr}
+  .pd-processos-form button{margin-bottom:0;justify-self:start}
+  .pd-processo{grid-template-columns:1fr 1fr}
+  .pd-processo-acoes{grid-column:1/-1}
+}
+@media (max-width:560px){
+  .pd-processo{grid-template-columns:1fr;gap:14px;padding:16px}
+}
