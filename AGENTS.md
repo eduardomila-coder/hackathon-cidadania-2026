@@ -17,8 +17,11 @@ fonte de verdade sobre objetivo, prioridade, divisão da equipe e entregas.
 ## Início automático de sessão
 
 1. Rode `git status --short`, descubra a branch atual e execute `npm run pegar`.
-2. Se a pessoa não disser quem é, pergunte se é Eduardo, Maria ou Fernando
-   antes de editar. Se ela disser, use a área dela abaixo.
+2. Se o projeto estiver em `/Users/eduardomila/` ou o usuário do sistema for
+   `eduardomila`, assuma automaticamente que a pessoa é **Eduardo**. Em outro
+   computador, tente identificar pelo `git config user.name`; só pergunte se
+   ainda não der para identificar. A palavra `começar` no Claude Android
+   identifica Maria pelo atalho abaixo.
 3. Diga em uma frase a tarefa aberta mais urgente daquela pessoa. Só então
    edite o necessário.
 
