@@ -60,6 +60,17 @@ Regras que os comandos já cumprem e você não pode contornar:
   histórico de outra pessoa.
 - Conflito em arquivo de outra área: pergunte antes de resolver.
 
+## Pasta compartilhada na rede (Wi-Fi do Eduardo)
+
+A pasta do projeto está compartilhada por SMB na rede que o Mac do Eduardo
+distribui (`smb://192.168.2.1/hackathon`, usuário e senha individuais).
+**Serve para arquivos**: prints, fotos, canvas, PDFs, depoimentos — quem está
+no tablet joga direto em `docs/entregas/`. **Não serve para código**: não
+rode Claude Code, `npm` nem `git` a partir do drive de rede (lento no Windows
+e o `.git` corrompe). Código continua no clone local de cada um, com
+`/comecar` e `/entregar`. O que entra pela pasta compartilhada é commitado
+pelo Eduardo no próximo `/entregar` dele.
+
 ## Servidor compartilhado
 
 `https://hackathon.eduardomila.adv.br` roda no Mac do Eduardo e **puxa `main`

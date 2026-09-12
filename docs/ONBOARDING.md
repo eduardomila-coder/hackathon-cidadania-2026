@@ -74,6 +74,20 @@ npm run dev
 Abre http://localhost:3000, escreve um relato, clica em Analisar. Funcionou?
 Está pronto.
 
+## 6b. Pasta compartilhada (para arquivos, não para código)
+
+Conectado no Wi-Fi do Eduardo, a pasta do projeto aparece como um drive de
+rede. Usuário e senha ele manda no privado.
+
+- **Windows:** Explorador → Este Computador → Mapear unidade de rede →
+  `\\192.168.2.1\hackathon`, marcar "conectar usando outras credenciais".
+- **Mac:** Finder → Ir → Conectar ao Servidor → `smb://192.168.2.1/hackathon`.
+- **Android (tablet):** app Cx File Explorer ou Solid Explorer → Rede →
+  SMB → host `192.168.2.1`, pasta `hackathon`, usuário e senha.
+
+Use para colocar prints, fotos, canvas e PDFs em `docs/entregas/`. Não abra
+o Claude Code nem rode comandos a partir daí.
+
 ## 7. Trabalhar
 
 Sempre que sentar pra trabalhar:
