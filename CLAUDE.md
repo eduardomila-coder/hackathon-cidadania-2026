@@ -86,7 +86,8 @@ sem `.env.local` só falha no botão Analisar.
 |---|---|---|
 | Interface (telas, componentes, fluxo da conversa) | `app/`, `components/` | Fernando (sugestão) |
 | Cérebro (prompts, análise, pedido, leitura de documento) | `lib/` | Eduardo (sugestão) |
-| Conteúdo jurídico e entregas (regras do JEC, modelo do pedido, canvas, testes, pitch) | `docs/juridico/`, `docs/entregas/` | Maria (sugestão) |
+| Conteúdo jurídico e entregas (regras do JEC, modelo do pedido, canvas, testes e evidências) | `docs/juridico/`, `docs/entregas/` | Maria (sugestão) |
+| Pitch e apresentação (roteiro, slides, ensaio e demonstração) | `docs/entregas/` | Eduardo |
 
 É sugestão até a equipe confirmar no sábado de manhã; troque os nomes aqui.
 Se precisar mexer fora da sua área, avise no grupo antes.

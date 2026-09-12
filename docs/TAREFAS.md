@@ -55,10 +55,10 @@ Pontuação e horários em `docs/EVENTO.md`.
 - [ ] @eduardo Demonstrar os testes rodando ao vivo
 
 ### Até 14h30 — Entrega 5: slides do pitch de 2 minutos (50 pts)
-- [ ] @maria Roteiro imposto: PROBLEMA (20 s) → SOLUÇÃO (20 s) → DEMO (60 s) → IMPACTO (20 s)
-- [ ] @maria Impacto fala de escala: replicável, baixo custo, outros ramos do Direito (critério 7.5)
-- [ ] @maria @fernando Slides no formato que a organização pedir; cópia em `docs/entregas/5-pitch.pdf`
-- [ ] @maria @eduardo @fernando Ensaiar 3 vezes com cronômetro
+- [ ] @eduardo Roteiro imposto: PROBLEMA (20 s) → SOLUÇÃO (20 s) → DEMO (60 s) → IMPACTO (20 s)
+- [ ] @eduardo Impacto fala de escala: replicável, baixo custo, outros ramos do Direito (critério 7.5)
+- [ ] @eduardo @maria @fernando Slides no formato que a organização pedir; cópia em `docs/entregas/5-pitch.pdf`
+- [ ] @eduardo @maria @fernando Ensaiar 3 vezes com cronômetro
 
 ### 16h30 — Banca
 - [ ] @fernando Caso de exemplo fictício pronto e ensaiado para a demo ao vivo
