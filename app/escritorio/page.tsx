@@ -7,7 +7,9 @@ import { useEffect, useMemo, useState } from "react";
 type Documento = { id: number; nome: string; detalhe: string; recebido: boolean; essencial?: boolean };
 type Tarefa = { id: number; titulo: string; prazo: string; concluida: boolean };
 type Atendimento = { id: number; resumo: string; momento: string; tipo: "registro" | "mila" | "humano" };
-type ConexaoWhatsApp = { configurado: boolean; instancia: string | null; estado: string; webhookPodeSerConfigurado: boolean };
+type ConexaoWhatsApp = { configurado: boolean; instancia: string | null; estado: string; numero: string | null; webhookPodeSerConfigurado: boolean };
+const WHATSAPP_INICIAL: ConexaoWhatsApp = { configurado: false, instancia: null, estado: "carregando", numero: null, webhookPodeSerConfigurado: false };
+const ESTADOS_WHATSAPP: Record<string, string> = { open: "conectado", connecting: "aguardando leitura do QR", close: "desconectado", sem_numero: "cadastre seu número", sem_instancia: "instância perdida", nao_configurado: "servidor sem Evolution", indisponivel: "indisponível", carregando: "…" };
 type ConsultaProcesso = { encontrado: boolean; numero: string; classe?: string; orgao?: string; ultimoMovimento?: string; dataMovimento?: string | null };
 type Nomeacao = { processo: string; orgao: string; ato: string; prazo: string; situacao: string; resumo: string };
 
@@ -46,7 +48,8 @@ export default function Escritorio() {
   const [novaTarefa, setNovaTarefa] = useState("");
   const [aviso, setAviso] = useState("Pronto para organizar o próximo atendimento.");
   const [mensagemDocumentos, setMensagemDocumentos] = useState<string | null>(null);
-  const [whatsApp, setWhatsApp] = useState<ConexaoWhatsApp>({ configurado: false, instancia: null, estado: "carregando", webhookPodeSerConfigurado: false });
+  const [whatsApp, setWhatsApp] = useState<ConexaoWhatsApp>(WHATSAPP_INICIAL);
+  const [numeroWhatsApp, setNumeroWhatsApp] = useState("");
   const [codigoConexao, setCodigoConexao] = useState<string | null>(null);
   const [imagemConexao, setImagemConexao] = useState<string | null>(null);
   const [carregandoWhatsApp, setCarregandoWhatsApp] = useState(false);
@@ -65,34 +68,38 @@ export default function Escritorio() {
       const dados = await resposta.json() as ConexaoWhatsApp & { erro?: string };
       if (!resposta.ok) throw new Error(dados.erro);
       setWhatsApp(dados);
+      if (dados.estado === "open") { setImagemConexao(null); setCodigoConexao(null); }
     } catch {
-      setWhatsApp({ configurado: false, instancia: null, estado: "indisponivel", webhookPodeSerConfigurado: false });
+      setWhatsApp({ ...WHATSAPP_INICIAL, estado: "indisponivel" });
     }
   }
 
+  // Consulta o estado ao abrir e, enquanto um QR está na tela, a cada 4 s:
+  // assim a página vira "conectado" sozinha quando o advogado lê o código.
   useEffect(() => {
     let ativo = true;
-    void fetch("/api/whatsapp/conexao", { cache: "no-store" })
-      .then(async (resposta) => ({ resposta, dados: await resposta.json() as ConexaoWhatsApp & { erro?: string } }))
-      .then(({ resposta, dados }) => {
-        if (!ativo) return;
-        setWhatsApp(resposta.ok ? dados : { configurado: false, instancia: null, estado: "indisponivel", webhookPodeSerConfigurado: false });
-      })
-      .catch(() => { if (ativo) setWhatsApp({ configurado: false, instancia: null, estado: "indisponivel", webhookPodeSerConfigurado: false }); });
-    return () => { ativo = false; };
-  }, []);
+    const consultar = () => { if (ativo) void atualizarWhatsApp(); };
+    consultar();
+    const intervalo = setInterval(consultar, imagemConexao ? 4000 : 30000);
+    return () => { ativo = false; clearInterval(intervalo); };
+  }, [imagemConexao]);
 
-  async function acionarWhatsApp(acao: "conectar" | "webhook") {
-    setCarregandoWhatsApp(true); setCodigoConexao(null); setImagemConexao(null);
+  async function acionarWhatsApp(acao: "cadastrar" | "conectar" | "desconectar" | "remover") {
+    setCarregandoWhatsApp(true);
+    if (acao !== "conectar") { setCodigoConexao(null); setImagemConexao(null); }
     try {
-      const resposta = await fetch("/api/whatsapp/conexao", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ acao }) });
-      const dados = await resposta.json() as { codigo?: string | null; imagem?: string | null; erro?: string };
+      const corpo = acao === "cadastrar" ? { acao, numero: numeroWhatsApp } : { acao };
+      const resposta = await fetch("/api/whatsapp/conexao", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
+      const dados = await resposta.json() as { conectado?: boolean; codigo?: string | null; imagem?: string | null; webhookRegistrado?: boolean; erro?: string };
       if (!resposta.ok) throw new Error(dados.erro);
-      if (acao === "conectar") {
+      if (acao === "cadastrar" || acao === "conectar") {
         setCodigoConexao(dados.codigo ?? null);
         setImagemConexao(dados.imagem ?? null);
+        setAviso(dados.conectado ? "O WhatsApp já está conectado." : dados.imagem ? "Leia o QR no WhatsApp do celular: Configurações → Aparelhos conectados → Conectar aparelho." : "A Evolution não devolveu um QR agora. Tente de novo em alguns segundos.");
+        if (acao === "cadastrar" && dados.webhookRegistrado === false) setAviso("Número cadastrado, mas o webhook não foi registrado: falta APP_URL ou EVOLUTION_WEBHOOK_SECRET no servidor.");
       }
-      setAviso(acao === "conectar" ? "Código de conexão solicitado. Nenhuma mensagem foi enviada." : "Webhook registrado para receber eventos mínimos e aguardar revisão humana.");
+      if (acao === "desconectar") setAviso("WhatsApp desconectado. O número continua cadastrado; gere um QR para voltar.");
+      if (acao === "remover") { setNumeroWhatsApp(""); setAviso("Número e sessão do WhatsApp removidos do servidor."); }
       await atualizarWhatsApp();
     } catch (e) {
       setAviso(e instanceof Error && e.message ? e.message : "Não consegui configurar o WhatsApp agora.");
@@ -228,10 +235,23 @@ export default function Escritorio() {
       </section>
 
       <section className="md-whatsapp md-cartao" id="whatsapp" aria-labelledby="whatsapp-titulo">
-        <div className="md-titulo-linha"><div><p className="md-eyebrow">Canal profissional</p><h2 id="whatsapp-titulo">WhatsApp conectado ao caso, sem piloto automático.</h2></div><span className={`md-whatsapp-estado estado-${whatsApp.estado}`}>{whatsApp.estado === "open" ? "conectado" : whatsApp.estado === "nao_configurado" ? "a configurar" : whatsApp.estado}</span></div>
+        <div className="md-titulo-linha"><div><p className="md-eyebrow">Canal profissional</p><h2 id="whatsapp-titulo">WhatsApp conectado ao caso, sem piloto automático.</h2></div><span className={`md-whatsapp-estado estado-${whatsApp.estado}`}>{ESTADOS_WHATSAPP[whatsApp.estado] ?? whatsApp.estado}</span></div>
         <div className="md-whatsapp-corpo">
           <div><p>O advogado conecta a própria instância via Evolution API. O webhook recebe apenas novas mensagens e alterações de conexão, sem mídia em base64 e sem resposta automática. A triagem fica sob revisão humana antes de qualquer retorno ao cliente.</p><ul><li>Conexão por QR Code da instância do advogado</li><li>Eventos mínimos: nova mensagem e estado da conexão</li><li>Estratégia e envio sempre aprovados pelo advogado</li></ul></div>
-          <aside>{whatsApp.configurado ? <><strong>Instância preparada</strong><small>{whatsApp.instancia}</small><div className="md-acoes"><button type="button" className="md-botao-primario" onClick={() => acionarWhatsApp("conectar")} disabled={carregandoWhatsApp}>{carregandoWhatsApp ? "Conectando…" : "Gerar QR de conexão"}</button><button type="button" className="md-botao-secundario" onClick={() => acionarWhatsApp("webhook")} disabled={carregandoWhatsApp || !whatsApp.webhookPodeSerConfigurado}>Ativar webhook seguro</button></div>{imagemConexao && <Image className="md-qr-conexao" src={imagemConexao} alt="QR Code para conectar o WhatsApp da instância" width={240} height={240} unoptimized />}{codigoConexao && <code className="md-codigo-conexao">{codigoConexao}</code>}</> : <><strong>Configuração do servidor necessária</strong><small>As chaves da Evolution ficam somente no ambiente do servidor. Cada advogado precisará de identidade própria, controle de acesso e cofre de credenciais antes de uma operação multiusuário.</small></>}</aside>
+          <aside>{!whatsApp.configurado ? <><strong>Servidor sem Evolution</strong><small>Defina EVOLUTION_API_URL e EVOLUTION_API_KEY no ambiente do servidor. As chaves nunca passam pela tela.</small></> : whatsApp.estado === "sem_numero" || whatsApp.estado === "sem_instancia" ? <>
+            <strong>Cadastre o seu WhatsApp</strong><small>O número fica ligado ao seu login do escritório. Depois do cadastro, o QR aparece aqui para ler no celular.</small>
+            <div className="md-adicionar md-numero-whatsapp"><label htmlFor="numero-whatsapp">Número com DDD</label><div><input id="numero-whatsapp" value={numeroWhatsApp} onChange={(evento) => setNumeroWhatsApp(evento.target.value)} inputMode="tel" autoComplete="tel" maxLength={20} placeholder="(41) 99999-9999" /><button type="button" className="md-botao-primario" onClick={() => acionarWhatsApp("cadastrar")} disabled={carregandoWhatsApp || numeroWhatsApp.replace(/\D/g, "").length < 10}>{carregandoWhatsApp ? "Cadastrando…" : "Cadastrar e gerar QR"}</button></div></div>
+            {whatsApp.estado === "sem_instancia" && <small>O cadastro anterior ({whatsApp.numero}) perdeu a instância no servidor. Cadastre de novo para recriá-la.</small>}
+          </> : <>
+            <strong>{whatsApp.estado === "open" ? "Conectado" : "Número cadastrado"}</strong><small>{whatsApp.numero} · instância {whatsApp.instancia}</small>
+            <div className="md-acoes">
+              {whatsApp.estado !== "open" && <button type="button" className="md-botao-primario" onClick={() => acionarWhatsApp("conectar")} disabled={carregandoWhatsApp}>{carregandoWhatsApp ? "Gerando…" : imagemConexao ? "Gerar novo QR" : "Gerar QR de conexão"}</button>}
+              {whatsApp.estado === "open" && <button type="button" className="md-botao-secundario" onClick={() => acionarWhatsApp("desconectar")} disabled={carregandoWhatsApp}>Desconectar</button>}
+              <button type="button" className="md-botao-secundario" onClick={() => acionarWhatsApp("remover")} disabled={carregandoWhatsApp}>Remover número</button>
+            </div>
+            {imagemConexao && whatsApp.estado !== "open" && <><Image className="md-qr-conexao" src={imagemConexao} alt="QR Code para conectar o seu WhatsApp" width={240} height={240} unoptimized /><small>Abra o WhatsApp no celular → Aparelhos conectados → Conectar aparelho. O QR expira sozinho; se passar, gere outro.</small></>}
+            {codigoConexao && whatsApp.estado !== "open" && <code className="md-codigo-conexao">Código de pareamento: {codigoConexao}</code>}
+          </>}</aside>
         </div>
       </section>
 

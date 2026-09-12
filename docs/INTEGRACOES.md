@@ -7,23 +7,36 @@ em exemplos.
 ## 1. WhatsApp profissional via Evolution API v2
 
 O conector técnico está em `lib/evolution.ts` e nas rotas
-`/api/whatsapp/conexao` e `/api/whatsapp/webhook`.
+`/api/whatsapp/conexao` e `/api/whatsapp/webhook`. Funciona assim:
 
-- A conexão consulta o estado da instância e pode solicitar o QR Code em
-  `GET /instance/connect/{instance}`.
-- O webhook é registrado em `POST /webhook/set/{instance}` somente para
-  `MESSAGES_UPSERT` e `CONNECTION_UPDATE`, sem anexos em base64.
-- O segredo do webhook, a URL da Evolution, a chave e o nome da instância ficam
+1. O advogado entra no escritório (`/escritorio`, com o login do painel) e
+   cadastra o próprio número no cartão "Canal profissional".
+2. O servidor cria uma instância só dele na Evolution, chamada
+   `ponto-dativo-<login>` (`POST /instance/create`, integração Baileys), e
+   registra o webhook (`POST /webhook/set/{instance}`) só para
+   `MESSAGES_UPSERT` e `CONNECTION_UPDATE`, sem anexos em base64.
+3. O QR aparece na tela; o advogado lê no celular em Aparelhos conectados. A
+   página consulta o estado a cada 4 s e vira "conectado" sozinha. O QR expira
+   sozinho e há botão para gerar outro (`GET /instance/connect/{instance}`).
+4. "Desconectar" encerra a sessão (`DELETE /instance/logout`) e mantém o
+   cadastro; "Remover número" apaga a instância (`DELETE /instance/delete`) e
+   o cadastro, sem deixar sessão do advogado no servidor.
+
+O número não vai no `create` de propósito: com ele a Evolution troca o QR pelo
+código de pareamento, que expira a cada 45 s e falha muito na prática.
+
+- O cadastro (login, instância, número) fica em `data/whatsapp.json`, fora do
+  git. Nenhuma conversa é gravada.
+- A URL da Evolution, a chave global e o segredo do webhook ficam
   exclusivamente em variáveis de ambiente descritas em `.env.example`.
 - A rota do webhook valida o segredo, não persiste conteúdo de mensagem e não
   envia resposta automática. Estratégia, negociação, prazo real e situação
   sensível exigem revisão do advogado.
 
-O QR e o webhook só podem ser acionados por usuário autenticado no escritório.
-Para vários advogados, ainda é obrigatório acrescentar autenticação individual,
-cofre de credenciais por conta, banco com criptografia, trilha de auditoria e
-política de retenção. O Basic Auth atual protege apenas a demonstração, não é
-modelo de produção multiusuário.
+Para vários advogados em produção ainda é obrigatório acrescentar autenticação
+individual, cofre de credenciais por conta, banco com criptografia, trilha de
+auditoria e política de retenção. O Basic Auth atual identifica o advogado na
+demonstração; não é modelo de produção multiusuário.
 
 Referência técnica: [Evolution API v2 — conexão de instância](https://github.com/evolution-foundation/docs-evolution/blob/main/v2/api-reference/instance-controller/instance-connect.mdx)
 e [webhook](https://github.com/evolution-foundation/docs-evolution/blob/main/v2/api-reference/webhook/set.mdx).
