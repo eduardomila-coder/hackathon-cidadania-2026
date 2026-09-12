@@ -1,38 +1,69 @@
 # A ideia
 
-Decidida nas reuniões de 10/09/2026 (manhã e noite; transcrições em
-`docs/privado/`). Foco fechado: **Juizado Especial Cível e acesso à Justiça
-para a população de baixa renda e leiga.**
+Direção atual, fechada em 12/09/2026 depois da mentoria das 11h e registrada no
+canvas da Entrega 1 (`docs/entregas/1-canvas.md`): **ferramenta de triagem
+contratada pelo advogado**, que recebe o relato do cliente e devolve o caso
+organizado, com a fonte legal de cada ponto. O foco original (o cidadão leigo
+usando sozinho) está preservado no fim deste arquivo, em "Como chegamos aqui":
+o público mudou, o problema de acesso à Justiça é o mesmo.
 
 ## O problema
 
-Hoje a pessoa vai ao juizado, recebe um formulário, escreve a história à mão,
-leva alguns documentos e a secretaria distribui. Muita gente acaba nos NPJs
-(como o da PUC) só para entender o que está acontecendo. Comarcas menores nem
-têm juizado separado. Pessoas longe do fórum, idosas ou sem instrução ficam
-de fora.
+Quem atende a maior parte da população no Juizado Especial é o advogado que
+trabalha sozinho — 72% da advocacia brasileira, ver "Tamanho do público"
+abaixo. Antes de fechar contrato, é ele mesmo quem ouve o cliente, separa
+documento por documento, decide se o caso vale e traduz o juridiquês no
+telefone. Essa triagem não é remunerada e consome o dia. Quando esse advogado
+trava, o acesso à Justiça trava junto.
+
+Do outro lado do balcão o problema antigo continua: a pessoa chega ao juizado,
+escreve a história à mão e não sabe o que precisa levar. A diferença é que
+agora quem opera a ferramenta é o profissional habilitado, que assina por cima.
 
 ## A solução
 
-Uma atendente virtual, como se fosse a pessoa da secretaria:
+Uma plataforma que o advogado contrata e o cliente alimenta:
 
-1. A pessoa **conta a história** com as próprias palavras, de preferência
-   **por voz**, e manda **fotos dos documentos**.
-2. O sistema **entende e classifica** o caso (consumidor, contrato,
-   vizinhança...), como a secretaria faz hoje ao filtrar.
-3. Diz se **cabe no JEC** e, importante, se existe **caminho sem processo**
-   (Procon, consumidor.gov.br, mediação): "às vezes a pessoa está levando uma
-   demanda para a Justiça que poderia ter outras formas de solução".
-4. Vai **pedindo o que falta** (documentos, informações), como uma atendente
-   de verdade.
-5. **Monta o pedido** no formato do formulário virtual do TJPR.
+1. O cliente **conta o que aconteceu**, por escrito ou **por voz**, pelo link
+   que o advogado manda — ou o próprio advogado cola o relato.
+2. Se o processo **já corre**, o advogado cola o andamento e a ferramenta o lê
+   junto com o relato.
+3. A cadeia **organiza o caso** e diz, com o trecho da lei ao lado: se cabe no
+   JEC, quais **requisitos legais já estão comprovados** e qual documento falta
+   para fechar cada um que ainda está aberto.
+4. Lista o que **pedir e perguntar** ao cliente, e os **caminhos sem processo**
+   (Procon, consumidor.gov.br, Anatel, mediação) quando existirem.
+5. **Mede-se**: mostra o custo real daquela triagem em tokens e o tempo, e
+   guarda a medida para responder se a ferramenta está se pagando.
+
+## Força do caso, não probabilidade de êxito
+
+A plataforma **não** estima porcentagem de vitória. Ela conta requisitos:
+"2 de 3 requisitos comprovados", cada um com o id do trecho que o exige e o
+documento que o comprova. É aritmética sobre fato verificável, e o revisor da
+cadeia derruba requisito marcado como comprovado sem prova no relato.
+
+O motivo é direto: não temos base histórica de processos julgados para
+sustentar uma probabilidade, e número sem fonte é exatamente a alucinação que
+a rubrica da auditoria pune. Jurimetria real sobre dados do TJPR fica como
+caminho depois do evento.
+
+## Como a eficiência é medida
+
+Cada triagem registra **só medida** — área, requisitos comprovados, custo,
+tempo. Nunca o relato, o nome do cliente ou o número do processo. Depois o
+advogado volta e anota no que o caso deu (ganho, acordo, perdido, desistiu).
+Com isso saem duas respostas: quanto custou por caso e quantas vezes a força
+medida apontou para o mesmo lado que o resultado real, usando o corte
+declarado em `lib/casos.ts`.
 
 ## O que fica de fora (por enquanto)
 
-- Integração real com o tribunal: exigiria convênio. Mostramos o pedido pronto
-  para a pessoa levar ou protocolar.
-- Orientação jurídica no sentido de parecer: risco de conflito com a OAB.
-  O sistema **explica e organiza**; não aconselha se processa ou não.
+- Integração real com o tribunal: exigiria convênio. O andamento entra colado
+  ou digitado pelo advogado, não puxado do PROJUDI.
+- Parecer jurídico: a ferramenta organiza e cita a fonte; quem analisa, decide
+  e assina é o advogado. Isso é atividade privativa da advocacia.
+- Estimativa de honorário ou de valor de condenação: sem base, não se afirma.
 
 ## Tamanho do público
 
@@ -57,9 +88,10 @@ Fontes: [OAB](https://www.oab.org.br/noticia/62213/perfil-adv-maioria-dos-advoga
 
 ## Leitura B2B2C: mesmo produto, canal pelo advogado autônomo
 
-Ideia levantada em conversa com a Maria em 12/09/2026, para registrar e
-levar ao grupo — **não implementar agora**, é reformulação de discurso do
-produto atual, não feature nova.
+Ideia levantada em conversa com a Maria em 12/09/2026. **Adotada na tarde do
+mesmo dia**: deixou de ser só reformulação de discurso e passou a ser a
+direção do produto, junto com o canvas da Entrega 1. O registro abaixo é o
+raciocínio original, mantido porque é o argumento do pitch.
 
 O advogado autônomo (ver "Tamanho do público" acima) tem problemas que a
 cadeia atual já resolve, sem mudar nada de código:
@@ -99,3 +131,24 @@ pitch para a pergunta "e o risco com a OAB?".
 - Suporte a mulher vítima de violência doméstica (ideia da Maria: boa, mas
   difícil de fazer em dois dias).
 - Explicar à pessoa o processo que já está em andamento.
+
+## Como chegamos aqui
+
+Direção original, decidida nas reuniões de 10/09/2026 (transcrições em
+`docs/privado/`): **atendente virtual do Juizado Especial Cível para a pessoa
+leiga de baixa renda**, que contava a história por voz, recebia a classificação
+do caso, sabia se cabia no JEC e levava o pedido pronto no formato do
+formulário do TJPR.
+
+O que mudou, e por quê:
+
+| Quando | Mudança | Motivo |
+|---|---|---|
+| 12/09, manhã | Canvas fecha na "linha Advocacia": ferramenta contratada pelo advogado | Mentoria das 11h e conversa da equipe (`docs/entregas/1-canvas.md`) |
+| 12/09, tarde | Leitura B2B2C da Maria adotada como direção, não só discurso | O público do autônomo é grande e o risco com a OAB cai quando quem opera é o profissional |
+| 12/09, tarde | Métrica entra no produto: força do caso, custo por triagem, eficiência | Pedido de "simetrificar": dizer se vale a pena, quanto custa e se a ferramenta acerta |
+
+O que **não** mudou: a cadeia (`extrair → buscar na lei → analisar citando
+trecho → verificar`), o RAG sobre `docs/juridico/`, a regra de não afirmar lei
+sem id de trecho, e o fato de que o beneficiário final é a pessoa que não
+conseguiria acessar a Justiça sozinha.

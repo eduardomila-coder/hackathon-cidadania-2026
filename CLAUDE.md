@@ -7,10 +7,17 @@ dois dias. Estas regras existem para os três Claudes não se atropelarem.
 
 ## O projeto
 
-Atendente virtual do Juizado Especial Cível: a pessoa leiga conta o que
-aconteceu (falando ou escrevendo), o sistema entende, diz se cabe no JEC,
-aponta caminhos sem processo, lista documentos e monta o pedido. Detalhes em
-`docs/IDEIA.md`. Regras do evento em `docs/EVENTO.md`.
+Triagem de casos do Juizado Especial Cível **para o advogado que atua
+sozinho**. O cliente conta o que aconteceu (falando ou escrevendo); a
+ferramenta devolve ao advogado o caso organizado: quais requisitos legais já
+estão comprovados e por qual documento, o que falta pedir, se cabe no JEC e
+quais são os caminhos sem processo — com o trecho da lei em cada afirmação.
+Mede o próprio custo por triagem e se a força que mediu bate com o resultado
+real do caso. Não dá parecer: quem analisa e assina é o advogado.
+
+A direção mudou em 12/09/2026 (antes era o cidadão leigo usando sozinho); o
+histórico e o motivo estão em `docs/IDEIA.md`, em "Como chegamos aqui".
+Regras do evento em `docs/EVENTO.md`.
 
 ## Stack (não trocar sem combinar com a equipe)
 
@@ -24,6 +31,15 @@ aponta caminhos sem processo, lista documentos e monta o pedido. Detalhes em
   em `docs/juridico/`) → analisar citando trechos → verificar. Não junte
   etapas num prompt só e não deixe o modelo afirmar lei sem id de trecho:
   é isso que a auditoria pontua (ver `docs/EVENTO.md`).
+- **Nada de número sem fonte.** A ferramenta não estima probabilidade de
+  êxito, honorário nem valor de condenação. O que ela mostra é a *força do
+  caso*: requisitos comprovados sobre os que se aplicam, cada um com o id do
+  trecho que o exige e o documento que o comprova. Preço de modelo vem da
+  tabela em `lib/custo.ts`; cotação do dólar, da variável `DOLAR_REAIS`. Sem
+  valor conhecido, o custo aparece como não calculado.
+- **O registro de triagens (`lib/casos.ts`, `data/casos.json`) guarda só
+  medida**: área, requisitos, custo, tempo e o desfecho que o advogado anota.
+  Nunca o relato, o nome do cliente ou o número do processo.
 - Fonte jurídica nova entra como `docs/juridico/<nome>.md`, um `## Art. N`
   por trecho; o índice carrega a pasta inteira.
 - Sem banco de dados até alguém precisar de verdade. Estado em memória ou
@@ -34,7 +50,9 @@ aponta caminhos sem processo, lista documentos e monta o pedido. Detalhes em
 
 - Tudo em português: código (nomes de variáveis, funções, arquivos), comentários,
   commits, textos da interface. Termos técnicos ficam como são (`route`, `hook`).
-- Interface em linguagem simples, sem juridiquês: o usuário final é leigo.
+- Interface em linguagem simples, sem juridiquês decorativo. Quem contrata é o
+  advogado, mas quem digita ou dita o relato costuma ser o cliente leigo: o
+  campo de entrada fala com ele, e o dossiê fala com o profissional.
 
 ## Como o trabalho circula entre os três
 
