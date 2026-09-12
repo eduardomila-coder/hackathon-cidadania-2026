@@ -155,6 +155,33 @@ oferece agendar/ligar), reaproveitando o canal de WhatsApp já registrado
 em `docs/entregas/3-testes-externos.md` como o "agendar conversa" de
 verdade.
 
+**Segundo ajuste da Maria (mesmo dia): compaixão, não só limite.** A
+resposta acima serve para decisão estratégica neutra ("devo processar?").
+Mas quando o relato indica **sofrimento, medo ou situação delicada** — não
+só "isso é uma decisão sua", mas dor de verdade — o tom não pode ser só
+administrativo. Precisa **reconhecer a dor da pessoa** e dizer, com
+todas as letras, que aquilo **merece atenção de verdade, não uma
+resposta por mensagem**:
+
+> "Percebo que isso pesa muito pra você, e é o tipo de assunto que merece
+> ser conversado com calma, não resolvido por mensagem. Vou pedir para o
+> seu advogado te ligar o quanto antes — tudo bem?"
+
+Isso é um **terceiro tipo de sinal**, além dos sinais A e B acima: não é
+sobre a lei nem sobre estratégia, é sobre o **estado emocional** que o
+relato demonstra (medo, angústia, urgência pessoal). Precisa entrar na
+etapa "extrair" (`lib/etapas.ts`, que já lê o relato bruto primeiro),
+como um campo tipo `sinal_de_sofrimento: boolean`, porque é ali que o
+relato original da pessoa é lido antes de virar fato jurídico — e o
+prompt dessa etapa já é curto e sem julgamento hoje ("Não julgue, não
+oriente, não cite lei"), então essa seria uma exceção deliberada a essa
+regra, só para captar esse sinal.
+
+**Os dois princípios juntos**: colocar limite (a IA não avalia mérito
+nem promete resultado) sem soar fria — reconhecer o que a pessoa está
+sentindo antes de encaminhar, principalmente quando o assunto é
+delicado.
+
 ## Proposta: acompanhamento real do processo (aguardando aprovação do Eduardo)
 
 Pedido da Maria em 12/09/2026: a ferramenta atualizar o cliente sobre em que
