@@ -25,41 +25,51 @@ fonte de verdade sobre objetivo, prioridade, divisão da equipe e entregas.
 3. Diga em uma frase a tarefa aberta mais urgente daquela pessoa. Só então
    edite o necessário.
 
-| Pessoa | Área principal | Pode publicar em `main`? |
+| Pessoa | Área principal | Pode publicar em `main` no GitHub? |
 |---|---|---|
 | Eduardo | `lib/`, integração, revisão e pitch | Sim, depois de build e revisão |
-| Fernando | `app/`, componentes e acessibilidade | Não, envia para revisão |
-| Maria | `docs/juridico/`, `docs/entregas/`, testes e evidências | Não, envia para revisão |
+| Fernando | `app/`, componentes e acessibilidade | Não, só commita na pasta compartilhada |
+| Maria | `docs/juridico/`, `docs/entregas/`, testes e evidências | Não, só commita na pasta compartilhada |
 
 ## Como cada pessoa abre o agente
 
-- **Eduardo:** abre este repositório no Codex, Claude Code ou DeepCode no Mac.
-- **Fernando:** abre o Claude Code no Windows dentro do clone local e pode usar
-  `/comecar` e `/enviar-revisao`.
-- **Maria:** abre a área Code do aplicativo Claude no Android, seleciona este
-  repositório conectado ao GitHub e escreve a tarefa em português. Não depende
-  de terminal nem dos comandos com barra. Quando terminar, ela pede: "envie
-  para revisão em uma branch, sem juntar na main, e diga como testar".
+Desde 12/09: Fernando e Maria não clonam mais o repositório nem usam GitHub.
+Os três apontam o Claude Code para a mesma pasta do projeto, dentro de
+`/Users/eduardomila/Claude` no MacBook do Eduardo, compartilhada por SMB
+inteira (`smb://192.168.2.1/Claude`, ver `CLAUDE.md`) — não só a pasta do
+projeto, a `Claude/` toda.
+
+- **Eduardo:** abre este repositório no Codex, Claude Code ou DeepCode no Mac
+  (é a pasta original, dentro de `~/Claude`, a mesma que está compartilhada).
+- **Fernando:** no Windows, mapeia o drive de rede (`smb://192.168.2.1/Claude`)
+  e abre o Claude Code dentro da subpasta do projeto — não é mais um clone
+  local próprio. Pode usar `/comecar` e `/situacao`; `/enviar-revisao` e
+  `/entregar` não fazem mais sentido pra ele (não há push nem Pull Request).
+- **Maria:** idem, pelo computador ou pelo tablet conectado à mesma rede;
+  se usar o aplicativo Claude no Android sem acesso a essa pasta, peça para
+  alguém aplicar a mudança dela na pasta compartilhada.
 
 ### Atalho da Maria
 
 Se Maria escrever apenas **"começar"**, assuma como tarefa padrão: preparar ou
 atualizar o registro dos testes externos em
 `docs/entregas/3-testes-externos.md`. Leia as tarefas e evidências existentes,
-não invente depoimentos nem resultados. Faça a alteração em uma branch, envie
-para revisão sem juntar na `main` e explique ao Eduardo como testar ou conferir.
+não invente depoimentos nem resultados. Faça a alteração direto na pasta
+compartilhada, commite em português e avise o Eduardo o que mudou e como
+conferir — ele publica no GitHub quando for revisar.
 
 ## Entrega correta
 
-- Toda alteração deve passar por `npm run build` antes de ser enviada.
-- Eduardo pode usar `npm run enviar -- "mensagem"` para publicar em `main`.
-- Maria e Fernando nunca usam `npm run enviar`: fazem commit na própria branch,
-  fazem `git push -u origin HEAD` e abrem ou pedem uma Pull Request para a
-  `main`. A mudança aparece no Habeas Release em `/revisoes` para Eduardo
-  aprovar. Maria pede isso ao Claude no aplicativo; Fernando pode usar
-  `/enviar-revisao`.
-- Nunca faça `push --force`, `reset --hard`, merge na `main` em nome de Maria
-  ou Fernando, nem leia ou envie `.env.local`, chaves ou `docs/privado/`.
+- Toda alteração deve passar por `npm run build` antes de ser commitada.
+- Eduardo pode usar `npm run enviar -- "mensagem"` para publicar em `main` no
+  GitHub — é o único que faz essa publicação, e é o que cumpre a exigência do
+  edital de solução em licença MIT publicada em repositório aberto.
+- Maria e Fernando nunca usam `npm run enviar` nem fazem push para um remoto:
+  fazem commit direto, em `main`, na pasta compartilhada. Não criam branch
+  própria (é uma pasta só, compartilhada — trocar de branch nela afeta todo
+  mundo). O Eduardo revisa com `git log`/`git diff` antes de publicar.
+- Nunca faça `push --force`, `reset --hard`, nem leia ou envie `.env.local`,
+  chaves ou `docs/privado/`.
 
 ## Comunicação esperada ao terminar
 
