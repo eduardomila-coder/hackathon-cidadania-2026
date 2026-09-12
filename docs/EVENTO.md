@@ -1,7 +1,8 @@
 # Hackathon da Cidadania 2026 — OAB/PR, 6ª edição
 
-Fontes: programação oficial (PDF de 10/09, texto em `docs/privado/`),
-https://eventos.oabpr.org.br/hackathon-cidadania e o grupo dos inscritos.
+Fontes: Manual de Orientações, slides "Regras do Jogo" e programação oficial
+(PDFs e texto em `docs/privado/regras/`), o site do evento e o grupo dos
+inscritos. Em caso de divergência entre Manual e Edital, vale o Edital.
 
 ## Onde
 
@@ -61,6 +62,71 @@ mercado já existentes) voltadas à advocacia" e ao acesso à Justiça.
 | até 19h | Resultado e premiação | — |
 | dia todo | Foto da equipe nas redes (print no repositório) | 5 |
 
+## Como se entrega (Manual, seção 6)
+
+Cada entrega precisa de **evidência publicada no repositório oficial da
+OAB/PR, numa pasta por equipe**, dentro do prazo. "Sem evidência, o
+checkpoint não existe." O que vale como evidência:
+
+| Entrega | Evidência |
+|---|---|
+| 1 Canvas | apresentação do canvas preenchido |
+| 2 Testes internos | apresentação dos testes que nós mesmos fizemos |
+| 3 Testes externos | **depoimentos de usuários/testes em redes sociais, link no repositório** |
+| 4 Produto | documentação e dados com instruções de uso para teste; **laptop à disposição do auditor** |
+| 6 Slides | deck de 2 minutos na pasta da equipe |
+| Fotos e live | print/link no repositório até o prazo de cada uma |
+
+Prazos das evidências extras: foto no banner **até 10h de sábado**; foto da
+equipe até 15h (cada dia); live/vídeo até 15h de domingo.
+
+Onde é o repositório oficial e como se sobe a pasta: perguntar na abertura
+(a organização "explica as entregas, prazos e ambientes").
+
+## Auditoria: a rubrica (Manual, seção 8)
+
+Quatro auditores, nota por consenso, três dimensões. Nota 1 = 0, 2 = 25,
+3 = 50, 4 = 75, 5 = 100. **O que dá nota 5 em cada uma:**
+
+| Dimensão | Nota 5 | Nota 3 (o que evitar) |
+|---|---|---|
+| **Confiabilidade** | "Respostas testadas e validadas com **controle explícito de alucinação** (agente inteligente, **verificação de fontes** etc.)" | "corretas em geral, mas com possíveis alucinações em casos específicos" |
+| **Usabilidade** | "Altamente intuitivo. **Experiência orientada a leigos, com acessibilidade inclusiva**" | "curva de aprendizado moderada" |
+| **Sofisticação técnica** | "Uso de técnicas avançadas como **RAG e sistemas de prompts**" (nota 4: "encadeamento e delimitação de contexto") | "estrutura clara, com ajustes de tom e persona" |
+
+Tradução para o nosso produto:
+
+- **RAG sobre a lei**: Lei 9.099/95, CDC e o formulário do TJPR como fonte
+  recuperada e citada na resposta, não decorada pelo modelo.
+- **Verificação de fontes**: uma segunda passada que confere cada afirmação
+  jurídica contra o trecho recuperado e marca o que não tem base.
+- **Sistema de prompts encadeado**: extrair fatos → classificar com a lei →
+  verificar → redigir o pedido. Cada etapa com contexto delimitado.
+- **Leigos e acessibilidade**: voz, linguagem simples, contraste, fonte
+  grande, rótulos para leitor de tela.
+- **Dados de teste e instruções** que deixem o auditor rodar sozinho no
+  nosso laptop.
+
+## Pitch: 2 minutos (Manual, seção 7)
+
+Roteiro imposto pelos slides: **PROBLEMA → SOLUÇÃO → DEMO → IMPACTO.**
+Cinco critérios, 1 a 5 cada, por jurado: clareza, relevância jurídica,
+inovação, viabilidade/sustentabilidade, escalabilidade/disseminação. Nota 5
+em escala: "agente replicável, baixo custo, aplicável a diferentes ramos do
+Direito". Só as equipes mais pontuadas apresentam.
+
+## Regras que desclassificam
+
+- Menos de 50% da equipe na sede: desclassificação. Somos 3: **dois sempre lá.**
+- Pessoa líder definida e comunicada à organização (obrigatório para prêmio).
+- Solução sob licença MIT, publicada no repositório oficial. Nada fechado.
+- Frameworks e APIs externas permitidos **desde que referenciados** no material.
+
+## Premiação
+
+R$ 10.000 / 5.000 / 3.000 por categoria. Nota final = pontos das entregas +
+auditoria + extras + pitch.
+
 ## O que isso significa
 
 - **A auditoria técnica vale 300 dos 810 pontos.** É o que mais pesa. Ela olha
@@ -72,10 +138,8 @@ mercado já existentes) voltadas à advocacia" e ao acesso à Justiça.
 - Foto e live com a organização somam 40 pontos. Alguém da equipe fica
   responsável por isso.
 
-## Anotar na abertura de sexta
+## Ainda sem resposta (ver transcrição da abertura em `docs/privado/`)
 
-- [ ] Onde é o repositório oficial e como se entrega cada item (link? upload? PR?)
-- [ ] O que exatamente conta como "testes internos" e "testes externos"
-- [ ] O que a auditoria técnica avalia (critérios)
-- [ ] Formato do canvas e do slide (Canva? modelo deles?)
-- [ ] Link da transmissão online
+- [ ] Onde é o repositório oficial e como se sobe a pasta da equipe
+- [ ] Formato do canvas (o workshop de sábado 9h deve dar o modelo)
+- [ ] Quem é a pessoa líder registrada (Eduardo se ofereceu no grupo)

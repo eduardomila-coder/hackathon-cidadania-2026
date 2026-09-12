@@ -68,7 +68,8 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 
 ### Pendências críticas
 
-- [ ] Confirmar repositório oficial, formato das entregas e critérios da auditoria.
+- [ ] Confirmar onde é o repositório oficial da OAB/PR e como se sobe a pasta da equipe (critérios da auditoria já estão em `docs/EVENTO.md`).
+- [ ] Definir e comunicar a pessoa líder à organização (obrigatório para premiação).
 - [ ] Definir divisão de áreas entre os três integrantes.
 - [ ] Completar conversa em turnos.
 - [ ] Implementar leitura de foto de documento.
@@ -80,3 +81,4 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 | Data | Decisão ou mudança | Motivo |
 |---|---|---|
 | 2026-09-12 | Criado o cérebro local do projeto | Centralizar contexto sem misturar com outros projetos |
+| 2026-09-12 | Roadmap técnico passa a seguir a rubrica da auditoria: RAG sobre a lei, verificação de fontes, cadeia de prompts, acessibilidade | Manual, seção 8: é o que dá nota 5 nas três dimensões (300 pts) |
