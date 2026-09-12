@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { AUDITORIA, EQUIPE, LINKS, LOCAL, MARCOS, PITCH, PREMIOS, REGRAS, type Marco } from "@/lib/evento";
 import { lerTarefas } from "@/lib/tarefas";
 import { Relogio } from "./Relogio";
@@ -39,25 +40,34 @@ export default function Painel() {
   const dias = Array.from(new Set(MARCOS.map((m) => diaDe(m.quando))));
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900">
-      <header className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-4 px-6 py-6">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-blue-800">Hackathon da Cidadania 2026 · OAB/PR · Inovação Aberta</p>
-            <h1 className="text-4xl font-bold">Habeas Titas</h1>
-            <p className="mt-1 text-zinc-600">Atendente virtual do Juizado Especial Cível · {LOCAL}</p>
+    <div className="min-h-screen bg-[#f5f7fb] text-slate-950">
+      <header className="relative overflow-hidden bg-[#101b3d] text-white">
+        <div className="absolute -right-24 -top-32 h-80 w-80 rounded-full bg-cyan-400/20 blur-3xl" aria-hidden />
+        <div className="absolute -bottom-40 left-1/3 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl" aria-hidden />
+        <div className="relative mx-auto max-w-6xl px-6 pb-8 pt-7">
+          <div className="mb-8 flex items-center justify-between gap-4 text-sm text-blue-100">
+            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">OAB/PR · 12 e 13 de setembro</span>
+            <Link href="/" className="rounded-full border border-white/20 px-3 py-1 hover:bg-white/10">Abrir atendente →</Link>
           </div>
-          <nav aria-label="Seções" className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-end justify-between gap-7">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-300">Hackathon da Cidadania 2026</p>
+            <h1 className="mt-2 text-5xl font-black tracking-tight">Habeas Titas</h1>
+            <p className="mt-3 max-w-2xl text-lg text-blue-100">Atendente virtual do Juizado Especial Cível para transformar histórias difíceis em próximos passos claros.</p>
+            <p className="mt-2 text-sm text-blue-200">{LOCAL}</p>
+          </div>
+          <nav aria-label="Seções" className="flex flex-wrap gap-2 text-sm">
             {SECOES.map(([id, nome]) => (
-              <a key={id} href={`#${id}`} className="rounded-full border border-zinc-300 bg-white px-3 py-1 text-sm hover:border-blue-700 hover:text-blue-800">
+              <a key={id} href={`#${id}`} className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 hover:bg-white/20">
                 {nome}
               </a>
             ))}
           </nav>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-14 px-6 py-10">
+      <main className="mx-auto flex max-w-6xl flex-col gap-12 px-6 py-10">
         <section id="agora" aria-labelledby="agora-t" className="flex flex-col gap-4">
           <h2 id="agora-t" className="sr-only">Agora</h2>
           <Relogio marcos={MARCOS} />
@@ -240,10 +250,10 @@ function Chip({ cor, children }: { cor: string; children: React.ReactNode }) {
 }
 function Placar({ titulo, valor, sub }: { titulo: string; valor: string; sub: string }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-5">
-      <div className="text-sm uppercase tracking-wide text-zinc-500">{titulo}</div>
-      <div className="text-3xl font-semibold">{valor}</div>
-      <div className="text-sm text-zinc-600">{sub}</div>
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_30px_rgba(15,23,42,0.06)]">
+      <div className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{titulo}</div>
+      <div className="mt-1 text-3xl font-black tracking-tight text-[#101b3d]">{valor}</div>
+      <div className="text-sm text-slate-600">{sub}</div>
     </div>
   );
 }
