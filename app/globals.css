@@ -24,6 +24,10 @@ button, input, textarea { font:inherit; }
 .cfp-menu-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:8px;color:#dbe4ee;text-decoration:none}
 .cfp-menu-item:before{content:"";width:8px;height:8px;border-radius:50%;background:#8fa9b4;flex:0 0 auto}
 .cfp-menu-item:hover{background:#547b71;color:#fff}
+.cfp-menu-release{margin-top:10px;border:1px solid #547b71;color:#fff;font-weight:700}
+.cfp-menu-release:before{background:#9fd3b6}
+.cfp-conta{margin-left:auto;min-width:22px;padding:2px 7px;border-radius:999px;background:#f3e5d4;color:#895a26;font-size:12px;text-align:center}
+.cfp-release{background:var(--azul);color:#fff;border-color:var(--azul);font-weight:700}
 .cfp-conteudo{min-width:0;display:flex;flex-direction:column}
 .cfp-barra{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 44px;border-bottom:1px solid var(--linha);background:rgba(251,250,246,.94)}
 .cfp-barra-sub{margin:0;color:#687184;font-size:14px}

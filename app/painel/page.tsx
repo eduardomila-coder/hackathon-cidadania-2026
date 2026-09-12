@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AUDITORIA, DRIVE, EQUIPE, LINKS, MARCOS, PITCH, PREMIOS, REGRAS } from "@/lib/evento";
 import { lerTarefas } from "@/lib/tarefas";
+import { listarRevisoes } from "@/lib/revisoes";
 import { acharNoDrive, listarDrive, type ArquivoDrive } from "@/lib/drive";
 import { Relogio } from "./Relogio";
 import { Tarefas } from "./Tarefas";
@@ -43,7 +44,8 @@ function primeiroNome(nome: string) {
 
 export default async function Painel() {
   const blocos = lerTarefas();
-  const arquivos = await listarDrive();
+  const [arquivos, revisoes] = await Promise.all([listarDrive(), listarRevisoes()]);
+  const pendentes = revisoes?.length ?? 0;
   // Tarefa com `drive:` casada com um arquivo da pasta: concluída por evidência.
   const noDrive: Record<number, ArquivoDrive> = {};
   for (const t of blocos.flatMap((b) => b.tarefas)) {
@@ -66,6 +68,7 @@ export default async function Painel() {
           {SECOES.map(([id, nome]) => (
             <a key={id} href={`#${id}`} className="cfp-menu-item">{nome}</a>
           ))}
+          <Link href="/revisoes" className="cfp-menu-item cfp-menu-release">Habeas Release{pendentes > 0 && <span className="cfp-conta">{pendentes}</span>}</Link>
         </nav>
       </aside>
 
@@ -76,6 +79,7 @@ export default async function Painel() {
             {EQUIPE.map((p) => (
               <span key={p.id} className="cfp-pessoa"><i aria-hidden /> {primeiroNome(p.nome)}</span>
             ))}
+            <Link href="/revisoes" className="cfp-sair cfp-release">Habeas Release{pendentes > 0 ? ` · ${pendentes}` : ""}</Link>
             <Link href="/" className="cfp-sair">Sair</Link>
           </div>
         </header>
@@ -91,6 +95,7 @@ export default async function Painel() {
               <aside className="cfp-placar">Tarefas concluídas<br /><strong>{feitas}/{tarefas.length}</strong> {arquivos.length} {arquivos.length === 1 ? "arquivo" : "arquivos"} na pasta do Drive</aside>
             </div>
             <div className="cfp-acoes">
+              <Link href="/revisoes">{pendentes > 0 ? `Revisar ${pendentes} ${pendentes === 1 ? "mudança" : "mudanças"} no Habeas Release` : "Habeas Release"}</Link>
               <a href="#tarefas">Ver tarefas críticas</a>
               <a href="#auditoria">Preparar auditoria</a>
               <a href="#pitch">Ensaiar pitch</a>
