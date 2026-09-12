@@ -60,32 +60,46 @@ export default function Home() {
   const carregando = etapa !== null;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 p-6 text-lg">
-      <header>
-        <h1 className="text-3xl font-semibold">Conte o que aconteceu</h1>
-        <p className="text-zinc-700">
-          Fale ou escreva com suas palavras. A gente organiza, confere na lei e diz o que dá pra fazer.
-        </p>
+    <main className="min-h-screen bg-[#f7f8fc] text-slate-900">
+      <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-5 py-6 sm:px-8 sm:py-10">
+      <header className="mb-10 flex items-center justify-between">
+        <a href="/" className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-700 text-xl text-white shadow-lg shadow-blue-200">✓</span>
+          <span><strong className="block text-lg leading-none">Cidadania Fácil</strong><small className="text-slate-500">Habeas Titas · OAB/PR</small></span>
+        </a>
+        <a href="/painel" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm hover:border-blue-300 hover:text-blue-700">Área da equipe →</a>
       </header>
 
-      <label className="flex flex-col gap-2">
+      <section className="mb-8 max-w-3xl">
+        <p className="mb-3 text-sm font-bold uppercase tracking-[.18em] text-blue-700">Orientação inicial para pessoas comuns</p>
+        <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-6xl">Entenda seu caso.<br /><span className="text-blue-700">Saiba o próximo passo.</span></h1>
+        <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">Conte, do seu jeito, o que aconteceu. A gente organiza seu relato, consulta a legislação e mostra caminhos possíveis, inclusive antes de entrar com um processo.</p>
+      </section>
+
+      <div className="mb-8 grid gap-3 sm:grid-cols-3">
+        {[['1', 'Conte', 'Escreva ou fale o que aconteceu'], ['2', 'Entenda', 'Receba uma explicação simples'], ['3', 'Aja', 'Veja documentos e próximos passos']].map(([n, t, d]) => <div key={n} className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">{n}</span><span><strong className="block">{t}</strong><small className="text-slate-500">{d}</small></span></div>)}
+      </div>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/60 sm:p-8">
+      <label className="flex flex-col gap-3">
+        <span className="text-xl font-bold">O que aconteceu?</span>
         <span className="sr-only">Seu relato</span>
         <textarea
-          className="min-h-44 rounded-lg border-2 border-zinc-400 p-3 text-lg focus:border-blue-700 focus:outline-none"
-          placeholder="Ex.: comprei uma geladeira, ela chegou quebrada e a loja não troca…"
+          className="min-h-52 rounded-2xl border-2 border-slate-200 bg-slate-50 p-5 text-lg leading-8 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
+          placeholder="Exemplo: comprei uma geladeira, ela chegou quebrada e a loja não troca…"
           value={relato}
           onChange={(e) => setRelato(e.target.value)}
           disabled={carregando}
         />
       </label>
-
-      <div className="flex flex-wrap gap-3">
+      <p className="mt-3 text-sm text-slate-500">Não precisa usar palavras difíceis. Diga quem está envolvido, o que aconteceu e o que você gostaria de resolver.</p>
+      <div className="mt-5 flex flex-wrap items-center gap-3">
         {ditado.suportado && (
           <button
             type="button"
             onClick={ditado.gravando ? ditado.parar : ditado.iniciar}
             aria-pressed={ditado.gravando}
-            className="rounded-lg border-2 border-zinc-500 px-5 py-3 font-medium"
+            className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-700 transition hover:border-blue-600 hover:text-blue-700"
           >
             {ditado.gravando ? "⏹ Parar de falar" : "🎤 Falar"}
           </button>
@@ -94,14 +108,15 @@ export default function Home() {
           type="button"
           onClick={enviar}
           disabled={carregando || relato.trim().length < 10}
-          className="rounded-lg bg-blue-800 px-5 py-3 font-medium text-white disabled:opacity-40"
+          className="rounded-xl bg-blue-700 px-7 py-3 font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {carregando ? "Analisando…" : "Analisar"}
         </button>
       </div>
+      </section>
 
       {carregando && (
-        <ol aria-live="polite" className="flex flex-col gap-1 rounded-lg bg-zinc-100 p-4">
+        <ol aria-live="polite" className="flex flex-col gap-2 rounded-2xl border border-blue-100 bg-blue-50 p-5 text-base">
           {ETAPAS.map((e, i) => {
             const atual = ETAPAS.findIndex((x) => x.chave === etapa);
             const estado = i < atual ? "✓" : i === atual ? "…" : "○";
@@ -115,16 +130,17 @@ export default function Home() {
       )}
 
       {erro && (
-        <p role="alert" className="rounded-lg bg-red-50 p-3 text-red-800">
+        <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800">
           {erro}
         </p>
       )}
 
       {resultado && <Painel r={resultado} />}
 
-      <footer className="mt-auto pt-6 text-center text-sm text-zinc-500">
+      <footer className="mt-auto pt-12 text-center text-sm text-slate-500">
         Equipe Habeas Titas · Hackathon da Cidadania 2026 · <a href="/painel" className="underline">painel da equipe</a>
       </footer>
+      </div>
     </main>
   );
 }
