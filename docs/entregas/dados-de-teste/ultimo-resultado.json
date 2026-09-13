@@ -1,7 +1,7 @@
 {
-  "quando": "2026-09-12T03:51:56.206Z",
-  "base": "http://localhost:3999",
-  "acertos": 9,
+  "quando": "2026-09-13T03:20:53.564Z",
+  "base": "http://127.0.0.1:3102",
+  "acertos": 10,
   "total": 10,
   "casos": [
     {
@@ -9,13 +9,17 @@
       "ok": true,
       "area": "consumidor",
       "jec": true,
+      "forca": {
+        "comprovados": 3,
+        "aplicaveis": 5
+      },
       "confirmados": 11,
-      "barrados": 1,
+      "barrados": 0,
       "sem_base": [
-        "Quem exatamente deve ser acionado na Justiça (a loja, a fabricante ou as duas juntas) depende de informações que não aparecem nos trechos fornecidos.",
-        "Se o cartão de crédito foi emitido pelo mesmo fornecedor ou grupo econômico da loja, não é possível afirmar com base nos trechos se isso muda o caminho judicial.",
-        "Se o prazo para reclamar já passou depende da data exata da compra e do tipo de vício (aparente ou oculto), informação que não consta no relato.",
-        "Documentos necessários: identidade, CPF, comprovante de endereço, nota fiscal, fotos, comprovante de pagamento e comprovantes de ligações. (Lorient-6 apenas diz que o sistema lista documentos; os documentos específicos não são listados nos trechos fornecidos.)"
+        "Não é possível afirmar se o valor de R$ 2.800,00 está dentro do limite de 40 salários mínimos sem conhecer o valor vigente do salário mínimo, cuja conversão em reais não consta nos trechos.",
+        "Os trechos não disciplinam custas, despesas processuais ou gratuidade de justiça no Juizado Especial, portanto não há base para afirmar valores ou isenções de custo.",
+        "A responsabilidade solidária entre loja e fabricante decorre da qualificação de ambos como fornecedores, mas os trechos não especificam expressamente a responsabilidade do comerciante por vício do produto além das hipóteses do art. 13 do CDC, que trata de responsabilidade pelo fato e não de vício.",
+        "Não é possível afirmar que a responsabilidade do comerciante se aplica ao caso sem análise específica dos arts. 18 e 13 do CDC, pois o art. 13 trata de responsabilidade do comerciante em situações específicas e não foi diretamente citado para vício do produto."
       ],
       "fontes": [
         "L9099-3",
@@ -25,31 +29,37 @@
         "Lorient-4",
         "Lorient-5",
         "Lorient-6",
-        "Lorient-1",
-        "L8078-23",
         "L8078-13",
-        "L8078-17",
-        "L8078-54",
-        "L8078-26",
         "L8078-33",
-        "L8078-19"
+        "L8078-25",
+        "L8078-53",
+        "L8078-17",
+        "L8078-26",
+        "L8078-18",
+        "L8078-54"
       ],
-      "segundos": 142.7
+      "segundos": 38.4,
+      "custo_dolares": null,
+      "modelo": "deepseek-v4-pro"
     },
     {
       "id": "vizinho-muro",
       "ok": true,
       "area": "vizinhanca",
       "jec": true,
-      "confirmados": 7,
-      "barrados": 3,
+      "forca": {
+        "comprovados": 2,
+        "aplicaveis": 2
+      },
+      "confirmados": 8,
+      "barrados": 2,
       "sem_base": [
-        "Responsabilidade civil por danos causados por escoamento de água da chuva entre imóveis vizinhos, incluindo critérios para definir culpa ou defeito na construção",
-        "Prazo ou regra específica para reclamar danos em relação de vizinhança",
-        "Aplicação de normas de direito de vizinhança ou do Código Civil sobre águas",
-        "O caso trata de uma causa cível de menor complexidade envolvendo possível dano entre vizinhos. (A qualificação como causa de menor complexidade é uma conclusão valorativa, não extraída diretamente dos trechos. A competência do juizado depende do valor e da natureza, mas os trechos não trazem critério para classificar esse caso concreto como de menor complexidade.)",
-        "O caso trata de possível dano entre vizinhos e não se trata de causa de família, trabalhista, contra a Fazenda Pública, acidente de trabalho, estado ou capacidade das pessoas, nem de natureza alimentar ou falimentar. (As exclusões citadas têm base no art. 3º, §2º da Lei 9.099/95 e no Lorient-4, mas a afirmação de que não se trata dessas hipóteses deriva da interpretação do relato e depende de prova, não estando expressamente nos trechos.)",
-        "Para casos de vizinhança, a pessoa pode tentar resolver diretamente com o vizinho ou por meios extrajudiciais, como notificação por escrito, guardando provas. (Os trechos fornecidos não tratam especificamente de casos de vizinhança nem preveem notificação por escrito como via extrajudicial.)"
+        "Regras específicas sobre escoamento de águas pluviais entre vizinhos (ex.: dever de não alterar fluxo natural da água)",
+        "Responsabilidade civil por danos materiais decorrentes de construção em imóvel vizinho",
+        "Prazo prescricional ou decadencial para ajuizar ação de reparação de danos nessa situação",
+        "Custas, despesas processuais e gratuidade no Juizado Especial Cível",
+        "Somente pessoas físicas capazes podem propor ação perante o Juizado Especial. (O art. 8º, § 1º, permite também microempreendedores individuais, microempresas, empresas de pequeno porte, OSCIPs e sociedades de crédito ao microempreendedor, não apenas pessoas físicas capazes.)",
+        "Requisito: Ser pessoa física capaz (O art. 8º, § 1º, não exige exclusivamente pessoa física capaz; admite outras categorias de autores. Além disso, o relato não traz documento que comprove capacidade civil.)"
       ],
       "fontes": [
         "L9099-3",
@@ -60,24 +70,40 @@
         "Lorient-5",
         "Lorient-6",
         "L8078-12",
-        "L8078-14",
-        "L8078-25",
         "L8078-40",
-        "Lorient-1",
+        "Lorient-2",
+        "L8078-25",
+        "L8078-14",
         "L8078-28",
-        "L8078-13",
-        "L8078-91"
+        "L8078-95",
+        "L8078-13"
       ],
-      "segundos": 38.8
+      "segundos": 24,
+      "custo_dolares": null,
+      "modelo": "deepseek-v4-pro"
     },
     {
       "id": "emprestimo-nao-pago",
       "ok": true,
       "area": "contrato",
       "jec": true,
-      "confirmados": 6,
-      "barrados": 0,
-      "sem_base": [],
+      "forca": {
+        "comprovados": 0,
+        "aplicaveis": 4
+      },
+      "confirmados": 9,
+      "barrados": 4,
+      "sem_base": [
+        "Prazo prescricional para cobrança de empréstimo entre particulares",
+        "Necessidade de protesto ou notificação extrajudicial antes do ajuizamento",
+        "Possibilidade de pedido de juros e correção monetária",
+        "Valor em reais equivalente a quarenta ou vinte salários mínimos",
+        "Consequências específicas se o devedor não for localizado após o ajuizamento",
+        "Causa cujo valor não exceda quarenta salários mínimos (O requisito legal existe, mas a análise afirma 'comprovado' com base em valor estimado pelo cliente, sem documento que comprove o valor da causa. A comprovação depende de demonstração do valor efetivamente devido.)",
+        "Autor ser pessoa física capaz ou microempreendedor individual, microempresa ou empresa de pequeno porte (O trecho citado trata das pessoas que podem propor ação no Juizado, mas o relato não comprova a capacidade civil do autor. Apenas informa que é credor pessoa física, sem elementos sobre capacidade.)",
+        "Pedido escrito ou oral com nome, qualificação e endereço das partes, fatos, fundamentos, objeto e valor (A análise reconhece que faltam dados de qualificação do devedor. O requisito legal existe, mas a comprovação está incompleta.)",
+        "Prova do empréstimo e da promessa de pagamento (A análise afirma 'comprovado' com base em documento assinado e mensagens, mas não há verificação de que esses documentos realmente comprovam o empréstimo, o valor e o prazo. O próprio item 'perguntas_pendentes' questiona se as mensagens confirmam o empréstimo, valor e prazo.)"
+      ],
       "fontes": [
         "L9099-3",
         "L9099-8",
@@ -87,29 +113,38 @@
         "Lorient-5",
         "Lorient-6",
         "Lorient-3",
+        "L9099-53",
         "L8078-54",
-        "L8078-41",
-        "L8078-42",
-        "L8078-79",
-        "L8078-71",
+        "L8078-54",
+        "L9099-52",
         "L8078-104",
-        "L8078-54"
+        "L9099-55",
+        "L8078-53"
       ],
-      "segundos": 26.8
+      "segundos": 30.7,
+      "custo_dolares": null,
+      "modelo": "deepseek-v4-pro"
     },
     {
       "id": "acidente-carro",
       "ok": true,
       "area": "transito",
       "jec": true,
-      "confirmados": 4,
-      "barrados": 3,
+      "forca": {
+        "comprovados": 1,
+        "aplicaveis": 4
+      },
+      "confirmados": 8,
+      "barrados": 5,
       "sem_base": [
-        "O valor de 6 mil reais está abaixo de quarenta salários mínimos não pode ser afirmado sem conhecer o salário mínimo vigente.",
-        "Não há informação nos trechos sobre prazos ou procedimentos específicos para ação de indenização por acidente de trânsito sem lesão.",
-        "Levar três orçamentos do conserto é documento necessário para o pedido. (Nenhum trecho fornecido menciona três orçamentos como requisito documental ou probatório.)",
-        "O valor de 6 mil reais parece estar dentro do limite para causas que podem ser julgadas no Juizado. (A orientação adverte que não se deve afirmar um valor em reais sem confirmação do salário mínimo vigente pela equipe jurídica. Como esse valor não está confirmado, a afirmação de que R$ 6.000 está dentro do limite carece de base.)",
-        "Procurar mediação ou conciliação de órgão de defesa do consumidor é caminho extrajudicial adequado para acidente de trânsito. (Nenhum trecho fornecido trata de mediação ou conciliação em órgão de defesa do consumidor para acidente de trânsito.)"
+        "O teto de quarenta salários mínimos não foi convertido para reais, pois não há valor de salário mínimo confirmado nos trechos.",
+        "Critérios de responsabilidade civil e prova de culpa pelo avanço de sinal não constam dos trechos fornecidos.",
+        "Custas processuais e gratuidade no Juizado Especial não estão previstas nos trechos.",
+        "Valor da causa não exceder quarenta salários mínimos (O relato indica valor estimado de R$ 6.000,00, mas não há conversão do salário mínimo vigente nem comprovação documental de que esse valor não excede quarenta salários mínimos.)",
+        "Ser causa cível de menor complexidade (A lei prevê o requisito, mas a análise não comprova com documento que a causa seja efetivamente de menor complexidade.)",
+        "Não ser causa excluída da competência (A exclusão está prevista no § 2º do art. 3º, mas a afirmação de que o relato não contém nenhuma hipótese de exclusão depende de prova não apresentada.)",
+        "Ser pessoa física capaz (A lei exige pessoa física capaz, mas a afirmação de que o cliente é capaz baseia-se apenas em inferência do relato, sem documento de identificação ou prova de capacidade.)",
+        "O caso parece caber no Juizado Especial Cível, mas a triagem não substitui advogado nem a secretaria do juizado. (A orientação consta do trecho Lorient-6, mas essa afirmação não está listada entre os fundamentos da análise.)"
       ],
       "fontes": [
         "L9099-3",
@@ -119,29 +154,37 @@
         "Lorient-4",
         "Lorient-5",
         "Lorient-6",
-        "L8078-79",
+        "L8078-91",
         "L8078-98",
+        "L9099-48",
+        "L8078-60",
         "L8078-52",
-        "L8078-54",
-        "L8078-54",
-        "L8078-76",
-        "L8078-40",
-        "L9099-42"
+        "L8078-95",
+        "L8078-101",
+        "L8078-93"
       ],
-      "segundos": 27.9
+      "segundos": 38.5,
+      "custo_dolares": null,
+      "modelo": "deepseek-v4-pro"
     },
     {
       "id": "pensao-filho",
       "ok": true,
       "area": "familia",
       "jec": false,
-      "confirmados": 1,
-      "barrados": 0,
+      "forca": {
+        "comprovados": 1,
+        "aplicaveis": 3
+      },
+      "confirmados": 6,
+      "barrados": 2,
       "sem_base": [
-        "Como cobrar pensão alimentícia atrasada de forma específica",
-        "Procedimento para execução de pensão na Vara de Família",
-        "Possibilidade de prisão do devedor de pensão",
-        "Valor da pensão ou forma de cálculo"
+        "Rito processual específico para cobrança de pensão alimentícia atrasada ou execução de alimentos na Vara de Família",
+        "Prazo prescricional para cobrança de pensões alimentícias vencidas e não pagas",
+        "Regras sobre desconto em folha de pagamento ou prisão do devedor de alimentos",
+        "Definição de valores em reais, pois o relato não informa o valor da pensão e não há trecho que permita cálculo",
+        "Existência de título que fixe a obrigação de pagar pensão (decisão judicial ou acordo homologado) (Lorient-4 apenas indica que causas de família não vão ao Juizado; não trata de requisito de título para cobrança de pensão.)",
+        "Demonstração da inadimplência dos últimos 4 meses (Lorient-4 não trata de forma de demonstração de inadimplência.)"
       ],
       "fontes": [
         "L9099-3",
@@ -155,24 +198,32 @@
         "L8078-72",
         "L8078-52",
         "L8078-73",
-        "L8078-76",
-        "L8078-54",
+        "L9099-55",
+        "L9099-52",
         "L8078-42",
-        "L8078-3"
+        "L8078-98"
       ],
-      "segundos": 17.8
+      "segundos": 24.9,
+      "custo_dolares": null,
+      "modelo": "deepseek-v4-pro"
     },
     {
       "id": "verbas-trabalhistas",
       "ok": true,
       "area": "trabalho",
       "jec": false,
+      "forca": {
+        "comprovados": 0,
+        "aplicaveis": 1
+      },
       "confirmados": 2,
-      "barrados": 0,
+      "barrados": 2,
       "sem_base": [
-        "Prazo para reclamar férias ou 13º na Justiça do Trabalho",
-        "Valores exatos de férias ou 13º devidos",
-        "Multas ou penalidades trabalhistas por atraso no pagamento"
+        "Requisitos legais para cobrança de férias e 13º na Justiça do Trabalho",
+        "Custas e gratuidade na Justiça do Trabalho",
+        "Prazos e procedimentos da Justiça do Trabalho",
+        "Competência da Justiça do Trabalho para causas trabalhistas (O trecho Lorient-4 indica que causas trabalhistas são encaminhadas à Justiça do Trabalho, e o relato descreve vínculo empregatício e cobrança de verbas rescisórias, o que caracteriza causa trabalhista.)",
+        "Causa trabalhista não vai ao Juizado Especial Cível estadual. O caminho é a Justiça do Trabalho. Este sistema não substitui advogado; organize o relato e os documentos e procure um advogado trabalhista ou o sindicato. (A orientação cita implicitamente Lorient-6 (sistema não substitui advogado), mas o fundamento listado para a orientação é Lorient-4, que apenas trata do encaminhamento para a Justiça do Trabalho. A afirmação de que o sistema não substitui advogado está prevista em Lorient-6, mas não foi listada como fundamento específico. Além disso, Lorient-6 diz que o sistema 'indica se o caso parece caber no juizado', o que não se aplica aqui, pois o caso não cabe. A parte da orientação sobre procurar advogado ou sindicato não tem fundamento listado.)"
       ],
       "fontes": [
         "L9099-3",
@@ -183,31 +234,36 @@
         "Lorient-5",
         "Lorient-6",
         "L9099-59",
+        "L8078-49",
+        "L8078-54",
         "Lorient-1",
+        "L8078-53",
         "L8078-42",
         "L8078-71",
-        "L8078-72",
-        "L8078-49",
-        "L9099-6",
-        "L8078-39"
+        "L8078-72"
       ],
-      "segundos": 16.5
+      "segundos": 20.2,
+      "custo_dolares": null,
+      "modelo": "deepseek-v4-pro"
     },
     {
       "id": "plano-saude-alto-valor",
       "ok": true,
       "area": "consumidor",
       "jec": false,
-      "confirmados": 5,
-      "barrados": 4,
+      "forca": {
+        "comprovados": 2,
+        "aplicaveis": 4
+      },
+      "confirmados": 8,
+      "barrados": 3,
       "sem_base": [
-        "Como calcular o valor exato do salário mínimo para converter o limite em reais, pois isso depende de confirmação da equipe jurídica.",
-        "Se a negativa de cirurgia urgente poderia ser tratada como exceção à regra de valor no Juizado Especial.",
-        "Se a pessoa teria direito a alguma medida liminar de urgência na vara cível comum.",
-        "O valor estimado da cirurgia (80 mil reais) ultrapassa os limites de competência do Juizado Especial Cível, que são definidos em salários mínimos e não podem ser convertidos para reais sem confirmação do valor vigente pela equipe jurídica. (A primeira parte da afirmação conclui que o valor ultrapassa o limite, mas não há base nos trechos para converter 80 mil reais em salários mínimos ou confirmar que excede o limite vigente. A análise deveria apenas indicar a necessidade de confirmação do valor, sem concluir que ultrapassa.)",
-        "O caso não parece caber no Juizado Especial Cível, pois o valor da cirurgia é de 80 mil reais e o limite do juizado é de quarenta salários mínimos. (A conclusão de que o valor não cabe no juizado depende de conversão não confirmada pelos trechos, que proíbem afirmar valor em reais sem confirmação da equipe jurídica.)",
-        "Como há urgência médica, procure imediatamente um advogado particular ou a Defensoria Pública para avaliar as medidas cabíveis. (Nenhum trecho fornecida trata de urgência médica ou de encaminhamento imediato a advogado/Defensoria Pública. A orientação geral do Lorient-6 não menciona urgência médica.)",
-        "Verificar a possibilidade de pedido de reconsideração diretamente ao plano de saúde, anexando laudo e pedido médico. (Lorient-1 lista Procon, consumidor.gov.br, notificação por escrito e pedido de estorno ao banco emissor, mas não menciona pedido de reconsideração diretamente ao plano de saúde.)"
+        "Não há base nos trechos fornecidos para tratar de cobertura obrigatória de plano de saúde, urgência, rol da ANS ou obrigação de fazer em desfavor de operadora.",
+        "Não há base nos trechos para afirmar se o valor de R$ 80.000,00 está dentro ou fora do limite de quarenta salários mínimos, pois não consta o valor do salário mínimo vigente.",
+        "Não há base nos trechos para tratar de custas, despesas ou gratuidade no processo.",
+        "Requisito: Competência do Juizado Especial Cível para causas cujo valor não exceda quarenta vezes o salário mínimo (O requisito é verdadeiro quanto à norma, mas a análise o marcou como 'falta_documento' indicando necessidade de confirmar o valor do salário mínimo e do teto. Não há no relato comprovação de que o valor de R$ 80.000,00 está dentro do limite; ao contrário, o motivo_juizado reconhece que pode exceder. Portanto, o requisito não está comprovado no caso.)",
+        "Requisito: Não se tratar de causa excluída da competência do Juizado Especial (A análise marcou como 'comprovado' com base na ausência de menção a matérias excluídas. No entanto, não há elemento no relato que comprove positivamente a inexistência de exclusão. Além disso, o valor da causa indicado pode já excluir a competência pelo teto, o que torna a conclusão precipitada. Falta comprovação concreta.)",
+        "Requisito: Parte autora ser pessoa física capaz (A análise afirma que o cliente é pessoa física e não há informação de incapacidade. Entretanto, o relato não traz documento ou informação que comprove capacidade civil plena. A mera ausência de menção a incapacidade não é comprovação.)"
       ],
       "fontes": [
         "L9099-3",
@@ -218,30 +274,34 @@
         "Lorient-5",
         "Lorient-6",
         "L8078-104",
-        "L9099-18",
-        "Lorient-3",
+        "L9099-22",
         "L9099-26",
-        "L8078-87",
-        "L8078-116",
-        "L8078-104",
-        "Lorient-1"
+        "L9099-57",
+        "L9099-18",
+        "Lorient-1",
+        "L9099-41",
+        "L8078-70"
       ],
-      "segundos": 30.6
+      "segundos": 31.2,
+      "custo_dolares": null,
+      "modelo": "deepseek-v4-pro"
     },
     {
       "id": "inss-beneficio",
       "ok": true,
       "area": "outro",
       "jec": false,
-      "confirmados": 4,
-      "barrados": 0,
+      "forca": {
+        "comprovados": 0,
+        "aplicaveis": 0
+      },
+      "confirmados": 0,
+      "barrados": 1,
       "sem_base": [
-        "Prazo para entrar com ação contra o INSS após a negativa.",
-        "Possibilidade de recorrer administrativamente da negativa do INSS antes de ir à justiça.",
-        "Valor em reais do limite para dispensa de advogado no Juizado Especial Federal.",
-        "Documentos específicos exigidos pelo Juizado Especial Federal.",
-        "Possibilidade de obter advogado gratuito ou assistência judiciária no Juizado Especial Federal.",
-        "Detalhes sobre como funciona o auxílio-doença ou o benefício por incapacidade."
+        "Não há nos trechos fornecidos informações sobre prazos para ajuizar ação previdenciária.",
+        "Não há nos trechos fornecidos previsão de custas ou despesas para ações contra o INSS no Juizado Especial Federal.",
+        "Não há nos trechos fornecidos requisitos legais específicos para concessão de auxílio-doença.",
+        "Causa contra o INSS não se enquadra no Juizado Especial Cível estadual, devendo ser encaminhada ao Juizado Especial Federal. (O trecho Lorient-4 menciona 'contra INSS ou União (Juizado Especial Federal)', indicando que causas contra o INSS vão ao Juizado Especial Federal. Embora não afirme expressamente que 'não se enquadra no Juizado Especial Cível estadual', a exclusão decorre da competência de juizados distintos e do L9099-3, §2º, que exclui causas de interesse da Fazenda Pública. A afirmação é compatível, mas a fonte citada não contém o texto exato nem a fundamentação completa.)"
       ],
       "fontes": [
         "L9099-3",
@@ -251,29 +311,36 @@
         "Lorient-4",
         "Lorient-5",
         "Lorient-6",
-        "L9099-18",
+        "L8078-103",
         "L9099-26",
         "L8078-101",
+        "L9099-18",
         "L8078-93",
-        "L8078-3",
         "L9099-41",
-        "L8078-43",
+        "L9099-22",
         "L9099-1"
       ],
-      "segundos": 22.2
+      "segundos": 17.1,
+      "custo_dolares": null,
+      "modelo": "deepseek-v4-pro"
     },
     {
       "id": "valor-acima-limite",
-      "ok": false,
+      "ok": true,
       "area": "consumidor",
       "jec": false,
-      "confirmados": 8,
-      "barrados": 0,
+      "forca": {
+        "comprovados": 0,
+        "aplicaveis": 2
+      },
+      "confirmados": 5,
+      "barrados": 2,
       "sem_base": [
-        "Se R$ 150.000,00 equivale a quarenta salários mínimos ou ultrapassa esse limite.",
-        "Se é possível pedir indenização por aluguel pago durante atraso na entrega de imóvel com base na lei.",
-        "Se o contrato firmado permite cobrar multa ou indenização por atraso.",
-        "Qual o prazo para reclamar esse tipo de prejuízo."
+        "Não há nos trechos fornecidos previsão sobre indenização por atraso na entrega de imóvel, aluguéis pagos no período ou lucros cessantes.",
+        "Não há nos trechos fornecidos regra sobre custas, despesas ou gratuidade no Juizado Especial.",
+        "Não há nos trechos fornecidos definição de 'menor complexidade' que permita afirmar com segurança se a causa se enquadra no Juizado.",
+        "Autor ser pessoa física capaz ou microempresa/EPP/OSCIP/sociedade de crédito ao microempreendedor (O trecho L9099-8 efetivamente prevê essa legitimidade, mas a situação 'comprovado' não se sustenta: o relato apenas diz 'comprador de apartamento', sem qualquer documento ou fato que comprove que é pessoa física, que é capaz, ou que não é cessionário de direito de pessoa jurídica.)",
+        "Causa cível de menor complexidade (O art. 3º lista hipóteses de menor complexidade, mas não permite concluir, com base apenas nos trechos fornecidos, se a controvérsia sobre atraso de entrega de imóvel com indenização e aluguéis se enquadra ou não. A análise 'nao_se_aplica' afirma uma conclusão jurídica sem fundamento suficiente.)"
       ],
       "fontes": [
         "L9099-3",
@@ -284,26 +351,38 @@
         "Lorient-5",
         "Lorient-6",
         "L8078-3",
-        "L8078-54",
         "L8078-25",
         "L8078-49",
+        "L8078-42",
         "L8078-100",
-        "L8078-54",
-        "L8078-99",
-        "L8078-65"
+        "L8078-61",
+        "L8078-43",
+        "L8078-54"
       ],
-      "segundos": 29.6
+      "segundos": 25.4,
+      "custo_dolares": null,
+      "modelo": "deepseek-v4-pro"
     },
     {
       "id": "armadilha-prazo",
       "ok": true,
       "area": "consumidor",
       "jec": true,
-      "confirmados": 6,
-      "barrados": 2,
+      "forca": {
+        "comprovados": 2,
+        "aplicaveis": 4
+      },
+      "confirmados": 9,
+      "barrados": 4,
       "sem_base": [
-        "Parece ser uma causa de menor complexidade envolvendo relação de consumo e direito de arrependimento, dentro dos limites de valor do Juizado Especial Cível. (Não há nos trechos fornecidos informação sobre o valor da compra nem indicação de que a complexidade foi verificada. A afirmação de que está dentro do limite de valor depende de prova não apresentada.)",
-        "Como o produto chegou ontem, a pessoa ainda está dentro desse prazo. (A informação de que o produto chegou ontem consta apenas do resumo, não dos trechos de lei. A conclusão de que ainda está dentro do prazo dependeria da data efetiva de recebimento, que não foi confirmada por prova ou documento referido nos trechos.)"
+        "Custas e despesas processuais aplicáveis a este tipo de demanda no Juizado Especial Cível",
+        "Valor do limite de quarenta salários mínimos em reais",
+        "Eventual condenação da loja por danos morais ou descumprimento da oferta",
+        "Multas ou sanções administrativas aplicáveis ao fornecedor pela recusa à devolução",
+        "Devolução dos valores eventualmente pagos, monetariamente atualizados (O requisito está previsto no trecho, mas não há comprovante de pagamento nem valor informado no relato; a análise marca como 'falta_documento', o que é coerente.)",
+        "Causa de valor até quarenta salários mínimos (O requisito decorre do trecho, mas o valor do celular não foi informado; não é possível confirmar que a causa está dentro do limite.)",
+        "Causa cível de menor complexidade envolvendo direito de arrependimento em compra fora do estabelecimento comercial, com valor presumidamente dentro do limite de 40 salários mínimos. (O trecho trata da competência para causas de menor complexidade até 40 salários mínimos, mas não permite presumir o valor da causa sem informação do valor pago.)",
+        "Antes de ingressar no Juizado Especial Cível, recomenda-se tentar resolver extrajudicialmente, inclusive formalizando a devolução por escrito ao fornecedor. (O trecho citado não trata de tentativa prévia de resolução extrajudicial nem de formalizar devolução por escrito; é apenas orientação prática sem base direta no fundamento indicado.)"
       ],
       "fontes": [
         "L9099-3",
@@ -315,14 +394,16 @@
         "Lorient-6",
         "L8078-49",
         "L8078-54",
-        "L8078-53",
+        "L8078-13",
         "L8078-41",
-        "Lorient-1",
         "L8078-106",
-        "L8078-54",
-        "L8078-81"
+        "L8078-39",
+        "L8078-28",
+        "L8078-35"
       ],
-      "segundos": 30.8
+      "segundos": 26.7,
+      "custo_dolares": null,
+      "modelo": "deepseek-v4-pro"
     }
   ]
 }
