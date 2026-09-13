@@ -11,6 +11,7 @@ import {
   NOMES_DA_ORIGEM, NOMES_DA_SITUACAO, ORIGENS, SITUACOES,
 } from "../formatos";
 import { CLASSE_DO_TOM, Documentos, Processo, Registros, Tarefas } from "./Secoes";
+import { AgendaDoCaso } from "./AgendaDoCaso";
 import { ForcaDoCaso, TriagemDoCaso } from "./Triagem";
 
 export type Atualizar = Dispatch<SetStateAction<DossieDoCaso>>;
@@ -22,6 +23,7 @@ const ABAS = [
   { id: "relato", rotulo: "Relato e triagem" },
   { id: "tarefas", rotulo: "Tarefas" },
   { id: "documentos", rotulo: "Documentos" },
+  { id: "agenda", rotulo: "Agenda" },
   { id: "processo", rotulo: "Processo" },
   { id: "conversa", rotulo: "Conversa" },
   { id: "registros", rotulo: "Registros" },
@@ -138,6 +140,10 @@ export function PaginaDoCaso({ inicial }: { inicial: DossieDoCaso }) {
 
     <Painel id="documentos" aba={aba}>
       <Documentos casoId={caso.id} documentos={dados.documentos} atualizar={setDados} />
+    </Painel>
+
+    <Painel id="agenda" aba={aba}>
+      <AgendaDoCaso casoId={caso.id} />
     </Painel>
 
     <Painel id="processo" aba={aba}>

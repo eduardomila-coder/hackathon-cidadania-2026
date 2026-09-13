@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { TipoDeEvento } from "@/lib/escritorio";
 import type { TomDoPrazo } from "../casos/formatos";
 
 export type ItemDaAgenda = {
@@ -17,7 +18,21 @@ export type ItemDaAgenda = {
   grupo: "vencendo" | "adiante" | "semData" | "concluida";
 };
 
-type Props = { grupos: Record<ItemDaAgenda["grupo"], ItemDaAgenda[]>; total: number };
+export type EventoNaAgenda = {
+  id: string;
+  titulo: string;
+  casoId: string;
+  caso: string;
+  cliente: string | null;
+  tipo: TipoDeEvento;
+  descricao: string;
+  data: string | null;
+  ordem: string | null;
+  prazoInformado: string | null;
+  atualizadoEm: string;
+};
+
+type Props = { grupos: Record<ItemDaAgenda["grupo"], ItemDaAgenda[]>; total: number; eventos: EventoNaAgenda[] };
 
 const CLASSES: Array<{ grupo: ItemDaAgenda["grupo"]; titulo: string; nota: string; vazio: string }> = [
   { grupo: "vencendo", titulo: "Vencendo agora", nota: "vencidas e o que vence nos próximos 7 dias", vazio: "Nada vencendo nos próximos 7 dias." },
@@ -32,18 +47,38 @@ function classeDoTom(tom: TomDoPrazo | null) {
   return "pd-estado";
 }
 
-export function Agenda({ grupos, total }: Props) {
+const NOME_DO_EVENTO: Record<TipoDeEvento, string> = {
+  audiencia: "Audiência",
+  atendimento: "Atendimento",
+  tarefa: "Tarefa",
+  revisao: "Revisão",
+  prazo_informado: "Prazo informado",
+  prazo_confirmado: "Prazo confirmado",
+};
+
+function DetalhesDoEvento({ evento }: { evento: EventoNaAgenda }) {
+  const ePrazoInformado = evento.tipo === "prazo_informado";
+  const ePrazoConfirmado = evento.tipo === "prazo_confirmado";
+  return <>
+    <span className={`pd-estado${ePrazoConfirmado ? " pd-estado-ok" : ePrazoInformado ? " pd-estado-atencao" : ""}`}>{NOME_DO_EVENTO[evento.tipo]}</span>
+    {ePrazoInformado && <p className="pd-linha-meta"><strong>Informado:</strong> {evento.prazoInformado ?? "sem texto de prazo anotado"}</p>}
+    {ePrazoConfirmado && <p className="pd-linha-meta"><strong>Confirmado:</strong> marcado pelo escritório; confira no processo oficial.</p>}
+    <p className="pd-linha-meta">{evento.data ? `${ePrazoConfirmado ? "Data confirmada registrada" : "Data registrada"}: ${evento.data}` : "Sem data registrada"}</p>
+  </>;
+}
+
+export function Agenda({ grupos, total, eventos }: Props) {
   return <div className="pd-agenda">
     <div className="pd-pagina-cabeca">
       <div>
         <p className="pd-eyebrow">Agenda e prazos</p>
         <h1>Agenda e prazos</h1>
-        <p className="pd-auxiliar">As tarefas com data de todos os seus casos, na ordem em que vencem. Cada item abre o caso de onde saiu, e a tarefa nova nasce lá dentro, no caso.</p>
+        <p className="pd-auxiliar">Tarefas e eventos anotados nos seus casos. Cada item abre o caso de onde veio.</p>
       </div>
     </div>
 
     <p className="pd-aviso pd-aviso-atencao">
-      <strong>Data de tarefa não é prazo processual.</strong> O que está aqui é compromisso de trabalho que o escritório anotou. Prazo se confere no processo oficial, no sistema do tribunal. Este ambiente ainda não guarda audiência nem compromisso com hora marcada: só as tarefas com data dos casos.
+      <strong>Agenda não confirma prazo processual.</strong> Tarefas e eventos são registros do escritório. “Prazo informado” reproduz a anotação; “prazo confirmado” indica apenas a marcação feita pelo escritório. Confira sempre no processo oficial.
     </p>
 
     <dl className="pd-metricas">
@@ -55,12 +90,12 @@ export function Agenda({ grupos, total }: Props) {
       <div className="pd-metrica"><dt>Concluídas</dt><dd>{grupos.concluida.length}</dd><small>já marcadas como feitas</small></div>
     </dl>
 
-    {total === 0
+    {total === 0 && eventos.length === 0
       ? <div className="pd-vazio">
-        <strong>Nenhuma tarefa com data ainda.</strong>
-        A tarefa nasce dentro do caso, na parte de tarefas: abra <Link href="/escritorio">um caso</Link> e anote o que precisa ser feito. O que tiver data aparece aqui, separado por vencimento.
+        <strong>Nenhuma tarefa ou evento anotado ainda.</strong>
+        Abra <Link href="/escritorio">um caso</Link> para registrar uma tarefa ou evento.
       </div>
-      : CLASSES.map(({ grupo, titulo, nota, vazio }) => <section className="pd-cartao" key={grupo}>
+      : total > 0 && CLASSES.map(({ grupo, titulo, nota, vazio }) => <section className="pd-cartao" key={grupo}>
         <div className="pd-cartao-cabeca">
           <h2>{titulo}</h2>
           <span className="pd-auxiliar">{grupos[grupo].length} · {nota}</span>
@@ -91,5 +126,26 @@ export function Agenda({ grupos, total }: Props) {
             </Link>)}
           </div>}
       </section>)}
+
+    {eventos.length > 0 && <section className="pd-cartao" aria-labelledby="eventos-registrados">
+      <div className="pd-cartao-cabeca">
+        <h2 id="eventos-registrados">Eventos registrados</h2>
+        <span className="pd-auxiliar">{eventos.length === 1 ? "1 evento anotado" : `${eventos.length} eventos anotados`}</span>
+      </div>
+      <div className="pd-lista">
+        {eventos.map((evento) => <Link key={evento.id} className="pd-linha pd-agenda-evento" href={`/escritorio/casos/${evento.casoId}`}>
+          <div className="pd-agenda-celula">
+            <p className="pd-numero">{evento.data ?? "sem data"}</p>
+          </div>
+          <div className="pd-agenda-celula">
+            <p className="pd-linha-titulo">{evento.titulo}</p>
+            <p className="pd-linha-meta">{evento.caso}{evento.cliente ? ` · ${evento.cliente}` : ""}</p>
+            {evento.descricao && <p className="pd-linha-meta">{evento.descricao}</p>}
+          </div>
+          <div className="pd-agenda-celula"><DetalhesDoEvento evento={evento} /></div>
+          <span className="pd-seta" aria-hidden="true">›</span>
+        </Link>)}
+      </div>
+    </section>}
   </div>;
 }

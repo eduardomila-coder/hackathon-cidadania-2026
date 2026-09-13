@@ -17,6 +17,7 @@
 .pd-agenda-celula { min-width: 0; display: grid; gap: 5px; align-content: start; justify-items: start; }
 .pd-agenda-celula > * { margin: 0; }
 .pd-agenda-data { font-size: 13px; font-weight: 700; }
+.pd-agenda-evento .pd-linha-meta strong { color: var(--tinta-2); }
 
 .pd-agenda-vazio { margin: 0; padding: 18px 16px; color: var(--tinta-3); font-size: 13px; }
 

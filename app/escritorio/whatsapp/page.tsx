@@ -90,7 +90,7 @@ export default function WhatsApp() {
       <div>
         <p className="pd-eyebrow">Canal profissional</p>
         <h1>WhatsApp do escritório</h1>
-        <p className="pd-auxiliar">Você conecta o seu próprio número. O que o cliente manda aparece em Mensagens e na página do caso. O assistente escreve o rascunho; o envio é sempre seu.</p>
+        <p className="pd-auxiliar">Você conecta o seu próprio número. O que o cliente manda aparece em Mensagens e na página do caso. O assistente escreve o rascunho; o envio é seu, salvo nas conversas em que você liga o estagiário virtual.</p>
       </div>
       <div className="pd-pagina-acoes">
         <span className={`pd-estado ${classeDoEstado(whatsApp.estado)}`}>{ESTADOS_WHATSAPP[whatsApp.estado] ?? whatsApp.estado}</span>
@@ -109,7 +109,7 @@ export default function WhatsApp() {
           <ol className="pd-whatsapp-passos">
             <li><b>1</b><span>Cadastre o número com DDD. Use um número seu ou de teste, nunca o de um cliente real.</span></li>
             <li><b>2</b><span>Gere o QR e leia no celular, em Aparelhos conectados, Conectar aparelho.</span></li>
-            <li><b>3</b><span>As conversas passam a aparecer em <Link href="/escritorio/mensagens">Mensagens</Link>. Nada sai para o cliente sem o seu clique.</span></li>
+            <li><b>3</b><span>As conversas passam a aparecer em <Link href="/escritorio/mensagens">Mensagens</Link>. Nada sai para o cliente sem o seu clique, salvo nas conversas em que você liga o estagiário virtual.</span></li>
           </ol>
         </div>
 

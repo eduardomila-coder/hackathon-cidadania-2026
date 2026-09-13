@@ -7,7 +7,7 @@ import { formatarMomento } from "../casos/formatos";
 import { Pesquisa, type CasoPesquisado, type FonteDaBase, type TriagemNaTela } from "./Pesquisa";
 import "./pesquisa.css";
 
-export const metadata: Metadata = { title: "Pesquisa jurídica · Ponto Dativo" };
+export const metadata: Metadata = { title: "Pesquisa jurídica · Escritório Dativo" };
 export const dynamic = "force-dynamic";
 
 const NOMES_DA_AREA: Record<string, string> = {

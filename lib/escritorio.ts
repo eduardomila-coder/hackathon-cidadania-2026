@@ -1,4 +1,5 @@
 import type { Resultado } from "./analise";
+import { FichaDeNomeacaoSchema, normalizarFicha, type FichaDeNomeacao } from "./assistente";
 import { agora, alterar, listar, novoId } from "./banco";
 
 // Modelo de dados do escritório e todo o CRUD. Cada advogado só enxerga o que
@@ -69,9 +70,21 @@ export type Processo = {
   dataMovimento: string | null;
   consultadoEm: string;
 };
+export type EstadoDaNomeacao = "aberta" | "arquivada";
+export type ItemDoChecklistDaNomeacao = { id: string; descricao: string; conferido: boolean; conferidoEm: string | null };
+export type Nomeacao = { id: string; advogadoId: string; textoOriginal: string; camposExtraidos: FichaDeNomeacao; checklist: ItemDoChecklistDaNomeacao[]; estado: EstadoDaNomeacao; casoId: string | null; criadoEm: string; atualizadoEm: string };
+export type TipoDeEvento = "audiencia" | "atendimento" | "tarefa" | "revisao" | "prazo_informado" | "prazo_confirmado";
+export type EventoDoCaso = { id: string; casoId: string; tipo: TipoDeEvento; titulo: string; descricao: string; data: string | null; prazoInformado: string | null; criadoEm: string; atualizadoEm: string };
+export type EtapaDeHonorario = { id: string; titulo: string; concluida: boolean };
+export type PendenciaDeHonorario = { id: string; descricao: string; resolvida: boolean };
+export type RegistroDeHonorario = { id: string; texto: string; quando: string };
+// Não há valores, cálculos nem pagamentos: só andamento administrativo informado pelo advogado.
+export type HonorariosDoCaso = { id: string; casoId: string; etapas: EtapaDeHonorario[]; pendencias: PendenciaDeHonorario[]; registros: RegistroDeHonorario[]; criadoEm: string; atualizadoEm: string };
 
 export const ORIGENS: Origem[] = ["nomeacao", "plantao", "particular"];
 export const SITUACOES: Situacao[] = ["novo", "em_andamento", "aguardando_cliente", "concluido"];
+export const ESTADOS_DA_NOMEACAO: EstadoDaNomeacao[] = ["aberta", "arquivada"];
+export const TIPOS_DE_EVENTO: TipoDeEvento[] = ["audiencia", "atendimento", "tarefa", "revisao", "prazo_informado", "prazo_confirmado"];
 export const NOMES_DA_ORIGEM: Record<Origem, string> = { nomeacao: "Nomeação", plantao: "Plantão", particular: "Particular" };
 export const NOMES_DA_SITUACAO: Record<Situacao, string> = { novo: "Novo", em_andamento: "Em andamento", aguardando_cliente: "Aguardando cliente", concluido: "Concluído" };
 
@@ -89,6 +102,9 @@ const REGISTROS = "escritorio-registros";
 const TRIAGENS = "escritorio-triagens";
 const MENSAGENS = "escritorio-mensagens";
 const PROCESSOS = "escritorio-processos";
+const NOMEACOES = "escritorio-nomeacoes";
+const EVENTOS = "escritorio-eventos";
+const HONORARIOS = "escritorio-honorarios";
 
 // Os quatro documentos que todo caso começa pedindo.
 export const DOCUMENTOS_PADRAO: Array<Pick<Documento, "nome" | "detalhe" | "essencial">> = [
@@ -96,6 +112,12 @@ export const DOCUMENTOS_PADRAO: Array<Pick<Documento, "nome" | "detalhe" | "esse
   { nome: "Comprovante de endereço", detalhe: "Conta recente em nome do cliente ou declaração de residência.", essencial: false },
   { nome: "Contrato ou proposta", detalhe: "O que foi combinado por escrito; ajuda a reconstruir os fatos.", essencial: true },
   { nome: "Conversas e comprovantes", detalhe: "Mensagens, recibos, prints e fotos que provam o relato.", essencial: false },
+];
+export const CHECKLIST_PADRAO_DA_NOMEACAO: Array<Pick<ItemDoChecklistDaNomeacao, "descricao">> = [
+  { descricao: "Conferir a íntegra da intimação e a data de ciência" },
+  { descricao: "Confirmar ato e prazo no processo oficial" },
+  { descricao: "Confirmar os dados da parte assistida" },
+  { descricao: "Verificar impedimento ou conflito" },
 ];
 
 const naoEncontrado = () => new ErroEscritorio("Caso não encontrado.", 404);
@@ -148,6 +170,20 @@ function validarOrigem(valor: unknown): Origem {
 function validarSituacao(valor: unknown): Situacao {
   if (SITUACOES.includes(valor as Situacao)) return valor as Situacao;
   throw new ErroEscritorio("Situação inválida.");
+}
+
+function validarEstadoDaNomeacao(valor: unknown): EstadoDaNomeacao {
+  if (ESTADOS_DA_NOMEACAO.includes(valor as EstadoDaNomeacao)) return valor as EstadoDaNomeacao;
+  throw new ErroEscritorio("Estado da nomeação inválido.");
+}
+
+function validarTipoDeEvento(valor: unknown): TipoDeEvento {
+  if (TIPOS_DE_EVENTO.includes(valor as TipoDeEvento)) return valor as TipoDeEvento;
+  throw new ErroEscritorio("Tipo de evento inválido.");
+}
+
+function objeto(valor: unknown): Record<string, unknown> | null {
+  return valor && typeof valor === "object" && !Array.isArray(valor) ? valor as Record<string, unknown> : null;
 }
 
 function listaDeTextos(valor: unknown): string[] {
@@ -263,6 +299,93 @@ export async function atualizarCaso(advogadoId: string, casoId: string, campos: 
   });
   if (!atualizado) throw naoEncontrado();
   return atualizado;
+}
+
+// ---- Nomeações -----------------------------------------------------------
+
+function normalizarCamposExtraidos(valor: unknown): FichaDeNomeacao {
+  const ficha = FichaDeNomeacaoSchema.safeParse(valor);
+  if (!ficha.success) throw new ErroEscritorio("Os campos extraídos da nomeação são inválidos.");
+  return normalizarFicha(ficha.data);
+}
+
+function normalizarChecklistDaNomeacao(valor: unknown, usarPadrao = false): ItemDoChecklistDaNomeacao[] {
+  if (valor === undefined && usarPadrao) {
+    return CHECKLIST_PADRAO_DA_NOMEACAO.map((item) => ({ id: novoId(), descricao: item.descricao, conferido: false, conferidoEm: null }));
+  }
+  if (!Array.isArray(valor)) throw new ErroEscritorio("O checklist da nomeação deve ser uma lista.");
+  return valor.slice(0, 30).map((item) => {
+    const campos = objeto(item);
+    const descricao = texto(campos?.descricao, 500);
+    if (!descricao) throw new ErroEscritorio("Cada item do checklist precisa de uma descrição.");
+    const conferido = Boolean(campos?.conferido);
+    return { id: texto(campos?.id, 100) || novoId(), descricao, conferido, conferidoEm: conferido ? (textoOuNulo(campos?.conferidoEm, 40) ?? agora()) : null };
+  });
+}
+
+function normalizarCasoIdOpcional(advogadoId: string, valor: unknown): string | null {
+  if (valor === undefined || valor === null || valor === "") return null;
+  const casoId = texto(valor, 100);
+  if (!casoId) throw new ErroEscritorio("Caso vinculado inválido.");
+  exigirCaso(advogadoId, casoId);
+  return casoId;
+}
+
+export type DadosDaNomeacao = { textoOriginal: string; camposExtraidos: unknown; checklist?: unknown; estado?: EstadoDaNomeacao; casoId?: string | null };
+
+export function listarNomeacoes(advogadoId: string, filtro: { estado?: EstadoDaNomeacao } = {}): Nomeacao[] {
+  return listar<Nomeacao>(NOMEACOES).filter((nomeacao) => nomeacao.advogadoId === advogadoId).filter((nomeacao) => !filtro.estado || nomeacao.estado === filtro.estado).sort(porDataDesc<Nomeacao>("atualizadoEm"));
+}
+
+export function nomeacaoPorId(advogadoId: string, nomeacaoId: string): Nomeacao | null {
+  return listar<Nomeacao>(NOMEACOES).find((nomeacao) => nomeacao.id === nomeacaoId && nomeacao.advogadoId === advogadoId) ?? null;
+}
+
+export function nomeacoesDoCaso(advogadoId: string, casoId: string): Nomeacao[] {
+  exigirCaso(advogadoId, casoId);
+  return listarNomeacoes(advogadoId).filter((nomeacao) => nomeacao.casoId === casoId);
+}
+
+export async function criarNomeacao(advogadoId: string, dados: DadosDaNomeacao): Promise<Nomeacao> {
+  const textoOriginal = texto(dados.textoOriginal, 12000);
+  if (!textoOriginal) throw new ErroEscritorio("Cole o texto original da nomeação.");
+  const momento = agora();
+  const nomeacao: Nomeacao = {
+    id: novoId(), advogadoId, textoOriginal, camposExtraidos: normalizarCamposExtraidos(dados.camposExtraidos),
+    checklist: normalizarChecklistDaNomeacao(dados.checklist, true), estado: dados.estado === undefined ? "aberta" : validarEstadoDaNomeacao(dados.estado),
+    casoId: normalizarCasoIdOpcional(advogadoId, dados.casoId), criadoEm: momento, atualizadoEm: momento,
+  };
+  await alterar<Nomeacao>(NOMEACOES, (nomeacoes) => { nomeacoes.push(nomeacao); });
+  return nomeacao;
+}
+
+export type CamposDaNomeacao = Partial<Pick<Nomeacao, "camposExtraidos" | "checklist" | "estado" | "casoId">>;
+
+export async function atualizarNomeacao(advogadoId: string, nomeacaoId: string, campos: CamposDaNomeacao): Promise<Nomeacao> {
+  const casoId = campos.casoId === undefined ? undefined : normalizarCasoIdOpcional(advogadoId, campos.casoId);
+  let atualizada = null as Nomeacao | null;
+  await alterar<Nomeacao>(NOMEACOES, (nomeacoes) => {
+    const nomeacao = nomeacoes.find((item) => item.id === nomeacaoId && item.advogadoId === advogadoId);
+    if (!nomeacao) throw new ErroEscritorio("Nomeação não encontrada.", 404);
+    if (campos.camposExtraidos !== undefined) nomeacao.camposExtraidos = normalizarCamposExtraidos(campos.camposExtraidos);
+    if (campos.checklist !== undefined) nomeacao.checklist = normalizarChecklistDaNomeacao(campos.checklist);
+    if (campos.estado !== undefined) nomeacao.estado = validarEstadoDaNomeacao(campos.estado);
+    if (casoId !== undefined) nomeacao.casoId = casoId;
+    nomeacao.atualizadoEm = agora();
+    atualizada = nomeacao;
+  });
+  if (!atualizada) throw new ErroEscritorio("Nomeação não encontrada.", 404);
+  return atualizada;
+}
+
+export async function removerNomeacao(advogadoId: string, nomeacaoId: string): Promise<void> {
+  let removida = false;
+  await alterar<Nomeacao>(NOMEACOES, (nomeacoes) => nomeacoes.filter((nomeacao) => {
+    const remover = nomeacao.id === nomeacaoId && nomeacao.advogadoId === advogadoId;
+    removida ||= remover;
+    return !remover;
+  }));
+  if (!removida) throw new ErroEscritorio("Nomeação não encontrada.", 404);
 }
 
 // ---- Clientes ------------------------------------------------------------
@@ -425,6 +548,149 @@ export async function guardarTriagem(advogadoId: string, casoId: string, resulta
   await alterar<Triagem>(TRIAGENS, (triagens) => { triagens.push(triagem); });
   await marcarAtualizado(casoId);
   return triagem;
+}
+
+// ---- Eventos -------------------------------------------------------------
+
+export function eventosDoCaso(advogadoId: string, casoId: string): EventoDoCaso[] {
+  exigirCaso(advogadoId, casoId);
+  return listar<EventoDoCaso>(EVENTOS).filter((evento) => evento.casoId === casoId).sort(porDataDesc<EventoDoCaso>("atualizadoEm"));
+}
+
+export type DadosDoEvento = { tipo: TipoDeEvento; titulo: string; descricao?: string; data?: string | null; prazoInformado?: string | null };
+
+export async function adicionarEvento(advogadoId: string, casoId: string, dados: DadosDoEvento): Promise<EventoDoCaso> {
+  exigirCaso(advogadoId, casoId);
+  const titulo = texto(dados.titulo, 200);
+  if (!titulo) throw new ErroEscritorio("Dê um título ao evento.");
+  const momento = agora();
+  const evento: EventoDoCaso = {
+    id: novoId(), casoId, tipo: validarTipoDeEvento(dados.tipo), titulo, descricao: texto(dados.descricao, 3000),
+    // A data e o prazo são apenas o que o advogado informou; nunca são calculados aqui.
+    data: normalizarData(dados.data), prazoInformado: textoOuNulo(dados.prazoInformado, 500), criadoEm: momento, atualizadoEm: momento,
+  };
+  await alterar<EventoDoCaso>(EVENTOS, (eventos) => { eventos.push(evento); });
+  await marcarAtualizado(casoId);
+  return evento;
+}
+
+export type CamposDoEvento = Partial<Pick<EventoDoCaso, "tipo" | "titulo" | "descricao" | "data" | "prazoInformado">>;
+
+export async function atualizarEvento(advogadoId: string, casoId: string, eventoId: string, campos: CamposDoEvento): Promise<EventoDoCaso> {
+  exigirCaso(advogadoId, casoId);
+  let atualizado = null as EventoDoCaso | null;
+  await alterar<EventoDoCaso>(EVENTOS, (eventos) => {
+    const evento = eventos.find((item) => item.id === eventoId && item.casoId === casoId);
+    if (!evento) throw new ErroEscritorio("Evento não encontrado.", 404);
+    if (campos.tipo !== undefined) evento.tipo = validarTipoDeEvento(campos.tipo);
+    if (campos.titulo !== undefined) {
+      const titulo = texto(campos.titulo, 200);
+      if (!titulo) throw new ErroEscritorio("O título do evento não pode ficar vazio.");
+      evento.titulo = titulo;
+    }
+    if (campos.descricao !== undefined) evento.descricao = texto(campos.descricao, 3000);
+    if (campos.data !== undefined) evento.data = normalizarData(campos.data);
+    if (campos.prazoInformado !== undefined) evento.prazoInformado = textoOuNulo(campos.prazoInformado, 500);
+    evento.atualizadoEm = agora();
+    atualizado = evento;
+  });
+  if (!atualizado) throw new ErroEscritorio("Evento não encontrado.", 404);
+  await marcarAtualizado(casoId);
+  return atualizado;
+}
+
+export async function removerEvento(advogadoId: string, casoId: string, eventoId: string): Promise<void> {
+  exigirCaso(advogadoId, casoId);
+  let removido = false;
+  await alterar<EventoDoCaso>(EVENTOS, (eventos) => eventos.filter((evento) => {
+    const remover = evento.id === eventoId && evento.casoId === casoId;
+    removido ||= remover;
+    return !remover;
+  }));
+  if (!removido) throw new ErroEscritorio("Evento não encontrado.", 404);
+  await marcarAtualizado(casoId);
+}
+
+// ---- Honorários ----------------------------------------------------------
+
+function normalizarEtapasDeHonorario(valor: unknown): EtapaDeHonorario[] {
+  if (!Array.isArray(valor)) throw new ErroEscritorio("As etapas dos honorários devem ser uma lista.");
+  return valor.slice(0, 50).map((item) => {
+    const campos = objeto(item);
+    const titulo = texto(campos?.titulo, 300);
+    if (!titulo) throw new ErroEscritorio("Cada etapa dos honorários precisa de um título.");
+    return { id: texto(campos?.id, 100) || novoId(), titulo, concluida: Boolean(campos?.concluida) };
+  });
+}
+
+function normalizarPendenciasDeHonorario(valor: unknown): PendenciaDeHonorario[] {
+  if (!Array.isArray(valor)) throw new ErroEscritorio("As pendências dos honorários devem ser uma lista.");
+  return valor.slice(0, 50).map((item) => {
+    const campos = objeto(item);
+    const descricao = texto(campos?.descricao, 1000);
+    if (!descricao) throw new ErroEscritorio("Cada pendência dos honorários precisa de uma descrição.");
+    return { id: texto(campos?.id, 100) || novoId(), descricao, resolvida: Boolean(campos?.resolvida) };
+  });
+}
+
+function normalizarRegistrosDeHonorario(valor: unknown): RegistroDeHonorario[] {
+  if (!Array.isArray(valor)) throw new ErroEscritorio("Os registros dos honorários devem ser uma lista.");
+  return valor.slice(0, 100).map((item) => {
+    const campos = objeto(item);
+    const textoDoRegistro = texto(campos?.texto, 3000);
+    if (!textoDoRegistro) throw new ErroEscritorio("Cada registro dos honorários precisa de um texto.");
+    return { id: texto(campos?.id, 100) || novoId(), texto: textoDoRegistro, quando: texto(campos?.quando, 40) || agora() };
+  });
+}
+
+export type DadosDosHonorarios = { etapas?: unknown; pendencias?: unknown; registros?: unknown };
+
+export function honorariosDoCaso(advogadoId: string, casoId: string): HonorariosDoCaso | null {
+  exigirCaso(advogadoId, casoId);
+  return listar<HonorariosDoCaso>(HONORARIOS).find((honorarios) => honorarios.casoId === casoId) ?? null;
+}
+
+export async function criarHonorariosDoCaso(advogadoId: string, casoId: string, dados: DadosDosHonorarios = {}): Promise<HonorariosDoCaso> {
+  exigirCaso(advogadoId, casoId);
+  if (honorariosDoCaso(advogadoId, casoId)) throw new ErroEscritorio("Os honorários deste caso já foram registrados.", 409);
+  const momento = agora();
+  const honorarios: HonorariosDoCaso = {
+    id: novoId(), casoId, etapas: dados.etapas === undefined ? [] : normalizarEtapasDeHonorario(dados.etapas),
+    pendencias: dados.pendencias === undefined ? [] : normalizarPendenciasDeHonorario(dados.pendencias),
+    registros: dados.registros === undefined ? [] : normalizarRegistrosDeHonorario(dados.registros), criadoEm: momento, atualizadoEm: momento,
+  };
+  await alterar<HonorariosDoCaso>(HONORARIOS, (itens) => { itens.push(honorarios); });
+  await marcarAtualizado(casoId);
+  return honorarios;
+}
+
+export async function atualizarHonorariosDoCaso(advogadoId: string, casoId: string, campos: DadosDosHonorarios): Promise<HonorariosDoCaso> {
+  exigirCaso(advogadoId, casoId);
+  let atualizado = null as HonorariosDoCaso | null;
+  await alterar<HonorariosDoCaso>(HONORARIOS, (itens) => {
+    const honorarios = itens.find((item) => item.casoId === casoId);
+    if (!honorarios) throw new ErroEscritorio("Honorários não encontrados.", 404);
+    if (campos.etapas !== undefined) honorarios.etapas = normalizarEtapasDeHonorario(campos.etapas);
+    if (campos.pendencias !== undefined) honorarios.pendencias = normalizarPendenciasDeHonorario(campos.pendencias);
+    if (campos.registros !== undefined) honorarios.registros = normalizarRegistrosDeHonorario(campos.registros);
+    honorarios.atualizadoEm = agora();
+    atualizado = honorarios;
+  });
+  if (!atualizado) throw new ErroEscritorio("Honorários não encontrados.", 404);
+  await marcarAtualizado(casoId);
+  return atualizado;
+}
+
+export async function removerHonorariosDoCaso(advogadoId: string, casoId: string): Promise<void> {
+  exigirCaso(advogadoId, casoId);
+  let removidos = 0;
+  await alterar<HonorariosDoCaso>(HONORARIOS, (itens) => itens.filter((item) => {
+    const remover = item.casoId === casoId;
+    if (remover) removidos += 1;
+    return !remover;
+  }));
+  if (removidos === 0) throw new ErroEscritorio("Honorários não encontrados.", 404);
+  await marcarAtualizado(casoId);
 }
 
 // ---- Mensagens (WhatsApp) ------------------------------------------------
@@ -609,6 +875,9 @@ export type DossieDoCaso = {
   triagens: Triagem[];
   processo: Processo | null;
   mensagens: Mensagem[];
+  nomeacoes: Nomeacao[];
+  eventos: EventoDoCaso[];
+  honorarios: HonorariosDoCaso | null;
 };
 
 // Tudo que a página do caso mostra, numa leitura só. null se o caso não é
@@ -629,5 +898,8 @@ export function dossieDoCaso(advogadoId: string, casoId: string): DossieDoCaso |
     triagens: triagensDoCaso(advogadoId, casoId),
     processo,
     mensagens: mensagensDo(advogadoId, { casoId }),
+    nomeacoes: nomeacoesDoCaso(advogadoId, casoId),
+    eventos: eventosDoCaso(advogadoId, casoId),
+    honorarios: honorariosDoCaso(advogadoId, casoId),
   };
 }

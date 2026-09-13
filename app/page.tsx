@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { Etapa, Resultado } from "@/lib/analise";
 import { useDitado } from "@/lib/useDitado";
 import { Versoes } from "./Versoes";
+import estilos from "./landing.module.css";
 
 const ETAPAS: { chave: Etapa; titulo: string; texto: string }[] = [
   { chave: "extraindo", titulo: "Lendo o relato", texto: "Separando fatos, partes, pedido e provas." },
@@ -21,6 +23,15 @@ const PERGUNTAS: { pergunta: string; resposta: string }[] = [
 ];
 
 export default function Home() {
+  return <Suspense fallback={<Landing />}><PaginaSelecionada /></Suspense>;
+}
+
+function PaginaSelecionada() {
+  const parametros = useSearchParams();
+  return parametros.get("triagem") === "1" ? <TriagemPublica /> : <Landing />;
+}
+
+function TriagemPublica() {
   const [relato, setRelato] = useState("");
   const [andamento, setAndamento] = useState("");
   const [documento, setDocumento] = useState<File | null>(null);
@@ -66,7 +77,7 @@ export default function Home() {
     {carregando ? <AnaliseAndamento etapa={etapa} /> : resultado ? <Dossie resultado={resultado} caso={caso} aoContinuar={enviar} /> : <>
       <section className="cf-hero" id="inicio">
         <div className="cf-hero-conteudo">
-          <p className="cf-sobrelinha">Ponto Dativo · Habeas Titas</p>
+          <p className="cf-sobrelinha">Escritório Dativo · Habeas Titas</p>
           <h1>Atendimento melhor.<br />Caso sob controle.</h1>
           <p className="cf-intro">A triagem é um módulo do escritório de apoio para a advocacia dativa. Organize o relato, os documentos e os próximos passos antes da conversa com o cliente, com fonte em cada afirmação jurídica.</p>
           <label className="cf-relato"><span className="sr-only">Relato do cliente</span><textarea value={relato} onChange={(evento) => setRelato(evento.target.value)} maxLength={4000} placeholder="Cole ou dite o que o cliente contou" /><small>{relato.length}/4000</small></label>
@@ -85,17 +96,17 @@ export default function Home() {
       </section>
       {erro && <p role="alert" className="cf-erro">{erro}</p>}
       <section className="cf-passos" id="como-funciona"><Passo numero="1" titulo="Acolha">Registre o essencial do atendimento e o próximo compromisso no escritório de apoio.</Passo><Passo numero="2" titulo="Organize">Estruture relato, requisitos e documentos com apoio do assistente, sempre com fonte legal.</Passo><Passo numero="3" titulo="Decida">O advogado dativo confere, orienta e assume o próximo ato. A ferramenta não toma a decisão.</Passo></section>
-      <section className="cf-conteudo" id="sobre"><p className="cf-sobrelinha">Para a advocacia dativa</p><h2>Um escritório de apoio para quem atende com poucos recursos e muita responsabilidade.</h2><p>Ponto Dativo reúne atendimento, checklist de documentos, agenda, WhatsApp profissional e triagem com fonte jurídica. É um ambiente demonstrativo, sem vínculo institucional e sem integração a sistemas externos.</p></section>
+      <section className="cf-conteudo" id="sobre"><p className="cf-sobrelinha">Para a advocacia dativa</p><h2>Um escritório de apoio para quem atende com poucos recursos e muita responsabilidade.</h2><p>Escritório Dativo reúne atendimento, checklist de documentos, agenda, WhatsApp profissional e triagem com fonte jurídica. É um ambiente demonstrativo, sem vínculo institucional e sem integração a sistemas externos.</p></section>
       <section className="cf-duvidas" id="perguntas"><p className="cf-sobrelinha">Antes de usar</p><h2>Perguntas frequentes</h2>{PERGUNTAS.map(({ pergunta, resposta }) => <details key={pergunta}><summary>{pergunta}<span>⌄</span></summary><p>{resposta}</p></details>)}</section>
-      <section className="cf-contato" id="contato"><div><p className="cf-sobrelinha">Ponto Dativo</p><h2>Da primeira conversa ao próximo ato.</h2><p>O protótipo apoia o atendimento dativo sem confundir organização de informações com a atuação profissional do advogado.</p></div><div className="cf-cartao"><h3>Habeas Titas</h3><p><strong>Protótipo para advocacia dativa</strong><br />Demonstração durante o Hackathon da Cidadania.</p><p><strong>Limite do ambiente</strong><br />Sem vínculo institucional e sem integração a sistemas externos.</p></div></section>
+      <section className="cf-contato" id="contato"><div><p className="cf-sobrelinha">Escritório Dativo</p><h2>Da primeira conversa ao próximo ato.</h2><p>O protótipo apoia o atendimento dativo sem confundir organização de informações com a atuação profissional do advogado.</p></div><div className="cf-cartao"><h3>Habeas Titas</h3><p><strong>Protótipo para advocacia dativa</strong><br />Demonstração durante o Hackathon da Cidadania.</p><p><strong>Limite do ambiente</strong><br />Sem vínculo institucional e sem integração a sistemas externos.</p></div></section>
       <Versoes />
     </>}
     <Rodape />
   </main>;
 }
 
-function Cabecalho() { return <header className="cf-cabecalho"><Link href="/" className="cf-marca">Ponto Dativo <small>Habeas Titas · protótipo dativo</small></Link><nav aria-label="Navegação principal"><a href="#inicio">Início</a><a href="#sobre">Sobre</a><a href="#como-funciona">Como funciona</a><a href="#perguntas">Perguntas</a><a href="#contato">Contato</a></nav><Link href="/escritorio" className="cf-equipe">Escritório de apoio →</Link></header>; }
-function Rodape() { return <footer className="cf-rodape"><strong>Ponto Dativo</strong><span>Habeas Titas · protótipo para advocacia dativa</span><small>Triagem com fonte. Decisão humana.</small></footer>; }
+function Cabecalho() { return <header className="cf-cabecalho"><Link href="/" className="cf-marca">Escritório Dativo <small>Habeas Titas · protótipo dativo</small></Link><nav aria-label="Navegação principal"><a href="#inicio">Início</a><a href="#sobre">Sobre</a><a href="#como-funciona">Como funciona</a><a href="#perguntas">Perguntas</a><a href="#contato">Contato</a></nav><Link href="/escritorio" className="cf-equipe">Escritório de apoio →</Link></header>; }
+function Rodape() { return <footer className="cf-rodape"><strong>Escritório Dativo</strong><span>Habeas Titas · protótipo para advocacia dativa</span><small>Triagem com fonte. Decisão humana.</small></footer>; }
 function Passo({ numero, titulo, children }: { numero: string; titulo: string; children: React.ReactNode }) { return <article><span>{numero}</span><div><h3>{titulo}</h3><p>{children}</p></div></article>; }
 
 function AnaliseAndamento({ etapa }: { etapa: Etapa | null }) {
@@ -199,3 +210,110 @@ function Medidor({ custo, tempos, caso }: { custo: Resultado["custo"]; tempos: R
 }
 
 function Linha({ titulo, texto }: { titulo: string; texto: string }) { return <div className="cf-linha"><b>→</b><div><h3>{titulo}</h3><p>{texto}</p></div></div>; }
+
+function Landing() {
+  return <main className={estilos.pagina}>
+    <header className={estilos.cabecalho}>
+      <Link href="/" className={estilos.marca}>
+        Escritório Dativo
+        <span>OAB Paraná · Advocacia Dativa</span>
+      </Link>
+      <nav className={estilos.navegacao} aria-label="Navegação principal">
+        <a href="#o-que-e">O que é</a>
+        <a href="#responsabilidades">Responsabilidades</a>
+        <a href="#o-caso">O caso</a>
+        <a href="#duvidas">Dúvidas</a>
+      </nav>
+      <Link href="/entrar" className={estilos.entrar}>Entrar</Link>
+    </header>
+
+    <section className={estilos.abertura} id="o-que-e">
+      <div className={estilos.aberturaTexto}>
+        <p className={estilos.sobrelinha}>Ambiente profissional</p>
+        <h1>Escritório<br />Dativo</h1>
+        <p className={estilos.chamada}>O ambiente de trabalho da advocacia dativa no Paraná.</p>
+        <p className={estilos.introducao}>Nomeações, atendimento, processo, documentos, pesquisa, formação e honorários convivem no mesmo ambiente. O sistema organiza o trabalho; o advogado continua responsável por cada ato.</p>
+        <div className={estilos.acoesAbertura}>
+          <Link href="/entrar" className={estilos.entrarPrincipal}>Entrar no Escritório Dativo <span aria-hidden="true">→</span></Link>
+          <Link href="/?triagem=1" className={estilos.linkSecundario}>Acessar triagem pública demonstrativa</Link>
+        </div>
+        <p className={estilos.avisoDemo}>Ambiente de demonstração. Todos os dados desta página são fictícios.</p>
+      </div>
+      <aside className={estilos.hoje} aria-labelledby="hoje-titulo">
+        <div className={estilos.hojeCabecalho}>
+          <div><p>Quarta-feira, 16 de setembro</p><h2 id="hoje-titulo">Hoje no escritório</h2></div>
+          <span>DEMO</span>
+        </div>
+        <ol className={estilos.filaHoje}>
+          <li><span className={estilos.marcadorAtencao} /><div><strong>Prazo informado</strong><p>Manifestação em contestação</p></div><small>A conferir no processo oficial</small></li>
+          <li><span className={estilos.marcadorAzul} /><div><strong>Audiência</strong><p>Conciliação · 14h30</p></div><small>2º JEC de Curitiba</small></li>
+          <li><span className={estilos.marcadorOk} /><div><strong>Documentos recebidos</strong><p>Comprovantes enviados pela assistida</p></div><small>Revisar 3 arquivos</small></li>
+          <li><span className={estilos.marcadorNeutro} /><div><strong>Honorários dativos</strong><p>Certidão em acompanhamento</p></div><small>Checklist documental</small></li>
+        </ol>
+      </aside>
+    </section>
+
+    <section className={estilos.fluxo} aria-labelledby="fluxo-titulo">
+      <div className={estilos.tituloSecao}><p className={estilos.sobrelinha}>Do recebimento ao pós-atuação</p><h2 id="fluxo-titulo">O caso permanece inteiro.</h2></div>
+      <div className={estilos.linhasFluxo}>
+        <article><span>01</span><h3>Nomeação</h3><p>O registro abre o caso com processo, órgão, pessoa assistida e pontos que exigem conferência.</p></article>
+        <article><span>02</span><h3>Atendimento</h3><p>Comunicação e documentos chegam vinculados ao contexto em que serão usados.</p></article>
+        <article><span>03</span><h3>Atuação</h3><p>Tarefas, pesquisa e peças deixam um histórico de trabalho rastreável.</p></article>
+        <article><span>04</span><h3>Encerramento</h3><p>Certidões, checklist e acompanhamento de honorários preservam o pós-atuação.</p></article>
+      </div>
+    </section>
+
+    <section className={estilos.responsabilidades} id="responsabilidades" aria-labelledby="responsabilidades-titulo">
+      <div className={estilos.tituloSecao}><p className={estilos.sobrelinha}>Tecnologia com limite claro</p><h2 id="responsabilidades-titulo">O sistema apoia. A responsabilidade permanece profissional.</h2></div>
+      <div className={estilos.tabelaResponsabilidades} role="table" aria-label="Responsabilidades do sistema e do advogado">
+        <div role="row" className={estilos.cabecaTabela}><span role="columnheader">Atividade</span><span role="columnheader">O sistema pode fazer</span><span role="columnheader">O advogado deve fazer</span></div>
+        <div role="row"><strong role="rowheader">Nomeação</strong><span role="cell">Estruturar dados e destacar campos incompletos.</span><span role="cell">Conferir processo oficial, parte, ato e eventual impedimento.</span></div>
+        <div role="row"><strong role="rowheader">Prazo</strong><span role="cell">Registrar data identificada como informação a conferir.</span><span role="cell">Validar prazo fatal no processo oficial e definir a providência.</span></div>
+        <div role="row"><strong role="rowheader">Pesquisa</strong><span role="cell">Recuperar fontes e organizar notas vinculadas ao caso.</span><span role="cell">Escolher tese, estratégia e fundamento aplicável.</span></div>
+        <div role="row"><strong role="rowheader">Comunicação</strong><span role="cell">Preparar um rascunho e manter o histórico da conversa.</span><span role="cell">Revisar e enviar a mensagem por ação expressa.</span></div>
+      </div>
+      <p className={estilos.notaResponsabilidades}>A plataforma não substitui Projudi, PJe ou qualquer sistema judicial oficial. Também não protocola, envia mensagens ou toma decisões de forma autônoma.</p>
+    </section>
+
+    <section className={estilos.caso} id="o-caso" aria-labelledby="caso-titulo">
+      <div className={estilos.casoIntroducao}><p className={estilos.sobrelinha}>Uma prévia de caso</p><h2 id="caso-titulo">Contexto suficiente para a próxima providência.</h2><p>Informações processuais, contato, documentos e pesquisa permanecem ligados ao mesmo caso, sem transformar o escritório em uma sequência de telas sem contexto.</p><Link href="/entrar" className={estilos.linkCaso}>Entrar para acessar o escritório <span aria-hidden="true">→</span></Link></div>
+      <div className={estilos.previaCaso} aria-label="Prévia fictícia de um caso no Escritório Dativo">
+        <div className={estilos.previaTopo}><div><p>CASO · DADOS FICTÍCIOS</p><h3>Marina A. · Responsabilidade civil</h3><span>0001234-56.2026.8.16.0001 · 2º Juizado Especial Cível de Curitiba</span></div><b>A conferir</b></div>
+        <div className={estilos.abasCaso}><span className={estilos.abaAtiva}>Visão geral</span><span>Tarefas</span><span>Processo</span><span>Assistida</span><span>Documentos</span><span>Honorários</span></div>
+        <div className={estilos.corpoCaso}>
+          <div className={estilos.providencia}><p>Próxima providência</p><h4>Conferir intimação e prazo no processo oficial</h4><span>Data identificada: 18 set. 2026 · não confirmada</span></div>
+          <div className={estilos.tarefasCaso}><p>Tarefas</p><ul><li><span />Solicitar comprovante de residência <small>Hoje</small></li><li><span />Revisar documentos recebidos <small>16 set.</small></li><li><span />Preparar resposta à contestação <small>A confirmar</small></li></ul></div>
+          <div className={estilos.resumoCaso}><p>Resumo técnico</p><span>Documentos iniciais recebidos. Consulta processual registrada em 15 set. Pesquisa jurídica deve manter as fontes visíveis para revisão profissional.</span></div>
+          <div className={estilos.colunaCaso}><p>Assistida</p><strong>Marina A.</strong><span>Contato iniciado pelo advogado</span><hr /><p>Documentos</p><strong>3 recebidos · 1 pendente</strong><span>Origem e vínculo preservados</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section className={estilos.duvidas} id="duvidas" aria-labelledby="duvidas-titulo">
+      <div className={estilos.tituloSecao}><p className={estilos.sobrelinha}>Dúvidas frequentes</p><h2 id="duvidas-titulo">Limites e funcionamento, sem promessas implícitas.</h2></div>
+      <div className={estilos.listaDuvidas}>
+        <Duvida pergunta="O sistema substitui Projudi ou PJe?">Não. O Escritório Dativo organiza o trabalho profissional e não substitui sistemas judiciais oficiais.</Duvida>
+        <Duvida pergunta="O sistema conta prazos automaticamente?">Uma data identificada permanece como informação a conferir no processo oficial até validação humana.</Duvida>
+        <Duvida pergunta="Como uma nomeação entra no Escritório Dativo?">A nomeação pode ser registrada e estruturada antes da criação do caso. A conferência dos dados é do advogado.</Duvida>
+        <Duvida pergunta="A pessoa assistida precisa criar conta?">Não. O contato e a solicitação de documentos partem do caso e da ação do profissional.</Duvida>
+        <Duvida pergunta="A OAB/PR consegue ver documentos, conversas e estratégia?">A mantenedora institucional não se confunde com acesso irrestrito ao conteúdo protegido da atuação profissional.</Duvida>
+        <Duvida pergunta="Como funciona a pesquisa jurídica?">Ela recupera fontes permitidas e organiza material de apoio. A escolha de tese e estratégia continua profissional.</Duvida>
+        <Duvida pergunta="O sistema envia mensagens ou petições sozinho?">Não por padrão. A comunicação sai por ação expressa do advogado. A exceção é o estagiário virtual, que você liga conversa por conversa e pode ser configurado para responder sozinho, sempre sob as travas de confiança que você define.</Duvida>
+        <Duvida pergunta="Como funciona o acompanhamento de honorários?">O caso preserva o vínculo com arbitramento, certidão, checklist documental e acompanhamento administrativo.</Duvida>
+        <Duvida pergunta="Formação e habilitações aparecem no sistema?">Quando houver integração institucional autorizada, essas informações podem ser reunidas no ambiente profissional.</Duvida>
+        <Duvida pergunta="Posso usar o Escritório Dativo como ambiente principal?">O produto foi concebido para concentrar a rotina dativa, mantendo sempre a conferência humana e os sistemas oficiais como referência processual.</Duvida>
+      </div>
+    </section>
+
+    <section className={estilos.chamadaFinal}>
+      <div><p className={estilos.sobrelinha}>Acesso profissional</p><h2>Seu trabalho dativo, com o caso no centro.</h2><p>Entre com sua identidade profissional vinculada ao ambiente de demonstração.</p></div>
+      <Link href="/entrar" className={estilos.entrarFinal}>Entrar no Escritório Dativo <span aria-hidden="true">→</span></Link>
+    </section>
+
+    <footer className={estilos.rodape}><strong>Escritório Dativo</strong><span>OAB Paraná · Advocacia Dativa</span><small>Ambiente de demonstração · dados fictícios</small><Link href="/?triagem=1">Triagem pública</Link></footer>
+  </main>;
+}
+
+function Duvida({ pergunta, children }: { pergunta: string; children: React.ReactNode }) {
+  return <details><summary>{pergunta}<span aria-hidden="true">+</span></summary><p>{children}</p></details>;
+}

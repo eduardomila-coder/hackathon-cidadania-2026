@@ -1,5 +1,5 @@
 import { FichaDeNomeacaoSchema, fichaDeNomeacao, normalizarFicha, type FichaDeNomeacao } from "@/lib/assistente";
-import { adicionarDocumento, adicionarTarefa, criarCaso, ErroEscritorio, normalizarProcesso, registrar } from "@/lib/escritorio";
+import { adicionarDocumento, adicionarTarefa, atualizarNomeacao, criarCaso, criarNomeacao, ErroEscritorio, normalizarProcesso, registrar } from "@/lib/escritorio";
 import { exigirAdvogado } from "@/lib/sessao";
 import { lerCorpo, responderErro } from "../comum";
 
@@ -24,7 +24,7 @@ function tituloDaFicha(ficha: FichaDeNomeacao, processo: string | null) {
 export async function POST(request: Request) {
   try {
     const advogado = await exigirAdvogado();
-    const corpo = await lerCorpo<{ texto: string; somenteFicha: boolean; ficha: unknown }>(request);
+    const corpo = await lerCorpo<{ texto: string; somenteFicha: boolean; ficha: unknown; nomeacaoId?: string }>(request);
     const texto = typeof corpo.texto === "string" ? corpo.texto.trim() : "";
     if (texto.length < 30) throw new ErroEscritorio("Cole o texto da intimação de nomeação.");
 
@@ -75,8 +75,13 @@ export async function POST(request: Request) {
     const ciencia = ficha.dataCiencia ? ` Ciência: ${emDia(ficha.dataCiencia)}.` : "";
     const alertas = ficha.alertas.length ? ` Alertas: ${ficha.alertas.join(" ")}` : "";
     await registrar(advogado.id, caso.id, "assistente", `Ficha de nomeação lida pela IA. Prazo: ${ficha.dataPrazo ? emDia(ficha.dataPrazo) : ficha.prazoInformado ?? "conferir no ato"}.${ciencia}${alertas}`);
+    // A tela de revisão vincula o registro que já existe; o fluxo antigo cria
+    // um registro junto com o caso para continuar atendendo quem o chama direto.
+    const nomeacao = corpo.nomeacaoId
+      ? await atualizarNomeacao(advogado.id, corpo.nomeacaoId, { casoId: caso.id })
+      : await criarNomeacao(advogado.id, { textoOriginal: texto, camposExtraidos: ficha, casoId: caso.id });
 
-    return Response.json({ caso, ficha }, { status: 201 });
+    return Response.json({ caso, ficha, nomeacao }, { status: 201 });
   } catch (e) {
     return responderErro(e, "nomeação");
   }

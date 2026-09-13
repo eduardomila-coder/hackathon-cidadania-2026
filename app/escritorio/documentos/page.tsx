@@ -6,7 +6,7 @@ import { formatarMomento, NOMES_DA_SITUACAO } from "../casos/formatos";
 import { Documentos, type GrupoDeDocumentos } from "./Documentos";
 import "./documentos.css";
 
-export const metadata: Metadata = { title: "Documentos · Ponto Dativo" };
+export const metadata: Metadata = { title: "Documentos · Escritório Dativo" };
 export const dynamic = "force-dynamic";
 
 // Todos os documentos do advogado, agrupados pelo caso de origem. O que existe

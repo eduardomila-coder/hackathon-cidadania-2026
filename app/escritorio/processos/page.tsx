@@ -6,7 +6,7 @@ import { advogadoAtual } from "@/lib/sessao";
 import { Processos } from "./Processos";
 import "../processos.css";
 
-export const metadata: Metadata = { title: "Processos · Ponto Dativo" };
+export const metadata: Metadata = { title: "Processos · Escritório Dativo" };
 export const dynamic = "force-dynamic";
 
 // Processos do advogado logado, com o último andamento público que o DataJud

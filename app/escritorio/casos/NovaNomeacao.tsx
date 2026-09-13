@@ -3,21 +3,20 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FichaDeNomeacao } from "@/lib/assistente";
-import type { Caso } from "@/lib/escritorio";
+import type { Nomeacao } from "@/lib/escritorio";
 import { chamar, mensagemDeErro } from "./api";
 import { formatarCnj, formatarData } from "./formatos";
 
 type Props = { aoFechar: () => void };
 
-// Nova nomeação em dois passos: a IA lê a intimação e mostra a ficha; o
-// caso só é aberto quando o advogado clica. Uma leitura só: ao abrir, a
-// ficha já conferida vai junto e o modelo não é chamado de novo.
+// A leitura só extrai a ficha. O registro de nomeação fica separado do caso
+// até que o advogado conclua as conferências humanas na tela de detalhe.
 export function NovaNomeacao({ aoFechar }: Props) {
   const router = useRouter();
   const [texto, setTexto] = useState("");
   const [ficha, setFicha] = useState<FichaDeNomeacao | null>(null);
   const [lendo, setLendo] = useState(false);
-  const [abrindo, setAbrindo] = useState(false);
+  const [registrando, setRegistrando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
   async function ler() {
@@ -34,20 +33,20 @@ export function NovaNomeacao({ aoFechar }: Props) {
     }
   }
 
-  async function abrirCaso() {
+  async function registrarNomeacao() {
     if (!ficha) return;
     setErro(null);
-    setAbrindo(true);
+    setRegistrando(true);
     try {
-      const resposta = await chamar<{ caso: Caso }>("/api/escritorio/nomeacao", { metodo: "POST", corpo: { texto, ficha } });
-      router.push(`/escritorio/casos/${resposta.caso.id}`);
+      const resposta = await chamar<Nomeacao>("/api/escritorio/nomeacoes", { metodo: "POST", corpo: { textoOriginal: texto, camposExtraidos: ficha } });
+      router.push(`/escritorio/nomeacoes/${resposta.id}`);
     } catch (e) {
       setErro(mensagemDeErro(e));
-      setAbrindo(false);
+      setRegistrando(false);
     }
   }
 
-  const ocupado = lendo || abrindo;
+  const ocupado = lendo || registrando;
   const cnjIdentificado = Boolean(ficha?.processo);
   const prazoDoTexto = ficha ? (ficha.dataPrazo ? formatarData(ficha.dataPrazo) : ficha.prazoInformado) : null;
 
@@ -61,7 +60,7 @@ export function NovaNomeacao({ aoFechar }: Props) {
     </div>
 
     <div className="pd-cartao-corpo">
-      <p className="pd-auxiliar pdl-formulario-intro">Cole o texto da intimação de nomeação (Portal da Advocacia Dativa, e-mail ou processo eletrônico). A IA monta uma ficha com o que está escrito ali, sem calcular prazo e sem decidir tese. O caso só é aberto quando você clicar.</p>
+        <p className="pd-auxiliar pdl-formulario-intro">Cole o texto da intimação de nomeação (Portal da Advocacia Dativa, e-mail ou processo eletrônico). A IA monta uma ficha com o que está escrito ali, sem calcular prazo e sem decidir tese. Primeiro a nomeação é registrada para conferência; o caso só abre depois das suas confirmações.</p>
 
       <div className="pd-campo">
         <label htmlFor="nn-texto">Texto da intimação</label>
@@ -122,33 +121,9 @@ export function NovaNomeacao({ aoFechar }: Props) {
           <Lista titulo="Confira antes de confiar" itens={ficha.alertas} vazio="Sem alertas." classe="pdl-alerta" />
         </div>
 
-        <section className="pdl-decisao">
-          <p className="pd-eyebrow">Antes de abrir o caso</p>
-          <h4>Checklist mínimo</h4>
-          <p>Estas conferências são suas. O sistema só mostra o que o texto da intimação trouxe.</p>
-          <ul className="pdl-tarefas">
-            <li>
-              <span className={`pdl-check${cnjIdentificado ? " pdl-check-ok" : ""}`} aria-hidden="true">{cnjIdentificado ? "✓" : ""}</span>
-              <div><strong>Número CNJ identificado</strong><span>{cnjIdentificado ? formatarCnj(ficha.processo ?? "") : "não consta no texto colado"}</span></div>
-            </li>
-            <li>
-              <span className="pdl-check" aria-hidden="true" />
-              <div><strong>Conferir o processo oficial</strong><span>ato e prazo, no sistema do tribunal</span></div>
-            </li>
-            <li>
-              <span className="pdl-check" aria-hidden="true" />
-              <div><strong>Confirmar os dados da parte assistida</strong><span>nome, contato e documentação</span></div>
-            </li>
-            <li>
-              <span className="pdl-check" aria-hidden="true" />
-              <div><strong>Verificar impedimento ou conflito</strong><span>confirmação humana</span></div>
-            </li>
-          </ul>
-        </section>
-
         <div className="pd-linha-campos">
-          <button type="button" className="pd-botao pd-botao-primario" onClick={abrirCaso} disabled={ocupado}>{abrindo ? "Abrindo…" : "Abrir caso a partir da ficha"}</button>
-          <span className="pd-auxiliar">O caso nasce com esta ficha, o checklist de documentos e duas tarefas: conferir a íntegra da intimação e confirmar o prazo no processo.</span>
+          <button type="button" className="pd-botao pd-botao-primario" onClick={registrarNomeacao} disabled={ocupado}>{registrando ? "Registrando…" : "Registrar para conferir"}</button>
+          <span className="pd-auxiliar">O registro guarda este texto e a ficha. Na próxima tela, marque as conferências humanas antes de abrir o caso.</span>
         </div>
       </div>}
     </div>

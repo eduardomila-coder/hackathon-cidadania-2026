@@ -14,6 +14,8 @@ const TRACOS: Record<string, string> = {
   processos: "M7 5h6M6 5a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 6 17h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14 5M7.5 3.5h5V5h-5zM7.5 9.5h5M7.5 12.5h3.5",
   mensagens: "M4 6.5A1.5 1.5 0 0 1 5.5 5h9A1.5 1.5 0 0 1 16 6.5v5A1.5 1.5 0 0 1 14.5 13H9l-3.5 3v-3H5.5A1.5 1.5 0 0 1 4 11.5z",
   whatsapp: "M7 3.5h6A1.5 1.5 0 0 1 14.5 5v10A1.5 1.5 0 0 1 13 16.5H7A1.5 1.5 0 0 1 5.5 15V5A1.5 1.5 0 0 1 7 3.5zM9 14.2h2",
+  formacao: "M4 5.5h5.5c1.2 0 2.2.5 2.5 1.2.3-.7 1.3-1.2 2.5-1.2H20v10.8h-5.5c-1.2 0-2.2.5-2.5 1.2-.3-.7-1.3-1.2-2.5-1.2H4zM12 6.7v10.8",
+  oabpr: "M10 3.5 16.5 6v4.4c0 3.2-2.2 5.7-6.5 6.9-4.3-1.2-6.5-3.7-6.5-6.9V6zM7.5 10h5M10 7.5v5",
 };
 
 type Contagens = {
@@ -39,8 +41,15 @@ const GRUPOS: Array<{ grupo: string; ligacoes: Ligacao[] }> = [
     ligacoes: [
       { destino: "/escritorio/documentos", nome: "Documentos", icone: "documentos", contagem: "documentos", alerta: true },
       { destino: "/escritorio/pesquisa", nome: "Pesquisa jurídica", icone: "pesquisa" },
+      { destino: "/escritorio/formacao", nome: "Formação", icone: "formacao" },
       { destino: "/escritorio/honorarios", nome: "Honorários", icone: "processos" },
       { destino: "/escritorio/processos", nome: "Processos", icone: "processos" },
+    ],
+  },
+  {
+    grupo: "Institucional",
+    ligacoes: [
+      { destino: "/escritorio/oabpr", nome: "Central OAB/PR", icone: "oabpr" },
     ],
   },
   {

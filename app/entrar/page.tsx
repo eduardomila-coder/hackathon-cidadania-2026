@@ -5,7 +5,7 @@ import { advogadoAtual } from "@/lib/sessao";
 import { Formulario } from "./Formulario";
 import "../escritorio/escritorio.css";
 
-export const metadata: Metadata = { title: "Entrar · Ponto Dativo" };
+export const metadata: Metadata = { title: "Entrar · Escritório Dativo" };
 export const dynamic = "force-dynamic";
 
 // Só aceita voltar para um caminho deste site. Qualquer outra coisa (outro
@@ -23,7 +23,7 @@ export default async function Entrar({ searchParams }: { searchParams: Promise<{
 
   return <main className="pd-entrar">
     <section className="pd-entrar-caixa" aria-labelledby="entrar-titulo">
-      <p className="pd-eyebrow">Ponto Dativo</p>
+      <p className="pd-eyebrow">Escritório Dativo</p>
       <h1 id="entrar-titulo">Entrar no escritório</h1>
       <p className="pd-entrar-intro">Use o usuário e a senha que a equipe do Hackathon passou para você.</p>
       <Formulario destino={destino} />

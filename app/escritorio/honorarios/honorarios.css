@@ -1,0 +1,29 @@
+.pd-honorarios { display: grid; gap: 16px; }
+.pd-honorarios .pd-aviso { margin: 0; }
+.pd-honorarios .pd-aviso strong { display: block; margin-bottom: 3px; }
+.pd-honorarios-seletor { display: flex; align-items: end; gap: 10px; flex-wrap: wrap; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--papel); }
+.pd-honorarios-seletor label { display: grid; gap: 5px; color: var(--tinta-2); font-size: 12px; font-weight: 700; }
+.pd-honorarios-seletor select { width: min(420px, 100%); }
+.pd-honorarios-recado { min-height: 18px; margin: -4px 0 0; color: var(--tinta-3); font-size: 12px; }
+.pd-honorarios-erro { color: var(--risco); font-weight: 700; }
+.pd-honorarios-paineis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.pd-honorarios-registros { grid-column: 1 / -1; }
+.pd-honorarios-corpo { display: grid; gap: 10px; }
+.pd-honorarios-item { display: grid; grid-template-columns: 108px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.pd-honorarios-marca { display: flex; align-items: center; gap: 6px; color: var(--tinta-2); font-size: 12px; font-weight: 700; }
+.pd-honorarios-marca input { width: 18px; height: 18px; }
+.pd-honorarios-adicionar { display: flex; gap: 8px; }
+.pd-honorarios-adicionar .pd-entrada { min-width: 0; flex: 1; }
+.pd-honorarios-registro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(160px, .45fr) auto; gap: 8px; align-items: start; padding-top: 10px; border-top: 1px solid var(--linha); }
+.pd-honorarios-registro:first-child { padding-top: 0; border-top: 0; }
+.pd-honorarios-novo-registro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(160px, .45fr) auto; gap: 8px; align-items: start; padding-top: 10px; border-top: 1px solid var(--linha); }
+.pd-honorarios-novo-registro .pd-botao { align-self: end; }
+
+@media (max-width: 760px) {
+  .pd-honorarios-paineis { grid-template-columns: minmax(0, 1fr); }
+  .pd-honorarios-registros { grid-column: auto; }
+  .pd-honorarios-item { grid-template-columns: minmax(0, 1fr) auto; }
+  .pd-honorarios-marca { grid-column: 1 / -1; }
+  .pd-honorarios-registro, .pd-honorarios-novo-registro { grid-template-columns: minmax(0, 1fr); }
+  .pd-honorarios-registro .pd-botao, .pd-honorarios-novo-registro .pd-botao { justify-self: start; }
+}

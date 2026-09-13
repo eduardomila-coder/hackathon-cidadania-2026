@@ -253,7 +253,7 @@ function EstadoDoWhatsapp() {
   const descricao = estado ? ESTADOS_DO_WHATSAPP[estado] ?? { texto: estado, tom: "neutro" as const } : { texto: "Verificando…", tom: "neutro" as const };
   return <>
     <span className={`pd-estado ${CLASSES_DE_TOM[descricao.tom]}`.trim()}>{descricao.texto}</span>
-    <p className="pd-auxiliar">As mensagens chegam aqui e nenhuma resposta sai sem o seu clique.</p>
+    <p className="pd-auxiliar">As mensagens chegam aqui. Nada sai sozinho, exceto nas conversas em que você liga o estagiário virtual.</p>
     <Link href="/escritorio/whatsapp" className="pd-botao pd-botao-secundario">Abrir a conexão</Link>
   </>;
 }

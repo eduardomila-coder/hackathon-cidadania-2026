@@ -7,7 +7,7 @@ import { AdvogadoProvider } from "./Advogado";
 import { BotaoSair, Navegacao } from "./Navegacao";
 import "./escritorio.css";
 
-export const metadata: Metadata = { title: "Escritório · Ponto Dativo" };
+export const metadata: Metadata = { title: "Escritório · Escritório Dativo" };
 export const dynamic = "force-dynamic";
 
 // Casca de todas as telas do escritório. O proxy já barrou quem não tem
@@ -21,13 +21,13 @@ export default async function LayoutDoEscritorio({ children }: { children: React
   return <AdvogadoProvider advogado={advogado}>
     <div className="pd-escritorio">
       <aside className="pd-menu">
-        <Link href="/escritorio" className="pd-menu-marca" aria-label="Ponto Dativo, ir para casos">
+        <Link href="/escritorio" className="pd-menu-marca" aria-label="Escritório Dativo, ir para casos">
           <svg className="pd-menu-simbolo" viewBox="0 0 28 28" fill="none" aria-hidden="true">
             <path d="M4 5.5h12.5l4.5 4.5v12.5H4z" fill="#0873B9" />
             <path d="M8 10h8M8 14h5.5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
             <path d="M17 5.5V10h4" stroke="#D7493F" strokeWidth="2" strokeLinejoin="round" />
           </svg>
-          <span>Ponto <b>Dativo</b><small>Escritório do advogado</small></span>
+          <span>Escritório <b>Dativo</b><small>Ambiente do advogado</small></span>
         </Link>
         <Navegacao contagens={{
           casos: resumo.casosAbertos,

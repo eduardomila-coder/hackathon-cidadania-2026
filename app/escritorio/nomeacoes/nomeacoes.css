@@ -1,6 +1,4 @@
-/* Tela /escritorio/nomeacoes: os casos com origem "nomeação", o último
-   registro de cada um e o prazo anotado. Reaproveita .pd-cartao, .pd-lista,
-   .pd-linha, .pd-estado, .pd-metricas e .pd-aviso de globals.css. */
+/* Lista e detalhe das nomeações, que existem antes e independentemente do caso. */
 
 .pd-nomeacoes { display: grid; gap: 16px; }
 .pd-nomeacoes .pd-aviso { margin: 0; }
@@ -19,8 +17,43 @@
 
 .pd-nomeacoes-cabecalho,
 .pd-nomeacoes .pd-linha {
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, .8fr) minmax(0, .9fr) minmax(0, 1.2fr) 18px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, .7fr) minmax(0, .8fr) minmax(0, .9fr) 18px;
 }
+
+/* Detalhe: o texto fonte fica separado da leitura para o advogado poder
+   comparar o que foi extraído antes de abrir qualquer caso. */
+.pd-nomeacao-detalhe { display: grid; gap: 16px; max-width: 1120px; }
+.pd-nomeacao-detalhe .pd-pagina-cabeca { align-items: flex-start; }
+.pd-nomeacao-detalhe-acoes { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pd-nomeacao-resumo { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding: 18px 20px; border: 1px solid var(--linha); border-top: 3px solid var(--azul); border-radius: var(--raio); background: var(--papel); }
+.pd-nomeacao-resumo h2 { margin: 5px 0 0; font-size: 21px; letter-spacing: -.02em; }
+.pd-nomeacao-resumo p { margin: 5px 0 0; }
+.pd-nomeacao-prazo { min-width: 180px; padding: 12px 14px; border-radius: var(--raio-pequeno); background: var(--papel-2); }
+.pd-nomeacao-prazo strong, .pd-nomeacao-prazo span { display: block; }
+.pd-nomeacao-prazo strong { margin-top: 4px; font-size: 16px; }
+.pd-nomeacao-prazo span { margin-top: 4px; font-size: 12px; color: var(--tinta-3); }
+.pd-nomeacao-grade { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+.pd-nomeacao-grade .pd-dado { padding: 11px 0; border-bottom: 1px solid var(--linha); }
+.pd-nomeacao-grade .pd-dado dd em { font-style: normal; color: var(--tinta-3); }
+.pd-nomeacao-ficha { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 28px; margin-top: 22px; }
+.pd-nomeacao-ficha > div { min-width: 0; }
+.pd-nomeacao-ficha h3 { margin: 0 0 7px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-3); }
+.pd-nomeacao-ficha p, .pd-nomeacao-ficha ul { margin: 0; font-size: 13px; line-height: 1.55; color: var(--tinta-2); }
+.pd-nomeacao-ficha ul { padding-left: 18px; }
+.pd-nomeacao-ficha li { margin: 4px 0; }
+.pd-nomeacao-alertas h3, .pd-nomeacao-alertas li { color: var(--risco); }
+.pd-nomeacao-texto { margin: 0; padding: 14px; overflow: auto; border: 1px solid var(--linha); border-radius: var(--raio-pequeno); background: var(--papel-2); color: var(--tinta-2); font: inherit; font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.pd-nomeacao-checklist { margin: 0; padding: 0; list-style: none; }
+.pd-nomeacao-checklist li { border-top: 1px solid var(--linha); }
+.pd-nomeacao-checklist li:first-child { border-top: 0; }
+.pd-nomeacao-check { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; width: 100%; min-height: 52px; padding: 10px 0; text-align: left; color: var(--tinta); }
+.pd-nomeacao-check input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--azul); }
+.pd-nomeacao-check strong, .pd-nomeacao-check span { display: block; }
+.pd-nomeacao-check strong { font-size: 13px; line-height: 1.4; }
+.pd-nomeacao-check span { margin-top: 2px; font-size: 12px; color: var(--tinta-3); }
+.pd-nomeacao-check input:disabled { cursor: wait; }
+.pd-nomeacao-acoes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.pd-nomeacao-acoes .pd-auxiliar { flex: 1 1 300px; }
 
 .pd-nomeacoes .pd-linha { align-items: start; }
 .pd-nomeacoes-celula { min-width: 0; display: grid; gap: 4px; align-content: start; }
@@ -42,6 +75,16 @@
   .pd-nomeacoes .pd-linha { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 14px 18px; }
   .pd-nomeacoes .pd-linha .pd-seta { display: none; }
   .pd-nomeacoes .pd-so-estreito { display: block; }
+}
+
+@media (max-width: 700px) {
+  .pd-nomeacao-detalhe-acoes { width: 100%; }
+  .pd-nomeacao-detalhe-acoes .pd-botao { flex: 1 1 150px; min-height: 44px; }
+  .pd-nomeacao-resumo { grid-template-columns: 1fr; padding: 16px; }
+  .pd-nomeacao-prazo { min-width: 0; }
+  .pd-nomeacao-grade, .pd-nomeacao-ficha { grid-template-columns: 1fr; }
+  .pd-nomeacao-ficha { gap: 18px; }
+  .pd-nomeacao-acoes .pd-botao { min-height: 44px; }
 }
 
 @media (max-width: 640px) {

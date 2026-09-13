@@ -321,7 +321,7 @@ function Mensagens() {
       <div>
         <p className="pd-eyebrow">Atendimento</p>
         <h1>Mensagens</h1>
-        <p className="pd-auxiliar">O que os clientes mandam para o seu número chega aqui. O assistente escreve o rascunho; quem envia é você.</p>
+        <p className="pd-auxiliar">O que os clientes mandam para o seu número chega aqui. O assistente escreve o rascunho; quem envia é você, salvo nas conversas em que você liga o estagiário virtual.</p>
       </div>
       <div className="pd-pagina-acoes">
         {seloConexao && <span className={`pd-estado ${seloConexao.classe}`}>{seloConexao.texto}</span>}
@@ -386,7 +386,7 @@ function Mensagens() {
             </button>)}
           </div>
 
-          <p className="pd-conversas-rodape">As conversas ficam guardadas na sua conta. Nada sai para o cliente sem o seu clique.</p>
+          <p className="pd-conversas-rodape">As conversas ficam guardadas na sua conta. Nada sai para o cliente sem o seu clique, salvo nas conversas com o estagiário virtual ligado.</p>
         </aside>
 
         <div className="pd-chat">
