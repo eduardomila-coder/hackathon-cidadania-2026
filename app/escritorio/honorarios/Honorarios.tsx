@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { chamar, mensagemDeErro } from "../casos/api";
+import { ETAPAS_PADRAO } from "./etapas";
 
 type Caso = { id: string; titulo: string };
 type Etapa = { id: string; titulo: string; concluida: boolean };
@@ -13,9 +14,10 @@ type Dados = { id: string; casoId: string; etapas: Etapa[]; pendencias: Pendenci
 type Resposta = { honorarios: Dados | null };
 type Campo = "etapas" | "pendencias" | "registros";
 
-// As cinco etapas do fluxo, como no protótipo. Entram quando o
-// acompanhamento é iniciado; o advogado edita, remove ou acrescenta.
-export const ETAPAS_PADRAO = ["Arbitramento", "Certidão judicial", "Checklist", "Requerimento", "Acompanhamento"];
+// As cinco etapas entram quando o acompanhamento é iniciado; o advogado edita,
+// remove ou acrescenta. A lista mora em ./etapas para servir também à página,
+// que é componente de servidor.
+export { ETAPAS_PADRAO } from "./etapas";
 
 function idTemporario() {
   return `novo-${Date.now()}-${Math.random().toString(36).slice(2)}`;

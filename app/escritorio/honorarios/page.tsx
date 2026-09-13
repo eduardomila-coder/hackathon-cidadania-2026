@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { honorariosDoCaso, listarCasosComDetalhes } from "@/lib/escritorio";
 import { advogadoAtual } from "@/lib/sessao";
 import { formatarCnj, formatarMomento } from "../casos/formatos";
-import { ETAPAS_PADRAO, Honorarios } from "./Honorarios";
+import { Honorarios } from "./Honorarios";
+import { ETAPAS_PADRAO } from "./etapas";
 
 export const metadata = { title: "Honorários · Escritório Dativo" };
 export const dynamic = "force-dynamic";
