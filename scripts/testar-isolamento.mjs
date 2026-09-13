@@ -4,11 +4,11 @@
 // vê, não abre e não altera nada da outra. Também confere os portões: rota do
 // escritório sem cookie, cookie adulterado e webhook fora do login.
 //
-// Uso: node scripts/testar-isolamento.mjs [http://127.0.0.1:3102]
-// Precisa das mesmas variáveis do servidor (PAINEL_USUARIOS) no ambiente.
+// Uso: node --env-file=.env.local scripts/testar-isolamento.mjs [http://127.0.0.1:3000]
+// Precisa de PAINEL_USUARIOS no ambiente (o --env-file lê o .env.local, como o app).
 import { randomUUID } from "node:crypto";
 
-const base = process.argv[2] ?? "http://127.0.0.1:3102";
+const base = process.argv[2] ?? "http://127.0.0.1:3000";
 const marcador = randomUUID().slice(0, 8);
 
 const equipe = (process.env.PAINEL_USUARIOS ?? "")
