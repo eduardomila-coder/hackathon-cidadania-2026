@@ -68,6 +68,8 @@ function AvatarDoContato({ contato, nome, grande = false }: { contato: string; n
   const classe = `pd-avatar${grande ? " pd-avatar-grande" : ""}`;
   if (!temFoto) return <span className={classe} aria-label={`Sem foto de perfil de ${nome}`}>{iniciais(nome)}</span>;
   return <span className={`${classe} pd-avatar-com-foto`}>
+    {/* `<img>` de propósito: o otimizador do next/image busca sem o cookie da sessão e a rota autenticada devolve 401. */}
+    {/* eslint-disable-next-line @next/next/no-img-element */}
     <img
       src={`/api/escritorio/mensagens/foto?contato=${encodeURIComponent(contato)}`}
       alt={`Foto de perfil de ${nome}`}
