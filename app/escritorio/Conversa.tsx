@@ -47,6 +47,10 @@ async function lerErro(resposta: Response, padrao: string) {
   return dados.erro || padrao;
 }
 
+// Os emojis do compositor. Lista curta e fixa, sem biblioteca: o painel da
+// Mila usa uma biblioteca inteira para isso, e aqui não vale a dependência.
+const EMOJIS = ["🙂", "😊", "😉", "👍", "🙏", "👏", "✅", "📄", "📎", "📅", "⏰", "⚖️", "📝", "❤️", "😅", "🤝", "📞", "✍️", "🔎", "💬", "💡", "⚠️", "🎉", "🙌"];
+
 type Props = {
   contato: string | null;
   casoId?: string | null;
@@ -73,6 +77,9 @@ function ConversaDoContato({ contato, casoId, aoAtualizar }: { contato: string; 
   const [aviso, setAviso] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
   const [sugerindo, setSugerindo] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  // Painel de emoji do compositor (o mesmo gesto do painel da Mila).
+  const [emojiAberto, setEmojiAberto] = useState(false);
+  const campoRef = useRef<HTMLTextAreaElement>(null);
   const listaRef = useRef<HTMLDivElement>(null);
   const quantidadeAnterior = useRef(0);
   const aoAtualizarRef = useRef(aoAtualizar);
@@ -150,44 +157,89 @@ function ConversaDoContato({ contato, casoId, aoAtualizar }: { contato: string; 
     } finally { setEnviando(false); }
   }
 
+  // Emoji entra na posição do cursor, como no compositor da Mila.
+  function inserirEmoji(emoji: string) {
+    const campo = campoRef.current;
+    if (!campo) { setTexto((atual) => atual + emoji); return; }
+    const inicio = campo.selectionStart ?? texto.length;
+    const fim = campo.selectionEnd ?? texto.length;
+    setTexto(texto.slice(0, inicio) + emoji + texto.slice(fim));
+    setEmojiAberto(false);
+    requestAnimationFrame(() => {
+      campo.focus();
+      const posicao = inicio + emoji.length;
+      campo.setSelectionRange(posicao, posicao);
+    });
+  }
+
   let diaAnterior = "";
 
   return <div className="pd-conversa">
-    <div className="pd-baloes" ref={listaRef} aria-live="polite" aria-label="Mensagens da conversa">
-      {erroCarga && <p className="pd-conversa-erro" role="alert">{erroCarga}</p>}
-      {mensagens === null && !erroCarga && <p className="pd-conversa-nota">Carregando a conversa…</p>}
-      {mensagens && mensagens.length === 0 && <p className="pd-conversa-nota">Nenhuma mensagem com {formatarTelefone(contato)} ainda. Escreva abaixo para começar.</p>}
-      {mensagens?.map((mensagem) => {
+    <div className="wa-chat-bg" ref={listaRef} aria-live="polite" aria-label="Mensagens da conversa">
+      {erroCarga && <p className="wa-nota wa-erro" role="alert">{erroCarga}</p>}
+      {mensagens === null && !erroCarga && <p className="wa-nota">Carregando a conversa…</p>}
+      {mensagens && mensagens.length === 0 && <p className="wa-nota">Nenhuma mensagem com {formatarTelefone(contato)} ainda. Escreva abaixo para começar.</p>}
+      {mensagens?.map((mensagem, indice) => {
         const dia = formatarDia(mensagem.quando);
         const mostraDia = dia !== diaAnterior;
         diaAnterior = dia;
+        // Sequência: mesma direção e mesmo dia da mensagem anterior. A partir
+        // da segunda, o balão perde o rabicho e arredonda o canto, como no
+        // WhatsApp Web e no painel da Mila.
+        const anterior = mensagens[indice - 1];
+        const agrupada = Boolean(anterior) && anterior.deMim === mensagem.deMim && formatarDia(anterior.quando) === dia;
         return <div key={mensagem.id}>
-          {mostraDia && <p className="pd-dia"><span>{dia}</span></p>}
-          <div className={`pd-balao ${mensagem.deMim ? "pd-balao-meu" : "pd-balao-dele"}`}>
-            <p>{mensagem.texto}</p>
-            <time dateTime={mensagem.quando}>{formatarHora(mensagem.quando)}</time>
+          {mostraDia && <div className="wa-dia"><span>{dia}</span></div>}
+          <div className={`wa-linha ${mensagem.deMim ? "out" : "in"}`}>
+            <div className={`wa-bubble ${mensagem.deMim ? "out" : "in"}${agrupada ? " grouped" : ""}`}>
+              <p className="wa-message-text">{mensagem.texto}</p>
+              <span className="wa-meta">
+                <time dateTime={mensagem.quando}>{formatarHora(mensagem.quando)}</time>
+                {mensagem.deMim && <svg width="14" height="11" viewBox="0 0 16 11" fill="none" aria-hidden="true"><title>enviada por você</title><path d="M1 5.5 4.5 9 11 1.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /><path d="M6 5.5 9.5 9 16 1.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+              </span>
+            </div>
           </div>
         </div>;
       })}
     </div>
 
     <form className="pd-resposta" onSubmit={(evento) => { evento.preventDefault(); void enviar(); }}>
-      <label htmlFor={`resposta-${contato}`}>Sua resposta</label>
-      <textarea
-        id={`resposta-${contato}`}
-        value={texto}
-        onChange={(evento) => { setTexto(evento.target.value); if (motivo) setMotivo(null); }}
-        placeholder="Escreva aqui ou peça uma sugestão ao assistente. Nada sai sem o seu clique."
-        maxLength={4000}
-        rows={4}
-        disabled={enviando}
-      />
       {motivo && <p className="pd-motivo"><b>O que o assistente fez</b>{motivo}</p>}
-      <div className="pd-resposta-acoes">
-        <button type="button" className="md-botao-secundario" onClick={sugerir} disabled={sugerindo || enviando}>{sugerindo ? "Trabalhando…" : "Sugerir resposta"}</button>
-        <button type="submit" className="md-botao-primario" disabled={enviando || sugerindo || !texto.trim()}>{enviando ? "Enviando…" : "Enviar pelo WhatsApp"}</button>
-        <small>A sugestão é um rascunho. Só vai ao cliente quando você clicar em enviar.</small>
+      <div className="wa-composer">
+        <button
+          type="button"
+          className="wa-botao-emoji"
+          onClick={() => setEmojiAberto((aberto) => !aberto)}
+          aria-expanded={emojiAberto}
+          aria-label="Emoji"
+          title="Emoji"
+          disabled={enviando}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8.5 14.5c1.8 2 5.2 2 7 0" /><path d="M9 9.5h.01M15 9.5h.01" strokeWidth="2.4" strokeLinecap="round" /></svg>
+        </button>
+        {emojiAberto && <div className="wa-emoji" role="group" aria-label="Escolher emoji">
+          {EMOJIS.map((emoji) => <button key={emoji} type="button" onClick={() => inserirEmoji(emoji)} aria-label={`Inserir ${emoji}`}>{emoji}</button>)}
+        </div>}
+        <textarea
+          ref={campoRef}
+          id={`resposta-${contato}`}
+          className="wa-composer-campo"
+          value={texto}
+          onChange={(evento) => { setTexto(evento.target.value); if (motivo) setMotivo(null); }}
+          placeholder="Escreva aqui ou peça uma sugestão ao assistente"
+          maxLength={4000}
+          rows={1}
+          disabled={enviando}
+          aria-label={`Resposta para ${formatarTelefone(contato)}`}
+        />
+        <button type="button" className="wa-botao-sugerir" onClick={sugerir} disabled={sugerindo || enviando}>{sugerindo ? "Trabalhando…" : "Sugerir resposta"}</button>
+        <button type="submit" className="wa-botao-enviar" disabled={enviando || sugerindo || !texto.trim()} title="Enviar pelo WhatsApp" aria-label="Enviar pelo WhatsApp">
+          {enviando
+            ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="9" strokeDasharray="40 20" /></svg>
+            : <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12 2-12 2z" /></svg>}
+        </button>
       </div>
+      <p className="pd-resposta-dica">A sugestão é um rascunho. Só vai ao cliente quando você clicar em enviar.</p>
       {aviso && <p className={`pd-resposta-aviso pd-aviso-${aviso.tipo}`} role={aviso.tipo === "erro" ? "alert" : "status"}>{aviso.texto}</p>}
     </form>
   </div>;
