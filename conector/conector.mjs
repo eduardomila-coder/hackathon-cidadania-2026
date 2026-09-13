@@ -152,6 +152,10 @@ function responder(res, origem, status, corpo) {
     cabecalhos["access-control-allow-headers"] = "content-type";
     cabecalhos["access-control-allow-methods"] = "GET,POST,OPTIONS";
     cabecalhos["access-control-max-age"] = "600";
+    // O Chrome trata uma chamada de página pública para 127.0.0.1 como acesso a
+    // rede privada e só deixa passar se o preflight responder isto. Sem a linha,
+    // a tela servida pelo endereço público não enxerga o conector.
+    cabecalhos["access-control-allow-private-network"] = "true";
   }
   res.writeHead(status, cabecalhos);
   res.end(JSON.stringify(corpo));
