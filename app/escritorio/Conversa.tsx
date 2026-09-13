@@ -44,6 +44,26 @@ export function formatarDia(quando: string) {
   return data.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: data.getFullYear() === hoje.getFullYear() ? undefined : "numeric" });
 }
 
+// Mensagem de mídia chega como marcador (`[imagem] legenda`, `[figurinha]`).
+// Imagem e figurinha viram a própria imagem, buscada na hora pela rota
+// autenticada; se a Evolution não tiver mais a mídia, fica o marcador.
+function midiaDe(texto: string): { tipo: "imagem" | "figurinha"; legenda: string } | null {
+  const partes = texto.match(/^\[(imagem|figurinha)\]\s*([\s\S]*)$/);
+  if (!partes) return null;
+  return { tipo: partes[1] as "imagem" | "figurinha", legenda: partes[2].trim() };
+}
+
+function ImagemDaMensagem({ id, tipo, texto }: { id: string; tipo: "imagem" | "figurinha"; texto: string }) {
+  const [falhou, setFalhou] = useState(false);
+  if (falhou) return <p className="wa-message-text">{texto}</p>;
+  const endereco = `/api/escritorio/mensagens/midia?id=${encodeURIComponent(id)}`;
+  return <a className={`wa-midia wa-midia-${tipo}`} href={endereco} target="_blank" rel="noopener">
+    {/* `<img>` de propósito: o otimizador do next/image busca sem o cookie da sessão e a rota autenticada devolve 401. */}
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    <img src={endereco} alt={tipo === "figurinha" ? "Figurinha" : "Imagem recebida"} loading="lazy" onError={() => setFalhou(true)} />
+  </a>;
+}
+
 async function lerErro(resposta: Response, padrao: string) {
   const dados = await resposta.json().catch(() => ({})) as { erro?: string };
   return dados.erro || padrao;
@@ -210,12 +230,18 @@ function ConversaDoContato({ contato, casoId, aoAtualizar, sugestao, aoEnviarSug
         // WhatsApp Web e no painel da Mila.
         const anterior = mensagens[indice - 1];
         const agrupada = Boolean(anterior) && anterior.deMim === mensagem.deMim && formatarDia(anterior.quando) === dia;
+        const midia = midiaDe(mensagem.texto);
         return <div key={mensagem.id}>
           {mostraDia && <div className="wa-dia"><span>{dia}</span></div>}
           <div className={`wa-linha ${mensagem.deMim ? "out" : "in"}`}>
-            <div className={`wa-bubble ${mensagem.deMim ? "out" : "in"}${agrupada ? " grouped" : ""}`}>
+            <div className={`wa-bubble ${mensagem.deMim ? "out" : "in"}${agrupada ? " grouped" : ""}${midia ? ` wa-bubble-${midia.tipo}` : ""}`}>
               {mensagem.doEstagiario && <p className="wa-nome-estagiaria">Estagiária virtual</p>}
-              <p className="wa-message-text">{mensagem.texto}</p>
+              {midia
+                ? <>
+                  <ImagemDaMensagem id={mensagem.id} tipo={midia.tipo} texto={mensagem.texto} />
+                  {midia.legenda && <p className="wa-message-text">{midia.legenda}</p>}
+                </>
+                : <p className="wa-message-text">{mensagem.texto}</p>}
               <span className="wa-meta">
                 {mensagem.doEstagiario && <span className="wa-selo-estagiario" title="Resposta enviada pelo estagiário virtual">estagiário</span>}
                 <time dateTime={mensagem.quando}>{formatarHora(mensagem.quando)}</time>

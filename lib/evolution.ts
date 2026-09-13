@@ -29,6 +29,7 @@ type RespostaConectar = { pairingCode?: string; code?: string; base64?: string; 
 type RespostaCriar = { instance?: { instanceName?: string; status?: string }; qrcode?: RespostaConectar };
 type RespostaEnvio = { key?: { id?: string; remoteJid?: string; fromMe?: boolean }; messageTimestamp?: number | string; status?: string };
 type RespostaFotoDePerfil = { profilePictureUrl?: string; url?: string };
+type RespostaMidia = { base64?: string; mimetype?: string; mediaType?: string };
 
 export class ErroEvolution extends Error {
   constructor(message: string, readonly status = 502) { super(message); }
@@ -182,6 +183,7 @@ export async function fotoDePerfil(usuario: string, contato: string): Promise<st
   const resposta = await requisitar<RespostaFotoDePerfil>(`/chat/fetchProfilePictureUrl/${encodeURIComponent(cadastro.instancia)}`, {
     method: "POST",
     body: JSON.stringify({ number: numero }),
+    signal: AbortSignal.timeout(8000),
   });
   const url = resposta.profilePictureUrl ?? resposta.url ?? null;
   if (!url) return null;
@@ -190,6 +192,25 @@ export async function fotoDePerfil(usuario: string, contato: string): Promise<st
     if (destino.protocol !== "https:" || !/(^|\.)whatsapp\.net$/i.test(destino.hostname)) return null;
     return destino.toString();
   } catch { return null; }
+}
+
+// Baixa a mídia de uma mensagem pelo id que a Evolution guardou no histórico
+// dela, como o painel da Mila faz. Volta os bytes e o tipo; nada vai para o
+// disco: a tela pede a imagem ao exibir a conversa e o navegador guarda em
+// cache privado. Mídia acima do limite é recusada antes de decodificar.
+export async function midiaDaMensagem(usuario: string, idExterno: string, limiteBytes: number): Promise<{ bytes: Buffer; tipo: string } | null> {
+  const cadastro = cadastroDe(usuario);
+  if (!cadastro) return null;
+  const resposta = await requisitar<RespostaMidia>(`/chat/getBase64FromMediaMessage/${encodeURIComponent(cadastro.instancia)}`, {
+    method: "POST",
+    body: JSON.stringify({ message: { key: { id: idExterno } }, convertToMp4: false }),
+    signal: AbortSignal.timeout(20000),
+  });
+  const base64 = typeof resposta.base64 === "string" ? resposta.base64.replace(/^data:[^;]+;base64,/, "") : "";
+  if (!base64 || base64.length > Math.ceil(limiteBytes / 3) * 4) return null;
+  const bytes = Buffer.from(base64, "base64");
+  const tipo = typeof resposta.mimetype === "string" ? resposta.mimetype.split(";", 1)[0].trim() : "";
+  return bytes.length ? { bytes, tipo } : null;
 }
 
 // Cadastra o número, cria a instância na Evolution (ou reaproveita a que já
