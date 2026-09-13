@@ -125,3 +125,24 @@ aparecendo como "sem preço" para o `deepseek-v4-pro`.
 **Evidências:** `prints/2026-09-13-testes/` (painel vazio, caso com triagem,
 ficha da nomeação, QR do WhatsApp e painel no celular) e
 `dados-de-teste/ultimo-resultado.json` com a rodada 10 de 10.
+
+## 13/09, 0h45 — plataforma publicada e conferida no endereço público
+
+A branch entrou em `main` por fast-forward (PR #9) e o servidor compartilhado
+passou a servir a plataforma: `https://habeastitas.eduardomila.adv.br/escritorio`
+redireciona para `/entrar` e o formulário responde pelo túnel.
+
+| Verificação no endereço público | Resultado |
+|---|---|
+| `/entrar` abre com a faixa de demonstração | ok |
+| O React assume a página antes do primeiro clique | ok |
+| Campo digitado liga o botão e a credencial errada volta como erro na tela | ok, 3 rodadas seguidas |
+| Tempo até a tela ficar interativa | 0,4 a 0,6 s pelo túnel; 0,1 a 0,3 s local |
+
+Cuidado para quem for testar: nos primeiros segundos, logo depois de o servidor
+subir, a página chega antes de o React assumir os campos. Digitar nessa janela
+faz o React devolver o campo ao estado inicial e o botão de entrar fica apagado,
+como se a página estivesse morta. A tela está pronta quando o botão acende ao
+digitar.
+
+**Print:** `prints/2026-09-13-testes/06-endereco-publico-entrar.png`.
