@@ -12,7 +12,7 @@ import os
 import sys
 from playwright.sync_api import sync_playwright
 
-BASE = sys.argv[1] if len(sys.argv) > 1 else "https://habeastitas.eduardomila.adv.br"
+BASE = sys.argv[1] if len(sys.argv) > 1 else "https://escritoriodativo.eduardomila.adv.br"
 RODADAS = int(sys.argv[2]) if len(sys.argv) > 2 else 1
 EXECUTAVEIS = [
     "/Users/eduardomila/Library/Caches/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-mac-arm64/chrome-headless-shell",

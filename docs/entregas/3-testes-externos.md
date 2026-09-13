@@ -3,7 +3,7 @@
 ## O que precisamos
 
 Pedir a **3 ou mais pessoas de fora da equipe** (outra equipe, organização) que
-abram https://habeastitas.eduardomila.adv.br no celular delas e contem um caso
+abram https://escritoriodativo.eduardomila.adv.br no celular delas e contem um caso
 fictício. Depois, um **depoimento em rede social** de quem testou, com
 #hackathonoabpr, com o link colado aqui embaixo. É evidência exigida pelo
 Manual do evento.
@@ -18,7 +18,7 @@ mundo tem aberto no evento. Duas mensagens, mandadas em sequência:
 > Oi! Somos a equipe Habeas Titas do Hackathon da Cidadania. Fizemos um
 > atendente virtual do Juizado Especial Cível — você conta um caso (inventado,
 > não precisa ser real) e ele diz se cabe no juizado e o que fazer. Topa testar
-> 2 minutinhos no celular? É só abrir: https://habeastitas.eduardomila.adv.br
+> 2 minutinhos no celular? É só abrir: https://escritoriodativo.eduardomila.adv.br
 
 **2. Pesquisa de satisfação** (logo depois que a pessoa terminar o teste):
 

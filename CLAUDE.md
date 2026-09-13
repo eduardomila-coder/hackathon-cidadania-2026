@@ -101,7 +101,7 @@ pelo Eduardo no próximo `/entregar` dele.
 
 ## Servidor compartilhado
 
-`https://habeastitas.eduardomila.adv.br` roda no Mac do Eduardo e **puxa `main`
+`https://escritoriodativo.eduardomila.adv.br` roda no Mac do Eduardo e **puxa `main`
 sozinho a cada minuto**. Tudo que entra em `main` aparece lá em até 60 s, sem
 ninguém fazer deploy. É a URL que vai no celular de quem testa (Entrega 3) e
 na tela do pitch. A chave do modelo está só nesse servidor: quem trabalha no

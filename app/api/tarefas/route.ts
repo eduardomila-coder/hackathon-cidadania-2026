@@ -35,7 +35,7 @@ async function marcar(linha: number, texto: string, feita: boolean, quem: string
   const nome = quem[0].toUpperCase() + quem.slice(1);
   try {
     await rodar(["commit", "--only", "docs/TAREFAS.md", "-q", "-m", `${feita ? "conclui" : "reabre"} tarefa: ${resumo}\n\nMarcado no painel por ${nome}.`,
-      "--author", `${nome} (painel) <painel@habeastitas.eduardomila.adv.br>`]);
+      "--author", `${nome} (painel) <painel@escritoriodativo.eduardomila.adv.br>`]);
   } catch {
     return { status: 500, erro: "Não consegui registrar a mudança no git." };
   }

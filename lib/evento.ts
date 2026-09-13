@@ -89,7 +89,7 @@ export const PREMIOS = ["1º lugar: R$ 10.000", "2º lugar: R$ 5.000", "3º luga
 export const DRIVE = { nome: "HabeasTITAS_Cidadania", url: "https://drive.google.com/drive/folders/1Gi9xWrC9v3ia5M2JJHLKsvi1SpZswOfO" };
 
 export const LINKS = [
-  { nome: "Demo ao vivo", url: "https://habeastitas.eduardomila.adv.br", desc: "acompanha main, atualiza a cada minuto" },
+  { nome: "Demo ao vivo", url: "https://escritoriodativo.eduardomila.adv.br", desc: "acompanha main, atualiza a cada minuto" },
   { nome: "Repositório", url: "https://github.com/eduardomila-coder/hackathon-cidadania-2026", desc: "código, docs, entregas" },
   { nome: "Onboarding", url: "https://github.com/eduardomila-coder/hackathon-cidadania-2026/blob/main/docs/ONBOARDING.md", desc: "como entrar e trabalhar" },
   { nome: "Site do evento", url: "https://eventos.oabpr.org.br/hackathon-cidadania", desc: "OAB/PR" },

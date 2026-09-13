@@ -365,7 +365,7 @@ export default async function Painel() {
             </div>
             <article className="cfp-cartao cfp-endereco">
               <span className="cfp-eyebrow">Endereço para compartilhar</span>
-              <p><b>habeastitas.eduardomila.adv.br</b></p>
+              <p><b>escritoriodativo.eduardomila.adv.br</b></p>
               <p className="cfp-muted">Credenciais, senhas e dados de acesso ficam fora deste painel.</p>
             </article>
           </section>

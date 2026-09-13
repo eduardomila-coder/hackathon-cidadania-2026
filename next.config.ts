@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   // deixava o login morto. Todo nome ou IP por onde a demonstração é aberta
   // precisa estar nesta lista.
   allowedDevOrigins: [
-    "habeastitas.eduardomila.adv.br",
+    "escritoriodativo.eduardomila.adv.br",
     "localhost",
     "127.0.0.1",
     "192.168.2.1",

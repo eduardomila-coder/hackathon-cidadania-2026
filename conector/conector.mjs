@@ -15,7 +15,7 @@
 // máquina — então é o conector que procura o escritório. Pegue a chave em
 // Certificado digital → "Ligar este computador" e rode:
 //
-//   ESCRITORIO=https://habeastitas.eduardomila.adv.br CHAVE=pd_... node conector/conector.mjs
+//   ESCRITORIO=https://escritoriodativo.eduardomila.adv.br CHAVE=pd_... node conector/conector.mjs
 //
 // O PIN, quando existe, é digitado aqui no terminal e fica só na memória deste
 // processo. Não vai para arquivo, não vai para o servidor, não vai para log.
@@ -39,7 +39,7 @@ const VERSAO = "1.0.0";
 // as origens conhecidas. Sem isso, qualquer site aberto no navegador poderia
 // pedir uma assinatura.
 const ORIGENS = new Set([
-  "https://habeastitas.eduardomila.adv.br",
+  "https://escritoriodativo.eduardomila.adv.br",
   "http://127.0.0.1:3000",
   "http://localhost:3000",
   "http://127.0.0.1:3100",

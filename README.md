@@ -20,10 +20,10 @@ produção está em [`docs/INTEGRACOES.md`](docs/INTEGRACOES.md).
 
 Categoria: **Inovação Aberta e Cidadania** · OAB/PR · 12 e 13/09/2026 · Licença MIT.
 
-**Demo ao vivo:** https://habeastitas.eduardomila.adv.br (triagem) e https://habeastitas.eduardomila.adv.br/entrar (escritório do advogado, com login; acompanha `main`, atualiza a cada minuto)
+**Demo ao vivo:** https://escritoriodativo.eduardomila.adv.br (triagem) e https://escritoriodativo.eduardomila.adv.br/entrar (escritório do advogado, com login; acompanha `main`, atualiza a cada minuto)
 
 O painel da equipe em `/painel` é privado e pede usuário e senha. As credenciais ficam somente no `.env.local` do servidor, nunca no repositório.
-**Painel da equipe:** https://habeastitas.eduardomila.adv.br/painel (regras, cronograma, tarefas lidas do `docs/TAREFAS.md` e a criação das contas de advogado)
+**Painel da equipe:** https://escritoriodativo.eduardomila.adv.br/painel (regras, cronograma, tarefas lidas do `docs/TAREFAS.md` e a criação das contas de advogado)
 
 ## Como funciona (arquitetura)
 
@@ -118,7 +118,7 @@ sublinhado); a senha, pelo menos 8.
 ### 2. Entrar
 
 Passe ao advogado o endereço `http://localhost:3000/entrar` (no servidor
-compartilhado, `https://habeastitas.eduardomila.adv.br/entrar`), o usuário e
+compartilhado, `https://escritoriodativo.eduardomila.adv.br/entrar`), o usuário e
 a senha. O login grava um cookie assinado (`pd_sessao`, 7 dias); a assinatura
 usa `SESSAO_SEGREDO` do `.env.local` ou, se faltar, um segredo gerado uma vez
 em `data/segredo-sessao.txt`. "Sair", no cabeçalho, apaga o cookie.

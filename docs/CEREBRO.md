@@ -154,7 +154,7 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 
 ## Servidor compartilhado roda em produção (13/09, tarde)
 
-O `habeastitas.eduardomila.adv.br` deixou de rodar `next dev` e passou a rodar
+O `escritoriodativo.eduardomila.adv.br` deixou de rodar `next dev` e passou a rodar
 `next build` + `next start`. Motivo: no modo dev o Turbopack recompila com a
 página aberta e o React às vezes recebia um módulo de cliente ainda não
 resolvido — "Element type is invalid. Received a promise that resolves to:

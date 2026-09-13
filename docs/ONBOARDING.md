@@ -61,7 +61,7 @@ cp .env.example .env.local
 ```
 
 O `.env.local` pode ficar vazio: a chave do modelo mora só no servidor
-compartilhado (https://habeastitas.eduardomila.adv.br). Localmente, tudo abre e
+compartilhado (https://escritoriodativo.eduardomila.adv.br). Localmente, tudo abre e
 funciona, menos o botão Analisar. Se o Eduardo te mandar uma chave no
 privado, cola ali. **Nunca cole chave no grupo nem no git.**
 
@@ -105,10 +105,10 @@ Quando algo estiver funcionando, basta descrever a próxima tarefa em português
 O agente cria a branch, testa, faz o commit, envia a mudança e abre a Pull
 Request sozinho. O Eduardo vê no Habeas Release, confere e publica quando
 estiver certo:
-https://habeastitas.eduardomila.adv.br/revisoes
+https://escritoriodativo.eduardomila.adv.br/revisoes
 
 Não junte nem publique em `main` por conta própria. Em até um minuto depois da
-aprovação, a mudança aparece em https://habeastitas.eduardomila.adv.br.
+aprovação, a mudança aparece em https://escritoriodativo.eduardomila.adv.br.
 
 Quer saber o que os outros fizeram? `/situacao`.
 

@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 VERSAO = "1.0.0"
 PORTA = int(os.environ.get("PORTA_CONSULTA", "8767"))
 ORIGENS = {
-    "https://habeastitas.eduardomila.adv.br",
+    "https://escritoriodativo.eduardomila.adv.br",
     "http://127.0.0.1:3000",
     "http://localhost:3000",
     "http://127.0.0.1:3100",

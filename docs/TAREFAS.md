@@ -1,7 +1,7 @@
 # Tarefas, na ordem das entregas
 
 Para concluir, clique na caixinha em
-https://habeastitas.eduardomila.adv.br/painel (grava aqui e publica sozinho) ou
+https://escritoriodativo.eduardomila.adv.br/painel (grava aqui e publica sozinho) ou
 marque `[x]` e faça `/entregar`. Para assumir uma tarefa, escreva `@eduardo`,
 `@maria` ou `@fernando` na linha. Escreva `drive:palavra|outra` na linha e a
 tarefa fecha sozinha quando um arquivo com essa palavra no nome aparecer na
@@ -38,7 +38,7 @@ testes, slides). Aqui no repositório fica a cópia em `docs/entregas/`.
 ### 15h30–17h30 — Entrega 3: V2 com testes externos (100 pts)
 - [x] @eduardo Upload de foto de documento → o modelo lê e extrai
 - [ ] @fernando Acessibilidade: contraste, fonte grande, rótulos `aria`, funciona só com teclado (auditoria: nota 5 em usabilidade)
-- [ ] @maria Pedir a 3+ pessoas de fora (outra equipe, organização) que abram https://habeastitas.eduardomila.adv.br no celular e contem um caso
+- [ ] @maria Pedir a 3+ pessoas de fora (outra equipe, organização) que abram https://escritoriodativo.eduardomila.adv.br no celular e contem um caso
 - [ ] @maria **Depoimento em rede social** de quem testou, com #hackathonoabpr; link em `docs/entregas/3-testes-externos.md` (o Manual pede isso como evidência) drive:depoimento
 - [ ] @maria Registrar o que cada um disse e o que mudou drive:testes-externos|3-testes
 
