@@ -45,6 +45,7 @@ const GRUPOS: Array<{ grupo: string; ligacoes: Ligacao[] }> = [
       { destino: "/escritorio/honorarios", nome: "Honorários dativos", icone: "money" },
       { destino: "/escritorio/formacao", nome: "Formação e habilitações", icone: "training" },
       { destino: "/escritorio/certificado", nome: "Certificado digital", icone: "cert" },
+      { destino: "/escritorio/projudi", nome: "PROJUDI", icone: "gov" },
     ],
   },
   {
