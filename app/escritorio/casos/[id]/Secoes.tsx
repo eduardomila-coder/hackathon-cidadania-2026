@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useId, useState, type ChangeEvent, type FormEvent } from "react";
 import type { Caso, Documento, Processo as ProcessoDoCaso, Registro, Tarefa } from "@/lib/escritorio";
 import { chamar, mensagemDeErro } from "../api";
 import { descreverPrazo, formatarCnj, formatarData, formatarMomento, type TomDoPrazo } from "../formatos";
@@ -63,6 +63,26 @@ export function Documentos({ casoId, documentos, atualizar }: { casoId: string; 
     }
   }
 
+  async function enviarArquivo(documento: Documento, evento: ChangeEvent<HTMLInputElement>) {
+    const arquivo = evento.target.files?.[0];
+    evento.target.value = "";
+    if (!arquivo) return;
+    setErro(null);
+    setOcupado(`arquivo-${documento.id}`);
+    try {
+      const corpo = new FormData();
+      corpo.append("arquivo", arquivo);
+      const resposta = await fetch(`${url}/${documento.id}/arquivo`, { method: "POST", body: corpo, cache: "no-store" });
+      const dados = await resposta.json().catch(() => null) as Documento | { erro?: string } | null;
+      if (!resposta.ok) throw new Error(dados && "erro" in dados && dados.erro ? dados.erro : "Não foi possível enviar o arquivo.");
+      atualizar((dadosDoCaso) => ({ ...dadosDoCaso, documentos: dadosDoCaso.documentos.map((item) => item.id === documento.id ? dados as Documento : item) }));
+    } catch (e) {
+      setErro(mensagemDeErro(e));
+    } finally {
+      setOcupado(null);
+    }
+  }
+
   const recebidos = documentos.filter((documento) => documento.recebido).length;
   return <section className="pd-cartao" aria-label="Documentos do caso">
     <div className="pd-cartao-cabeca">
@@ -84,7 +104,12 @@ export function Documentos({ casoId, documentos, atualizar }: { casoId: string; 
           <div className="pdc-linha-texto">
             <span className="pd-linha-titulo">{documento.nome}{documento.essencial && <em className="pdc-essencial">essencial</em>}</span>
             {documento.detalhe && <span className="pd-linha-meta">{documento.detalhe}</span>}
+            {documento.arquivo && <a className="pdc-arquivo" href={`${url}/${documento.id}/arquivo`}>Baixar {documento.arquivo.nome} ({Math.ceil(documento.arquivo.tamanho / 1024)} KB)</a>}
           </div>
+          <label className="pdc-enviar-arquivo">
+            <span>{ocupado === `arquivo-${documento.id}` ? "Enviando…" : documento.arquivo ? "Trocar arquivo" : "Anexar arquivo"}</span>
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.txt" onChange={(evento) => enviarArquivo(documento, evento)} disabled={ocupado !== null} />
+          </label>
           <span className={`pd-estado ${documento.recebido ? "pd-estado-ok" : "pd-estado-atencao"}`}>{documento.recebido ? "recebido" : "pendente"}</span>
         </li>)}
       </ul>}

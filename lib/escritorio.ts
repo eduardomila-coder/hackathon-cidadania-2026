@@ -1,6 +1,8 @@
 import type { Resultado } from "./analise";
 import { FichaDeNomeacaoSchema, normalizarFicha, type FichaDeNomeacao } from "./assistente";
 import { createHash } from "node:crypto";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { agora, alterar, listar, novoId } from "./banco";
 
 // Modelo de dados do escritório e todo o CRUD. Cada advogado só enxerga o que
@@ -39,7 +41,8 @@ export type Caso = {
   criadoEm: string;
   atualizadoEm: string;
 };
-export type Documento = { id: string; casoId: string; nome: string; detalhe: string; essencial: boolean; recebido: boolean; atualizadoEm: string };
+export type ArquivoDoDocumento = { nome: string; mime: string; tamanho: number; enviadoEm: string };
+export type Documento = { id: string; casoId: string; nome: string; detalhe: string; essencial: boolean; recebido: boolean; arquivo?: ArquivoDoDocumento; atualizadoEm: string };
 export type Tarefa = { id: string; casoId: string; titulo: string; prazo: string | null; concluida: boolean; criadoEm: string };
 export type TipoRegistro = "registro" | "assistente" | "humano" | "whatsapp";
 export type Registro = { id: string; casoId: string; tipo: TipoRegistro; texto: string; quando: string };
@@ -123,6 +126,12 @@ const NOMEACOES = "escritorio-nomeacoes";
 const EVENTOS = "escritorio-eventos";
 const HONORARIOS = "escritorio-honorarios";
 const ASSINATURAS = "escritorio-assinaturas";
+const PASTA_ARQUIVOS = join(process.cwd(), "data", "arquivos-escritorio");
+const TAMANHO_MAXIMO_DE_ARQUIVO = 10 * 1024 * 1024;
+const TIPOS_DE_ARQUIVO: Record<string, string> = {
+  pdf: "application/pdf", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp",
+  doc: "application/msword", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", txt: "text/plain",
+};
 
 // Os quatro documentos que todo caso começa pedindo.
 export const DOCUMENTOS_PADRAO: Array<Pick<Documento, "nome" | "detalhe" | "essencial">> = [
@@ -494,6 +503,57 @@ export async function atualizarDocumento(advogadoId: string, casoId: string, id:
   if (!atualizado) throw new ErroEscritorio("Documento não encontrado.", 404);
   await marcarAtualizado(casoId);
   return atualizado;
+}
+
+function tipoDeArquivo(nome: string): { extensao: string; mime: string } {
+  const extensao = nome.trim().split(".").pop()?.toLowerCase() ?? "";
+  const mime = TIPOS_DE_ARQUIVO[extensao];
+  if (!mime) throw new ErroEscritorio("Envie PDF, imagem (JPG, PNG ou WebP), Word ou TXT.");
+  return { extensao, mime };
+}
+
+function caminhoDoArquivo(advogadoId: string, casoId: string, documentoId: string, extensao: string) {
+  return join(PASTA_ARQUIVOS, advogadoId, casoId, `${documentoId}.${extensao}`);
+}
+
+export async function guardarArquivoDoDocumento(advogadoId: string, casoId: string, documentoId: string, arquivo: { nome: string; bytes: Uint8Array }): Promise<Documento> {
+  exigirCaso(advogadoId, casoId);
+  const nome = texto(arquivo.nome, 200);
+  if (!nome) throw new ErroEscritorio("Escolha um arquivo para enviar.");
+  if (!arquivo.bytes.byteLength) throw new ErroEscritorio("O arquivo está vazio.");
+  if (arquivo.bytes.byteLength > TAMANHO_MAXIMO_DE_ARQUIVO) throw new ErroEscritorio("O arquivo pode ter no máximo 10 MB.");
+  const { extensao, mime } = tipoDeArquivo(nome);
+  let atualizado = null as Documento | null;
+  await alterar<Documento>(DOCUMENTOS, (documentos) => {
+    const documento = documentos.find((item) => item.id === documentoId && item.casoId === casoId);
+    if (!documento) throw new ErroEscritorio("Documento não encontrado.", 404);
+    const enviadoEm = agora();
+    documento.arquivo = { nome, mime, tamanho: arquivo.bytes.byteLength, enviadoEm };
+    documento.recebido = true;
+    documento.atualizadoEm = enviadoEm;
+    atualizado = documento;
+  });
+  const destino = caminhoDoArquivo(advogadoId, casoId, documentoId, extensao);
+  await mkdir(join(PASTA_ARQUIVOS, advogadoId, casoId), { recursive: true });
+  const temporario = `${destino}.${novoId()}.tmp`;
+  await writeFile(temporario, arquivo.bytes);
+  await rename(temporario, destino);
+  await marcarAtualizado(casoId);
+  if (!atualizado) throw new ErroEscritorio("Documento não encontrado.", 404);
+  return atualizado;
+}
+
+export async function lerArquivoDoDocumento(advogadoId: string, casoId: string, documentoId: string): Promise<{ arquivo: ArquivoDoDocumento; bytes: Buffer }> {
+  exigirCaso(advogadoId, casoId);
+  const documento = documentosDoCaso(advogadoId, casoId).find((item) => item.id === documentoId);
+  if (!documento) throw new ErroEscritorio("Documento não encontrado.", 404);
+  if (!documento.arquivo) throw new ErroEscritorio("Este documento ainda não tem arquivo anexado.", 404);
+  const { extensao } = tipoDeArquivo(documento.arquivo.nome);
+  try {
+    return { arquivo: documento.arquivo, bytes: await readFile(caminhoDoArquivo(advogadoId, casoId, documentoId, extensao)) };
+  } catch {
+    throw new ErroEscritorio("O arquivo anexado não está disponível neste servidor.", 404);
+  }
 }
 
 // ---- Tarefas -------------------------------------------------------------

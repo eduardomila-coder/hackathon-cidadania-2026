@@ -122,7 +122,7 @@ export type Cliente = { id: string; advogadoId: string; nome: string; telefone: 
 export type Origem = "nomeacao" | "plantao" | "particular";
 export type Situacao = "novo" | "em_andamento" | "aguardando_cliente" | "concluido";
 export type Caso = { id: string; advogadoId: string; clienteId: string | null; titulo: string; origem: Origem; processo: string | null /* CNJ só dígitos ou null */; orgao: string | null; ato: string | null; prazo: string | null /* AAAA-MM-DD */; situacao: Situacao; resumo: string; relato: string; notas: string; fundamentos: string[]; criadoEm: string; atualizadoEm: string };
-export type Documento = { id: string; casoId: string; nome: string; detalhe: string; essencial: boolean; recebido: boolean; atualizadoEm: string };
+export type Documento = { id: string; casoId: string; nome: string; detalhe: string; essencial: boolean; recebido: boolean; arquivo?: { nome: string; mime: string; tamanho: number; enviadoEm: string }; atualizadoEm: string };
 export type Tarefa = { id: string; casoId: string; titulo: string; prazo: string | null; concluida: boolean; criadoEm: string };
 export type Registro = { id: string; casoId: string; tipo: "registro" | "assistente" | "humano" | "whatsapp"; texto: string; quando: string };
 export type Triagem = { id: string; casoId: string; quando: string; resultado: Resultado /* de lib/analise */ };
@@ -168,6 +168,7 @@ Arquivos: `app/escritorio/page.tsx`, `app/escritorio/casos/[id]/page.tsx`,
 - `GET /api/escritorio/casos/[id]` → `{ caso, cliente, documentos, tarefas, registros, triagens, processo, mensagens }`.
 - `PATCH /api/escritorio/casos/[id]` → campos editáveis de `Caso`.
 - `POST /api/escritorio/casos/[id]/documentos` `{ nome, detalhe?, essencial? }`; `PATCH` `{ id, recebido?, nome?, detalhe? }`.
+- `POST /api/escritorio/casos/[id]/documentos/[documentoId]/arquivo` recebe `multipart/form-data` com `arquivo` (PDF, JPG, PNG, WebP, Word ou TXT, até 10 MB); `GET` no mesmo caminho baixa o anexo. Os dois exigem a sessão e o documento do próprio advogado.
 - `POST /api/escritorio/casos/[id]/tarefas` `{ titulo, prazo? }`; `PATCH` `{ id, concluida?, titulo?, prazo? }`.
 - `POST /api/escritorio/casos/[id]/registros` `{ texto, tipo?: "registro"|"humano" }`.
 - `POST /api/escritorio/casos/[id]/triagem` → roda `analisarRelato` com
