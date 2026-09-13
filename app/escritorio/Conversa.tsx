@@ -214,6 +214,7 @@ function ConversaDoContato({ contato, casoId, aoAtualizar, sugestao, aoEnviarSug
           {mostraDia && <div className="wa-dia"><span>{dia}</span></div>}
           <div className={`wa-linha ${mensagem.deMim ? "out" : "in"}`}>
             <div className={`wa-bubble ${mensagem.deMim ? "out" : "in"}${agrupada ? " grouped" : ""}`}>
+              {mensagem.doEstagiario && <p className="wa-nome-estagiaria">Estagiária virtual</p>}
               <p className="wa-message-text">{mensagem.texto}</p>
               <span className="wa-meta">
                 {mensagem.doEstagiario && <span className="wa-selo-estagiario" title="Resposta enviada pelo estagiário virtual">estagiário</span>}
@@ -229,7 +230,9 @@ function ConversaDoContato({ contato, casoId, aoAtualizar, sugestao, aoEnviarSug
     <form className="pd-resposta" onSubmit={(evento) => { evento.preventDefault(); void enviar(); }}>
       {sugestao && <div className="pd-estagiario-sugestao">
         <div className="pd-estagiario-cabeca">
-          <p className="pd-estagiario-etiqueta">Rascunho do assistente</p>
+          <div className="pd-estagiario-identidade">
+            <p className="pd-estagiario-etiqueta">Estagiária virtual <span>· rascunho</span></p>
+          </div>
           <span className="pd-estagiario-nao-enviado">não enviado</span>
         </div>
         <p className="pd-estagiario-texto">{sugestao.texto}</p>

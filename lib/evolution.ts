@@ -28,6 +28,7 @@ type RespostaEstado = { instance?: { state?: string; instanceName?: string } };
 type RespostaConectar = { pairingCode?: string; code?: string; base64?: string; instance?: { state?: string } };
 type RespostaCriar = { instance?: { instanceName?: string; status?: string }; qrcode?: RespostaConectar };
 type RespostaEnvio = { key?: { id?: string; remoteJid?: string; fromMe?: boolean }; messageTimestamp?: number | string; status?: string };
+type RespostaFotoDePerfil = { profilePictureUrl?: string; url?: string };
 
 export class ErroEvolution extends Error {
   constructor(message: string, readonly status = 502) { super(message); }
@@ -169,6 +170,26 @@ export async function estadoDaConexao(usuario: string) {
     if (e instanceof ErroEvolution && e.status === 404) return { ...publico, estado: "sem_instancia", numero: formatarNumero(cadastro.numero), instancia: cadastro.instancia };
     throw e;
   }
+}
+
+// A Evolution devolve uma URL temporária do CDN do WhatsApp. Não a gravamos:
+// ela expira e uma foto de cliente não deve virar dado permanente do protótipo.
+// A rota autenticada de mensagens busca e transmite os bytes com cache privado.
+export async function fotoDePerfil(usuario: string, contato: string): Promise<string | null> {
+  const cadastro = cadastroDe(usuario);
+  if (!cadastro) return null;
+  const numero = normalizarNumero(contato);
+  const resposta = await requisitar<RespostaFotoDePerfil>(`/chat/fetchProfilePictureUrl/${encodeURIComponent(cadastro.instancia)}`, {
+    method: "POST",
+    body: JSON.stringify({ number: numero }),
+  });
+  const url = resposta.profilePictureUrl ?? resposta.url ?? null;
+  if (!url) return null;
+  try {
+    const destino = new URL(url);
+    if (destino.protocol !== "https:" || !/(^|\.)whatsapp\.net$/i.test(destino.hostname)) return null;
+    return destino.toString();
+  } catch { return null; }
 }
 
 // Cadastra o número, cria a instância na Evolution (ou reaproveita a que já
