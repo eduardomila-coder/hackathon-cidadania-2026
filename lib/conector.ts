@@ -22,7 +22,7 @@ const CONECTORES = "escritorio-conectores";
 // advogado desistiu. Some da fila depois disso.
 const VALIDADE_MS = 5 * 60 * 1000;
 
-export type TipoDePedido = "certificados" | "assinar" | "projudi-entrar" | "projudi-carteira" | "projudi-processo";
+export type TipoDePedido = "certificados" | "assinar" | "projudi-saude" | "projudi-entrar" | "projudi-carteira" | "projudi-processo";
 
 export type Pedido = {
   id: string;

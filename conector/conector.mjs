@@ -233,6 +233,8 @@ async function atender(pedido) {
       return { certificados: await listarCertificados() };
     case "assinar":
       return assinar(dados.certificadoId ?? "demonstracao", String(dados.hash ?? ""));
+    case "projudi-saude":
+      return noServicoDeConsulta("/saude", "GET");
     case "projudi-entrar":
       return noServicoDeConsulta("/entrar", "POST", dados);
     case "projudi-carteira":

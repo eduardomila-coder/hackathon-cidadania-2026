@@ -27,19 +27,16 @@ export function Projudi() {
 
   const consultarEstado = useCallback(async () => {
     try {
-      // Uma consulta vazia à carteira serve de sinal de vida: se o serviço
-      // responde (ou reclama que falta entrar), ele está de pé.
-      const { resultado } = await pedirAoConector("projudi-carteira", {}, 8000);
-      const dados = resultado as { processos?: ProcessoNaCarteira[] };
-      setEstado({ consulta: "projudi", versao: "1.0.0", autenticado: true });
-      setCarteira(dados.processos ?? []);
-    } catch (e: unknown) {
-      const mensagem = e instanceof Error ? e.message : "";
-      if (/entrar no PROJUDI/i.test(mensagem)) {
-        setEstado({ consulta: "projudi", versao: "1.0.0", autenticado: false });
-      } else {
-        setEstado(null);
-      }
+      // O serviço diz de si mesmo se já entrou no tribunal. Antes a tela
+      // adivinhava pelo texto do erro e errava: "Ainda não entrou no PROJUDI"
+      // não casava com o que ela procurava, e um serviço vivo aparecia como
+      // ausente.
+      const { resultado } = await pedirAoConector("projudi-saude", {}, 8000);
+      const saude = resultado as { versao?: string; autenticado?: boolean };
+      setEstado({ consulta: "projudi", versao: saude.versao ?? "1.0.0", autenticado: Boolean(saude.autenticado) });
+      if (saude.autenticado) void puxarCarteira();
+    } catch {
+      setEstado(null);
     } finally {
       setProcurando(false);
     }
