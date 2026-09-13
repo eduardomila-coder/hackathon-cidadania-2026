@@ -101,6 +101,13 @@ with sync_playwright() as p:
     # 2. Entrar.
     pagina.goto(f"{BASE}/entrar")
     marcar("a tela de entrar mostra a faixa de demonstração", "Ambiente de demonstração" in pagina.content())
+    # Esperar o React assumir os campos antes de digitar: em `next dev`, digitar
+    # antes disso faz o React devolver o campo ao estado inicial e o botão de
+    # entrar fica apagado, como se a página estivesse morta.
+    pagina.wait_for_function(
+        "!!Object.keys(document.querySelector('#usuario')).find(k => k.startsWith('__reactProps'))",
+        timeout=60000,
+    )
     pagina.fill("#usuario", usuario)
     pagina.fill("#senha", senha)
     pagina.click("button:has-text('Entrar')")
