@@ -57,6 +57,9 @@ export async function POST(request: Request) {
       processo,
       orgao: ficha.orgao,
       ato: ficha.ato,
+      // A data da intimação não entra aqui: `normalizarFicha` já a tirou de
+      // `dataPrazo`, senão o painel anunciaria vencimento onde só começa a
+      // contagem — alarme falso para o advogado.
       prazo: ficha.dataPrazo,
       resumo: ficha.resumo,
       fundamentos: ficha.fundamentosAAvaliar,
@@ -68,8 +71,10 @@ export async function POST(request: Request) {
     for (const titulo of TAREFAS_DA_NOMEACAO) {
       await adicionarTarefa(advogado.id, caso.id, { titulo, prazo: ficha.dataPrazo });
     }
+    const emDia = (data: string) => data.split("-").reverse().join("/");
+    const ciencia = ficha.dataCiencia ? ` Ciência: ${emDia(ficha.dataCiencia)}.` : "";
     const alertas = ficha.alertas.length ? ` Alertas: ${ficha.alertas.join(" ")}` : "";
-    await registrar(advogado.id, caso.id, "assistente", `Ficha de nomeação lida pela IA. Prazo: ${ficha.dataPrazo ? ficha.dataPrazo.split("-").reverse().join("/") : ficha.prazoInformado ?? "conferir no ato"}.${alertas}`);
+    await registrar(advogado.id, caso.id, "assistente", `Ficha de nomeação lida pela IA. Prazo: ${ficha.dataPrazo ? emDia(ficha.dataPrazo) : ficha.prazoInformado ?? "conferir no ato"}.${ciencia}${alertas}`);
 
     return Response.json({ caso, ficha }, { status: 201 });
   } catch (e) {

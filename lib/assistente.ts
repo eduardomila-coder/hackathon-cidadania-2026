@@ -88,7 +88,8 @@ export const FichaDeNomeacaoSchema = z.object({
   orgao: z.string().nullable().describe("Vara, juizado ou comarca; null se não aparece"),
   ato: z.string().nullable().describe("Para que o advogado foi nomeado; null se não dá para saber"),
   prazoInformado: z.string().nullable().describe("O prazo como está escrito no texto; null se não há"),
-  dataPrazo: z.string().nullable().describe("Data explícita do texto em AAAA-MM-DD; null se o texto não traz data"),
+  dataCiencia: z.string().nullable().default(null).describe("Data explícita da intimação ou da ciência (AAAA-MM-DD); null se o texto não traz essa data"),
+  dataPrazo: z.string().nullable().describe("Só a data explícita de vencimento de prazo ou de ato designado, como audiência (AAAA-MM-DD); null quando o prazo vem em dias"),
   resumo: z.string(),
   fundamentosAAvaliar: z.array(z.string()).describe("Ideias e pontos a examinar, não teses prontas"),
   documentosAPedir: z.array(z.string()),
@@ -110,20 +111,37 @@ function textoOuNulo(valor: string | null): string | null {
 
 // Deixa a ficha do jeito que o caso espera: data só se veio no formato certo
 // (senão vira alerta), listas sem item vazio, textos sem espaço sobrando.
+//
+// A data da intimação nunca pode virar prazo. Sem esta trava, o modelo às
+// vezes devolvia a data da ciência em `dataPrazo` e o painel do advogado
+// anunciava "vence hoje" para um prazo que só começa a contar ali: alarme
+// falso no lugar onde o erro custa caro.
 export function normalizarFicha(bruta: FichaDeNomeacao): FichaDeNomeacao {
   const alertas = limparLista(bruta.alertas);
-  let dataPrazo = textoOuNulo(bruta.dataPrazo);
-  if (dataPrazo && (!/^\d{4}-\d{2}-\d{2}$/.test(dataPrazo) || Number.isNaN(Date.parse(dataPrazo)))) {
-    alertas.push(`A data "${dataPrazo}" não veio no formato esperado: confira o prazo no ato.`);
+  const conferirData = (valor: string | null, oQue: string) => {
+    const limpo = textoOuNulo(valor);
+    if (limpo && (!/^\d{4}-\d{2}-\d{2}$/.test(limpo) || Number.isNaN(Date.parse(limpo)))) {
+      alertas.push(`A ${oQue} "${limpo}" não veio no formato esperado: confira no ato.`);
+      return null;
+    }
+    return limpo;
+  };
+
+  const dataCiencia = conferirData(bruta.dataCiencia, "data de ciência");
+  let dataPrazo = conferirData(bruta.dataPrazo, "data");
+  if (dataPrazo && dataCiencia && dataPrazo === dataCiencia) {
+    alertas.push("A data informada é a da intimação, não a do vencimento: o prazo conta a partir dela e quem conta é o advogado.");
     dataPrazo = null;
   }
+
   const prazoInformado = textoOuNulo(bruta.prazoInformado);
-  if (!dataPrazo) alertas.push(prazoInformado ? `O texto fala em "${prazoInformado}" sem data explícita: conferir no ato e contar a partir da ciência.` : "A intimação não traz data nem prazo explícito: conferir no ato.");
+  if (!dataPrazo) alertas.push(prazoInformado ? `O texto fala em "${prazoInformado}" sem data de vencimento explícita: conferir no ato e contar a partir da ciência.` : "A intimação não traz data nem prazo explícito: conferir no ato.");
   return {
     processo: textoOuNulo(bruta.processo),
     orgao: textoOuNulo(bruta.orgao),
     ato: textoOuNulo(bruta.ato),
     prazoInformado,
+    dataCiencia,
     dataPrazo,
     resumo: bruta.resumo.trim(),
     fundamentosAAvaliar: limparLista(bruta.fundamentosAAvaliar),
@@ -147,7 +165,8 @@ Regras:
 - "orgao": a vara, o juizado ou a comarca como está no texto; null se não aparece.
 - "ato": para que o advogado foi nomeado (audiência, defesa, contestação, recurso, acompanhamento...), como o texto diz; null se não dá para saber.
 - "prazoInformado": o prazo como está escrito (ex.: "15 dias", "audiência em 20/10/2026 às 14h"); null se o texto não fala de prazo.
-- "dataPrazo": só se o texto trouxer uma DATA explícita (dia, mês e ano) do ato ou do fim do prazo, em AAAA-MM-DD. Se o texto só diz "15 dias" ou "5 dias úteis" sem data, dataPrazo é null: você NÃO calcula prazo, quem conta é o advogado.
+- "dataCiencia": a DATA explícita da intimação ou da ciência, em AAAA-MM-DD, se o texto trouxer. É a data a partir da qual um prazo em dias começa a contar.
+- "dataPrazo": SÓ a data explícita de vencimento do prazo ou de um ato já designado (ex.: audiência marcada para 20/10/2026), em AAAA-MM-DD. NUNCA repita aqui a data da intimação/ciência: quando o prazo vem em dias ("15 dias"), "dataPrazo" é null mesmo que a data da intimação esteja escrita no texto, porque você NÃO calcula prazo — quem conta é o advogado.
 - "resumo": duas ou três frases sobre o que é o caso e o que se espera do advogado, sem juridiquês.
 - "fundamentosAAvaliar": pontos a examinar (ex.: "verificar se cabe justiça gratuita", "checar se houve citação válida"), como ideias, não como teses prontas nem conclusões. Lista vazia se o texto não permite.
 - "documentosAPedir": o que o advogado deve pedir ao cliente ou buscar nos autos, um por item.
@@ -160,6 +179,7 @@ Responda SOMENTE com um JSON válido, sem texto antes ou depois:
   "orgao": string | null,
   "ato": string | null,
   "prazoInformado": string | null,
+  "dataCiencia": "AAAA-MM-DD" | null,
   "dataPrazo": "AAAA-MM-DD" | null,
   "resumo": string,
   "fundamentosAAvaliar": string[],

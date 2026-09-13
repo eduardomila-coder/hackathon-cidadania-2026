@@ -73,6 +73,7 @@ export function NovaNomeacao({ aoFechar }: Props) {
         <div><dt>Processo</dt><dd>{ficha.processo ?? <em>não consta no texto</em>}</dd></div>
         <div><dt>Órgão</dt><dd>{ficha.orgao ?? <em>não consta</em>}</dd></div>
         <div><dt>Ato</dt><dd>{ficha.ato ?? <em>não consta</em>}</dd></div>
+        <div><dt>Ciência</dt><dd>{ficha.dataCiencia ? <>{formatarData(ficha.dataCiencia)} <em>· é daqui que o prazo em dias começa a contar</em></> : <em>o texto não traz a data da intimação</em>}</dd></div>
         <div><dt>Prazo</dt><dd>{ficha.dataPrazo ? <><b>{formatarData(ficha.dataPrazo)}</b>{ficha.prazoInformado ? ` · ${ficha.prazoInformado}` : ""}</> : <>{ficha.prazoInformado ?? "sem data no texto"} <em>· conferir no ato</em></>}</dd></div>
       </dl>
       <h3>Resumo</h3>

@@ -177,20 +177,30 @@ Arquivos: `app/escritorio/page.tsx`, `app/escritorio/casos/[id]/page.tsx`,
 - `GET/POST/PATCH /api/escritorio/clientes`.
 - `POST /api/escritorio/nomeacao` `{ texto }` (o advogado cola a intimação de
   nomeação) → `fichaDeNomeacao(texto)` da IA → cria `Caso` com `origem:
-  "nomeacao"`, `titulo`, `processo`, `orgao`, `ato`, `prazo` só se a intimação
-  trouxer data explícita (senão `null` e a ficha diz "conferir no ato"),
-  `resumo`, `fundamentos`, documentos sugeridos e tarefas "Conferir íntegra da
+  "nomeacao"`, `titulo`, `processo`, `orgao`, `ato`, `prazo` igual a
+  `ficha.dataPrazo` — que só existe quando a intimação traz a data do
+  vencimento ou de um ato já designado; prazo em dias ("15 dias") e data da
+  intimação **não** viram `prazo` do caso (ver abaixo), `resumo`,
+  `fundamentos`, documentos sugeridos e tarefas "Conferir íntegra da
   intimação e a data de ciência" e "Confirmar prazo no processo oficial".
   Devolve `{ caso, ficha }`.
 
 ### `lib/assistente.ts` — `fichaDeNomeacao(texto)`
 
 `perguntarJson` com prompt que exige: `{ processo: string|null, orgao, ato,
-prazoInformado: string|null, dataPrazo: "AAAA-MM-DD"|null, resumo,
-fundamentosAAvaliar: string[] (ideias, não teses prontas), documentosAPedir:
-string[], perguntasAoCliente: string[], alertas: string[] }`. Regras no
-prompt: não calcular prazo que não esteja escrito; não decidir tese; não
-inventar número de processo; tudo em português simples.
+prazoInformado: string|null, dataCiencia: "AAAA-MM-DD"|null,
+dataPrazo: "AAAA-MM-DD"|null, resumo, fundamentosAAvaliar: string[] (ideias,
+não teses prontas), documentosAPedir: string[], perguntasAoCliente: string[],
+alertas: string[] }`. Regras no prompt: não calcular prazo que não esteja
+escrito; não decidir tese; não inventar número de processo; tudo em português
+simples.
+
+`dataCiencia` é a data da intimação/ciência; `dataPrazo` é só a data de
+vencimento ou de ato designado. `normalizarFicha` ainda trava, no código, o
+caso em que o modelo repete a data da intimação em `dataPrazo`: ela volta para
+`dataCiencia`, o `prazo` fica `null` e entra o alerta de que quem conta o prazo
+é o advogado. Sem essa trava o painel anunciava "vence hoje" para um prazo que
+só começa a contar naquela data — alarme falso onde o erro custa caro.
 
 ### Telas
 
