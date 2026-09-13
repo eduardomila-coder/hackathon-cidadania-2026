@@ -1,16 +1,33 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import type { Caso, Documento, Processo as ProcessoDoCaso, Registro, Tarefa } from "@/lib/escritorio";
 import { chamar, mensagemDeErro } from "../api";
-import { descreverPrazo, formatarCnj, formatarData, formatarMomento } from "../formatos";
+import { descreverPrazo, formatarCnj, formatarData, formatarMomento, type TomDoPrazo } from "../formatos";
 import type { Atualizar } from "./Caso";
 
 // Seções da página do caso que são listas com um formulário embaixo:
-// documentos, tarefas, registros; e a consulta do processo no TJPR.
+// documentos, tarefas e registros; e a consulta do processo no TJPR.
+// Tom do prazo nunca é só cor: vai junto o texto do estado.
+
+export const CLASSE_DO_TOM: Record<TomDoPrazo, string> = {
+  vencido: "pd-estado-risco",
+  hoje: "pd-estado-atencao",
+  urgente: "pd-estado-atencao",
+  proximo: "pd-estado-info",
+  normal: "",
+};
+
+// Caixa de marcar de 44 px: o quadrado desenhado é menor, a área de toque não.
+function Marcar({ marcado, rotulo, aoClicar, desabilitado }: { marcado: boolean; rotulo: string; aoClicar: () => void; desabilitado: boolean }) {
+  return <button type="button" className="pdc-marcar" aria-pressed={marcado} aria-label={rotulo} onClick={aoClicar} disabled={desabilitado}>
+    <span aria-hidden="true">{marcado ? "✓" : ""}</span>
+  </button>;
+}
 
 // ── Documentos ──────────────────────────────────────────────────────────────
 export function Documentos({ casoId, documentos, atualizar }: { casoId: string; documentos: Documento[]; atualizar: Atualizar }) {
+  const idBase = useId();
   const [nome, setNome] = useState("");
   const [detalhe, setDetalhe] = useState("");
   const [essencial, setEssencial] = useState(false);
@@ -47,31 +64,51 @@ export function Documentos({ casoId, documentos, atualizar }: { casoId: string; 
   }
 
   const recebidos = documentos.filter((documento) => documento.recebido).length;
-  return <section className="pd-cartao pdc-secao" aria-label="Documentos">
-    <div className="md-titulo-linha">
-      <div><p className="md-eyebrow">Documentos</p><h2>Checklist</h2></div>
-      <span className="md-contador">{recebidos} de {documentos.length} recebidos</span>
+  return <section className="pd-cartao" aria-label="Documentos do caso">
+    <div className="pd-cartao-cabeca">
+      <h2>Documentos</h2>
+      <span className="pd-auxiliar">{recebidos} de {documentos.length} recebidos</span>
     </div>
-    {documentos.length === 0 ? <p className="pdc-vazio">Nenhum documento na lista. Adicione o que você precisa pedir ao cliente.</p> : <ul className="md-checklist pdc-checklist">{documentos.map((documento) => <li key={documento.id} className={documento.recebido ? "pdc-recebido" : ""}>
-      <button type="button" aria-pressed={documento.recebido} aria-label={`${documento.recebido ? "Desmarcar" : "Marcar como recebido"}: ${documento.nome}`} onClick={() => alternar(documento)} disabled={ocupado === documento.id}>{documento.recebido ? "✓" : ""}</button>
-      <div><strong>{documento.nome}{documento.essencial && <em>essencial</em>}</strong>{documento.detalhe && <small>{documento.detalhe}</small>}</div>
-      <b>{documento.recebido ? "recebido" : "pendente"}</b>
-    </li>)}</ul>}
-    <form className="md-adicionar pdc-adicionar" onSubmit={adicionar}>
-      <label htmlFor="novo-documento">Pedir outro documento</label>
-      <div>
-        <input id="novo-documento" value={nome} onChange={(evento) => setNome(evento.target.value)} maxLength={200} placeholder="Nome do documento" required />
-        <input value={detalhe} onChange={(evento) => setDetalhe(evento.target.value)} maxLength={500} placeholder="Para que serve (opcional)" />
-        <label className="pdc-marcar"><input type="checkbox" checked={essencial} onChange={(evento) => setEssencial(evento.target.checked)} /> essencial</label>
-        <button type="submit" disabled={ocupado === "novo" || !nome.trim()}>{ocupado === "novo" ? "Adicionando…" : "Adicionar"}</button>
+    {documentos.length === 0
+      ? <div className="pd-cartao-corpo">
+        <p className="pd-vazio"><strong>Nenhum documento na lista.</strong>Adicione o que você precisa pedir ao cliente. A triagem também sugere o que pedir.</p>
       </div>
+      : <ul className="pd-lista pdc-lista-documentos">
+        {documentos.map((documento) => <li key={documento.id} className={`pd-linha ${documento.recebido ? "pdc-recebido" : ""}`}>
+          <Marcar
+            marcado={documento.recebido}
+            rotulo={`${documento.recebido ? "Desmarcar" : "Marcar como recebido"}: ${documento.nome}`}
+            aoClicar={() => alternar(documento)}
+            desabilitado={ocupado === documento.id}
+          />
+          <div className="pdc-linha-texto">
+            <span className="pd-linha-titulo">{documento.nome}{documento.essencial && <em className="pdc-essencial">essencial</em>}</span>
+            {documento.detalhe && <span className="pd-linha-meta">{documento.detalhe}</span>}
+          </div>
+          <span className={`pd-estado ${documento.recebido ? "pd-estado-ok" : "pd-estado-atencao"}`}>{documento.recebido ? "recebido" : "pendente"}</span>
+        </li>)}
+      </ul>}
+    <form className="pd-cartao-corpo pdc-adicionar" onSubmit={adicionar}>
+      <div className="pd-campo">
+        <label htmlFor={`${idBase}-documento`}>Pedir outro documento</label>
+        <input id={`${idBase}-documento`} className="pd-entrada" value={nome} onChange={(evento) => setNome(evento.target.value)} maxLength={200} placeholder="Nome do documento" required />
+      </div>
+      <div className="pd-campo">
+        <label htmlFor={`${idBase}-detalhe`}>Para que serve</label>
+        <input id={`${idBase}-detalhe`} className="pd-entrada" value={detalhe} onChange={(evento) => setDetalhe(evento.target.value)} maxLength={500} placeholder="Opcional" />
+      </div>
+      <label className="pdc-interruptor" htmlFor={`${idBase}-essencial`}>
+        <input id={`${idBase}-essencial`} type="checkbox" checked={essencial} onChange={(evento) => setEssencial(evento.target.checked)} /> essencial
+      </label>
+      <button type="submit" className="pd-botao pd-botao-secundario" disabled={ocupado === "novo" || !nome.trim()}>{ocupado === "novo" ? "Adicionando…" : "Adicionar"}</button>
     </form>
-    {erro && <p role="alert" className="pdc-erro">{erro}</p>}
+    {erro && <p role="alert" className="pd-aviso pd-aviso-risco pdc-erro-fora">{erro}</p>}
   </section>;
 }
 
 // ── Prazos e tarefas ────────────────────────────────────────────────────────
 export function Tarefas({ casoId, tarefas, atualizar }: { casoId: string; tarefas: Tarefa[]; atualizar: Atualizar }) {
+  const idBase = useId();
   const [titulo, setTitulo] = useState("");
   const [prazo, setPrazo] = useState("");
   const [ocupado, setOcupado] = useState<string | null>(null);
@@ -113,31 +150,51 @@ export function Tarefas({ casoId, tarefas, atualizar }: { casoId: string; tarefa
     }
   }
 
-  const pendentes = tarefas.filter((tarefa) => !tarefa.concluida).length;
-  return <section className="pd-cartao pdc-secao" aria-label="Prazos e tarefas">
-    <div className="md-titulo-linha">
-      <div><p className="md-eyebrow">Prazos e tarefas</p><h2>O que fazer</h2></div>
-      <span className="md-contador">{pendentes === 0 ? "tudo feito" : pendentes === 1 ? "1 pendente" : `${pendentes} pendentes`}</span>
+  const lista = ordenar(tarefas);
+  const pendentes = lista.filter((tarefa) => !tarefa.concluida).length;
+  return <section className="pd-cartao" aria-label="Prazos e tarefas">
+    <div className="pd-cartao-cabeca">
+      <h2>Prazos e tarefas</h2>
+      <span className="pd-auxiliar">{pendentes === 0 ? "tudo feito" : pendentes === 1 ? "1 pendente" : `${pendentes} pendentes`}</span>
     </div>
-    {tarefas.length === 0 ? <p className="pdc-vazio">Nenhuma tarefa. Anote o que precisa ser feito e a data, e o prazo aparece no painel.</p> : <ul className="pdc-tarefas">{tarefas.map((tarefa) => {
-      const descricao = tarefa.prazo && !tarefa.concluida ? descreverPrazo(tarefa.prazo) : null;
-      return <li key={tarefa.id} className={tarefa.concluida ? "pdc-concluida" : ""}>
-        <button type="button" aria-pressed={tarefa.concluida} aria-label={`${tarefa.concluida ? "Reabrir" : "Concluir"}: ${tarefa.titulo}`} onClick={() => alternar(tarefa)} disabled={ocupado === tarefa.id}>{tarefa.concluida ? "✓" : ""}</button>
-        <div>
-          <strong>{tarefa.titulo}</strong>
-          <small className={descricao ? `pdc-prazo tom-${descricao.tom}` : ""}>{tarefa.prazo ? <>{formatarData(tarefa.prazo)}{descricao ? ` · ${descricao.texto}` : ""}</> : "sem data"}</small>
-        </div>
-      </li>;
-    })}</ul>}
-    <form className="md-adicionar pdc-adicionar" onSubmit={adicionar}>
-      <label htmlFor="nova-tarefa">Nova tarefa</label>
-      <div>
-        <input id="nova-tarefa" value={titulo} onChange={(evento) => setTitulo(evento.target.value)} maxLength={200} placeholder="O que precisa ser feito" required />
-        <input type="date" value={prazo} onChange={(evento) => setPrazo(evento.target.value)} aria-label="Data da tarefa" />
-        <button type="submit" disabled={ocupado === "nova" || !titulo.trim()}>{ocupado === "nova" ? "Adicionando…" : "Adicionar"}</button>
+    {lista.length === 0
+      ? <div className="pd-cartao-corpo">
+        <p className="pd-vazio"><strong>Nenhuma tarefa.</strong>Anote o que precisa ser feito e a data; o prazo aparece aqui e no painel do escritório.</p>
       </div>
+      : <ul className="pd-lista pdc-lista-tarefas">
+        {lista.map((tarefa) => {
+          const quando = tarefa.prazo && !tarefa.concluida ? descreverPrazo(tarefa.prazo) : null;
+          return <li key={tarefa.id} className={`pd-linha ${tarefa.concluida ? "pdc-concluida" : ""}`}>
+            <Marcar
+              marcado={tarefa.concluida}
+              rotulo={`${tarefa.concluida ? "Reabrir" : "Concluir"}: ${tarefa.titulo}`}
+              aoClicar={() => alternar(tarefa)}
+              desabilitado={ocupado === tarefa.id}
+            />
+            <div className="pdc-linha-texto">
+              <span className="pd-linha-titulo">{tarefa.titulo}</span>
+              <span className="pd-linha-meta">{tarefa.prazo ? formatarData(tarefa.prazo) : "sem data"}</span>
+            </div>
+            {tarefa.concluida
+              ? <span className="pd-estado pd-estado-ok">concluída</span>
+              : quando
+                ? <span className={`pd-estado ${CLASSE_DO_TOM[quando.tom]}`}>{quando.texto}</span>
+                : <span className="pd-estado">aberta</span>}
+          </li>;
+        })}
+      </ul>}
+    <form className="pd-cartao-corpo pdc-adicionar" onSubmit={adicionar}>
+      <div className="pd-campo">
+        <label htmlFor={`${idBase}-tarefa`}>Nova tarefa</label>
+        <input id={`${idBase}-tarefa`} className="pd-entrada" value={titulo} onChange={(evento) => setTitulo(evento.target.value)} maxLength={200} placeholder="O que precisa ser feito" required />
+      </div>
+      <div className="pd-campo">
+        <label htmlFor={`${idBase}-data`}>Data da tarefa</label>
+        <input id={`${idBase}-data`} className="pd-entrada" type="date" value={prazo} onChange={(evento) => setPrazo(evento.target.value)} />
+      </div>
+      <button type="submit" className="pd-botao pd-botao-secundario" disabled={ocupado === "nova" || !titulo.trim()}>{ocupado === "nova" ? "Adicionando…" : "Adicionar"}</button>
     </form>
-    {erro && <p role="alert" className="pdc-erro">{erro}</p>}
+    {erro && <p role="alert" className="pd-aviso pd-aviso-risco pdc-erro-fora">{erro}</p>}
   </section>;
 }
 
@@ -160,31 +217,42 @@ export function Processo({ caso, processo, atualizar, recarregar }: { caso: Caso
     }
   }
 
-  return <section className="pd-cartao pdc-secao" aria-label="Processo">
-    <div className="md-titulo-linha">
-      <div><p className="md-eyebrow">Processo</p><h2>Andamento no TJPR</h2></div>
-      <button type="button" className="md-botao-secundario pdc-botao-pequeno" onClick={consultar} disabled={consultando || !caso.processo}>{consultando ? "Consultando…" : "Consultar no TJPR"}</button>
+  return <section className="pd-cartao" aria-label="Processo">
+    <div className="pd-cartao-cabeca">
+      <h2>Andamento no TJPR</h2>
+      <button type="button" className="pd-botao pd-botao-secundario pd-botao-pequeno" onClick={consultar} disabled={consultando || !caso.processo}>
+        {consultando ? "Consultando…" : "Consultar no TJPR"}
+      </button>
     </div>
-    {caso.processo
-      ? <p className="pdc-numero">{formatarCnj(caso.processo)}</p>
-      : <p className="pdc-vazio">Sem número de processo. Coloque o número CNJ na ficha para consultar o andamento público.</p>}
-    {erro && <p role="alert" className="pdc-erro">{erro}</p>}
-    {processo ? <>
-      <dl className="pdc-dados">
-        <div><dt>Classe</dt><dd>{processo.classe ?? <em>não informada</em>}</dd></div>
-        <div><dt>Órgão julgador</dt><dd>{processo.orgao ?? <em>não informado</em>}</dd></div>
-        <div className="pdc-dado-largo"><dt>Último andamento</dt><dd>{processo.ultimoMovimento ?? <em>sem movimentação informada</em>}{processo.dataMovimento && <small> · {formatarMomento(processo.dataMovimento)}</small>}</dd></div>
-      </dl>
-      <p className="md-texto-auxiliar">Consultado em {formatarMomento(processo.consultadoEm)} na base pública do DataJud. É consulta pontual: não vale como intimação e não conta prazo.</p>
-    </> : caso.processo && <p className="md-texto-auxiliar">A consulta busca a classe, o órgão e o último andamento na base pública do DataJud. Não vale como intimação e não conta prazo.</p>}
+    <div className="pd-cartao-corpo">
+      {caso.processo
+        ? <p className="pdc-numero-cnj">{formatarCnj(caso.processo)}</p>
+        : <p className="pd-vazio"><strong>Sem número de processo.</strong>Coloque o número CNJ na ficha do caso para consultar o andamento público.</p>}
+
+      {processo
+        ? <>
+          <dl className="pdc-chaves">
+            <div><dt>Classe</dt><dd>{processo.classe ?? <em>não informada</em>}</dd></div>
+            <div><dt>Órgão julgador</dt><dd>{processo.orgao ?? <em>não informado</em>}</dd></div>
+            <div>
+              <dt>Último andamento</dt>
+              <dd>{processo.ultimoMovimento ?? <em>sem movimentação informada</em>}{processo.dataMovimento && <small> · {formatarMomento(processo.dataMovimento)}</small>}</dd>
+            </div>
+          </dl>
+          <p className="pd-aviso">Consultado em {formatarMomento(processo.consultadoEm)} na base pública do DataJud. É consulta pontual: não vale como intimação e não conta prazo. Confira sempre no processo oficial.</p>
+        </>
+        : caso.processo && <p className="pd-aviso">A consulta busca a classe, o órgão e o último andamento na base pública do DataJud. Não vale como intimação e não conta prazo.</p>}
+      {erro && <p role="alert" className="pd-aviso pd-aviso-risco">{erro}</p>}
+    </div>
   </section>;
 }
 
 // ── Registros (linha do tempo) ──────────────────────────────────────────────
 const NOME_DO_TIPO: Record<Registro["tipo"], string> = { registro: "Sistema", assistente: "Assistente", humano: "Você", whatsapp: "WhatsApp" };
-const CLASSE_DO_TIPO: Record<Registro["tipo"], string> = { registro: "", assistente: "md-evento-mila", humano: "md-evento-humano", whatsapp: "pdc-evento-whatsapp" };
+const CLASSE_DO_TIPO: Record<Registro["tipo"], string> = { registro: "", assistente: "pdc-tempo-assistente", humano: "pdc-tempo-humano", whatsapp: "pdc-tempo-whatsapp" };
 
 export function Registros({ casoId, registros, atualizar }: { casoId: string; registros: Registro[]; atualizar: Atualizar }) {
+  const idCampo = useId();
   const [texto, setTexto] = useState("");
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -204,20 +272,26 @@ export function Registros({ casoId, registros, atualizar }: { casoId: string; re
     }
   }
 
-  return <section className="pd-cartao pdc-secao" aria-label="Registros do caso">
-    <div className="md-titulo-linha">
-      <div><p className="md-eyebrow">Registros</p><h2>Linha do tempo</h2></div>
-      <span className="md-contador">{registros.length === 1 ? "1 registro" : `${registros.length} registros`}</span>
+  return <section className="pd-cartao" aria-label="Registros do caso">
+    <div className="pd-cartao-cabeca">
+      <h2>Registros</h2>
+      <span className="pd-auxiliar">{registros.length === 1 ? "1 registro" : `${registros.length} registros`}</span>
     </div>
-    <form className="md-campo pdc-anotar" onSubmit={anotar}>
-      <label htmlFor="nova-nota">Anotar</label>
-      <textarea id="nova-nota" value={texto} onChange={(evento) => setTexto(evento.target.value)} maxLength={5000} rows={3} placeholder="O que aconteceu, o que combinou com o cliente, o que falta." />
-      <button type="submit" disabled={salvando || !texto.trim()}>{salvando ? "Anotando…" : "Anotar"}</button>
-    </form>
-    {erro && <p role="alert" className="pdc-erro">{erro}</p>}
-    <ul className="md-linha-tempo pdc-linha-tempo">{registros.map((registro) => <li key={registro.id} className={CLASSE_DO_TIPO[registro.tipo]}>
-      <i aria-hidden="true" />
-      <div><strong>{registro.texto}</strong><small>{NOME_DO_TIPO[registro.tipo]} · {formatarMomento(registro.quando)}</small></div>
-    </li>)}</ul>
+    <div className="pd-cartao-corpo">
+      <form className="pdc-anotar" onSubmit={anotar}>
+        <div className="pd-campo">
+          <label htmlFor={`${idCampo}-nota`}>Anotar no caso</label>
+          <textarea id={`${idCampo}-nota`} className="pd-area-texto" value={texto} onChange={(evento) => setTexto(evento.target.value)} maxLength={5000} rows={3} placeholder="O que aconteceu, o que combinou com o cliente, o que falta." />
+        </div>
+        <button type="submit" className="pd-botao pd-botao-secundario" disabled={salvando || !texto.trim()}>{salvando ? "Anotando…" : "Anotar"}</button>
+      </form>
+      {erro && <p role="alert" className="pd-aviso pd-aviso-risco">{erro}</p>}
+      {registros.length === 0
+        ? <p className="pd-vazio"><strong>Nenhum registro.</strong>A triagem, a consulta ao TJPR e o WhatsApp escrevem aqui sozinhos. Você também pode anotar o que combinou com o cliente.</p>
+        : <ol className="pd-tempo pdc-linha-tempo">{registros.map((registro) => <li key={registro.id} className={CLASSE_DO_TIPO[registro.tipo]}>
+          <strong>{registro.texto}</strong>
+          <time>{NOME_DO_TIPO[registro.tipo]} · {formatarMomento(registro.quando)}</time>
+        </li>)}</ol>}
+    </div>
   </section>;
 }
