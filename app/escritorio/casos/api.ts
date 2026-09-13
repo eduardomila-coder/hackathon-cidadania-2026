@@ -19,7 +19,11 @@ export async function chamar<T>(url: string, opcoes: { metodo?: "GET" | "POST" |
   }
   const dados = await resposta.json().catch(() => null) as { erro?: unknown } | null;
   if (resposta.status === 401) {
-    window.location.href = `/entrar?voltar=${encodeURIComponent(window.location.pathname)}`;
+    // Recarga de verdade, e não navegação do cliente, de propósito: a sessão
+    // venceu no meio de uma ação e o layout do escritório é renderizado no
+    // servidor, com o cookie novo.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.assign(`/entrar?voltar=${encodeURIComponent(window.location.pathname)}`);
     throw new ErroDaApi("Sua sessão venceu. Entre de novo.", 401);
   }
   if (!resposta.ok) {
