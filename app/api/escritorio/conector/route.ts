@@ -4,7 +4,7 @@ import { lerCorpo, responderErro } from "../comum";
 
 export const dynamic = "force-dynamic";
 
-const TIPOS: TipoDePedido[] = ["certificados", "assinar", "projudi-entrar", "projudi-carteira", "projudi-processo"];
+const TIPOS: TipoDePedido[] = ["certificados", "assinar", "projudi-saude", "projudi-entrar", "projudi-carteira", "projudi-processo"];
 
 // GET  /api/escritorio/conector            → se há conector pareado e quando falou
 // GET  /api/escritorio/conector?pedido=id  → o que o conector respondeu

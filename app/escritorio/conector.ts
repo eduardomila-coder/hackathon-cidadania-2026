@@ -55,7 +55,7 @@ async function pelaFila(tipo: string, dados: Record<string, unknown>, esperaMs: 
 
 /** Faz o pedido pelo caminho que estiver disponível e diz por onde foi. */
 export async function pedirAoConector(
-  tipo: "certificados" | "assinar" | "projudi-entrar" | "projudi-carteira" | "projudi-processo",
+  tipo: "certificados" | "assinar" | "projudi-saude" | "projudi-entrar" | "projudi-carteira" | "projudi-processo",
   dados: Record<string, unknown> = {},
   // Quanto esperar pelo conector. O padrão serve para uma ação que a pessoa
   // pediu e está olhando; para saber se o conector existe, passe pouco, senão a
