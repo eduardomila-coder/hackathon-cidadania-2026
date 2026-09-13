@@ -177,3 +177,40 @@ vermelho quando vencem na semana.
 navegador, cada uma viu só os dois casos dela e nenhum título de caso das outras.
 Prints: `08-demo-ana-painel.png`, `09-demo-bruno-painel.png` e
 `10-demo-carla-painel.png`.
+
+
+### Tela de mensagens no visual da Mila (13/09, 4h)
+
+A pedido do Eduardo, a tela de Mensagens foi refeita com o visual do painel de
+mensagens da Mila (o de produção), sem trazer as bibliotecas dela: papel de parede
+do chat, balão com rabicho no canto superior, balões agrupados na mesma sequência
+(sem rabicho), hora no rodapé do balão, marca de enviada, separador de dia, lista
+com avatar de iniciais, busca e selo de não lidas, e compositor com painel de
+emoji. As ações continuam as nossas: sugerir resposta, vincular a um caso, abrir
+caso com a conversa e enviar só com o clique do advogado. Ficaram de fora, de
+propósito, o que depende de biblioteca nova ou de backend que não existe aqui
+(mídia baixada, reações, encaminhar, fixar, várias identidades de envio, tempo
+real). A única diferença de cor é o balão de saída, que usa o azul do Ponto Dativo
+em tom claro no lugar do verde-água da marca da Mila.
+
+**Conferido no endereço público, com a conta `ana.souza`, 18 verificações em
+navegador:** a lista mostra a conversa e o vínculo com o caso, com o selo de não
+lidas; a conversa tem seis balões, dois separadores de dia, um par agrupado, hora
+e marca de enviada; o painel de emoji abre e insere no campo; o botão de enviar
+começa apagado e acende com texto; a terceira coluna abre em tela larga; a mesma
+conversa aparece dentro da página do caso; e no celular aparece uma coluna por
+vez. Prints `11-mensagens-lista.png` a `14-mensagens-celular.png`.
+
+**Conversa de demonstração:** gravada direto no `data/` do clone `-live`, ligada
+ao caso do plano de saúde da `ana.souza` (seis mensagens, a última não lida),
+porque não existe API para inserir mensagem: as mensagens entram pelo webhook. O
+número fictício `+55 (41) 99000-1122` foi cadastrado pela própria tela do
+WhatsApp, então o aviso de conexão diz que o número existe e está desconectado, em
+vez de dizer que nenhum número foi cadastrado, o que contradiria a conversa na
+tela.
+
+**Teste do repositório:** `scripts/testar-ponta-a-ponta.py` rodado em worktree
+isolado depois da troca da tela: 39 de 39. No caminho apareceu uma corrida no
+próprio teste, que lia a página antes de o aviso de conexão chegar (é um pedido
+separado do da lista); o teste passou a esperar o aviso. `lint` sem erro, `tsc`
+limpo e `npm run build` verde.

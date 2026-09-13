@@ -204,6 +204,9 @@ with sync_playwright() as p:
     # 9. Mensagens e WhatsApp.
     pagina.goto(f"{BASE}/escritorio/mensagens")
     pagina.wait_for_selector("text=Nenhuma conversa ainda.", timeout=30000)
+    # O aviso de conexão vem de outro pedido, que pode chegar depois da lista:
+    # esperar o aviso evita ler a página no meio do carregamento.
+    pagina.wait_for_selector(".pd-aviso-conexao", timeout=30000)
     conteudo = pagina.content()
     marcar("a tela de mensagens avisa que falta cadastrar o WhatsApp", "não cadastrou" in conteudo or "Cadastrar e conectar" in conteudo)
     marcar("sem conexão, a tela não oferece envio", "Enviar pelo WhatsApp" not in conteudo)
