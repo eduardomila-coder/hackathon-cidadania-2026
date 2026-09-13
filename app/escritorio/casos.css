@@ -226,10 +226,15 @@
 }
 
 /* ── Documentos e tarefas ──────────────────────────────────────────────── */
-.pdc-lista-documentos .pd-linha,
+.pdc-lista-documentos .pd-linha { grid-template-columns: 44px minmax(0, 1fr) auto auto; min-height: 56px; }
 .pdc-lista-tarefas .pd-linha { grid-template-columns: 44px minmax(0, 1fr) auto; min-height: 56px; }
 .pdc-linha-texto { min-width: 0; }
 .pdc-linha-texto .pd-linha-titulo { display: block; }
+.pdc-arquivo { display: inline-block; margin-top: 3px; font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
+.pdc-enviar-arquivo { display: inline-flex; align-items: center; min-height: 36px; padding: 0 10px; border: 1px solid var(--linha-forte); border-radius: var(--raio-pequeno); color: var(--azul-escuro); cursor: pointer; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.pdc-enviar-arquivo:hover { border-color: var(--azul); background: var(--azul-claro-2); }
+.pdc-enviar-arquivo input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.pdc-enviar-arquivo:has(input:disabled) { cursor: wait; opacity: .6; }
 .pdc-recebido .pd-linha-titulo { color: var(--tinta-3); }
 .pdc-concluida .pd-linha-titulo { color: var(--tinta-3); text-decoration: line-through; }
 .pdc-essencial {
