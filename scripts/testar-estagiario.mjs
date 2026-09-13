@@ -161,7 +161,14 @@ await pedir(`/api/whatsapp/webhook?token=${encodeURIComponent(segredo)}`, {
 });
 const depoisDoObrigado = await esperarEstagiario(cookie, contato, { ateMudarDe: idDaSugestao ?? undefined, limiteMs: 75000 });
 const conversaDepoisDoObrigado = await conversaAtual(cookie, contato);
-conferir("agradecimento não vira conversa fiada: nada novo saiu", conversaDepoisDoObrigado.length === antesDoObrigado, `${antesDoObrigado} -> ${conversaDepoisDoObrigado.length}`);
+// A conversa cresce só com a mensagem do cliente; nada sai do escritório.
+const saidasDepoisDoObrigado = conversaDepoisDoObrigado.filter((mensagem) => mensagem.deMim).length;
+conferir(
+  "agradecimento não vira conversa fiada: nada novo saiu",
+  conversaDepoisDoObrigado.length === antesDoObrigado + 1 && saidasDepoisDoObrigado === 0,
+  `conversa ${antesDoObrigado} -> ${conversaDepoisDoObrigado.length}, mensagens de saída: ${saidasDepoisDoObrigado}`,
+);
+void depoisDoObrigado;
 const dossie2 = await pedir(`/api/escritorio/casos/${casoId}`, { cookie });
 const registros2 = (dossie2.json?.registros ?? []).map((registro) => registro.texto);
 conferir("o caso ganha o registro da decisão do estagiário", registros2.length > (dossie.json?.registros ?? []).length, `${(dossie.json?.registros ?? []).length} -> ${registros2.length}`);
