@@ -20,3 +20,6 @@
 .cert-ok { color: var(--oab-800); background: var(--oab-050); border: 1px solid var(--oab-100); }
 
 .cert-lista { margin: 12px 0 14px; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; }
+
+.cert-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+.cert-comando { display: block; margin: 8px 0; padding: 9px 11px; background: var(--paper-3); border-radius: 7px; font-size: 11px; word-break: break-all; user-select: all; }
