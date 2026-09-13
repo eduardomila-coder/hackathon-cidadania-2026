@@ -1,0 +1,22 @@
+/* Tela do certificado digital. Reaproveita card, status e notice do protótipo;
+   aqui ficam só o formulário de assinatura e os dois recados de resultado. */
+
+.cert-form { display: grid; gap: 14px; max-width: 620px; }
+.cert-form label { display: grid; gap: 5px; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); }
+.cert-form input,
+.cert-form select,
+.cert-form textarea {
+  font: inherit; font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: 0;
+  color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px;
+}
+.cert-form textarea { resize: vertical; min-height: 96px; line-height: 1.55; }
+.cert-form input:focus-visible,
+.cert-form select:focus-visible,
+.cert-form textarea:focus-visible { outline: 2px solid var(--oab); outline-offset: 1px; }
+.cert-form button { justify-self: start; }
+
+.cert-erro, .cert-ok { margin: 0; font-size: 12px; font-weight: 700; border-radius: 8px; padding: 9px 11px; }
+.cert-erro { color: var(--red-700); background: var(--red-050); border: 1px solid var(--red); }
+.cert-ok { color: var(--oab-800); background: var(--oab-050); border: 1px solid var(--oab-100); }
+
+.cert-lista { margin: 12px 0 14px; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; }
