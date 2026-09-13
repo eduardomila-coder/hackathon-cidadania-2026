@@ -153,6 +153,9 @@ export function Certificado({ advogado, casos, assinaturas, endereco }: {
         </>}
 
         <div className="cert-acoes">
+          <a className="btn btn-secondary btn-sm" href="/api/escritorio/conector/download">
+            Baixar conector para Windows e macOS
+          </a>
           <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setProcurando(true); setErro(null); void procurarCertificados(); }} disabled={procurando}>
             {procurando ? "Procurando…" : "Procurar de novo"}
           </button>
