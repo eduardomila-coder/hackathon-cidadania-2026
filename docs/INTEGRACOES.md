@@ -56,11 +56,18 @@ código de pareamento, que expira a cada 45 s e falha muito na prática.
   `/escritorio/mensagens` e na seção Conversa do caso.
 - A URL da Evolution, a chave global e o segredo do webhook ficam
   exclusivamente em variáveis de ambiente descritas em `.env.example`.
-- A rota do webhook valida o segredo e **nunca responde sozinha**. A IA pode
-  sugerir um texto (`POST /api/escritorio/mensagens/sugerir`), mas ele só sai
+- A rota do webhook valida o segredo e, por padrão, **não responde sozinha**. A
+  IA pode sugerir um texto (`POST /api/escritorio/mensagens/sugerir`), que só sai
   pelo clique do advogado em "Enviar pelo WhatsApp"
   (`POST /api/escritorio/mensagens/responder`). Estratégia, negociação, prazo
   real e situação sensível exigem revisão do advogado.
+- **Com o estagiário virtual ligado na conversa** (o advogado liga, conversa por
+  conversa), o webhook aciona o robô depois de guardar a mensagem, e ele pode
+  responder sozinho. As travas estão em `lib/estagiario.ts` e descritas em
+  `docs/PLATAFORMA.md`: confiança mínima, envio automático ou só sugestão, e
+  decisão de responder vinda do modelo. O que ele não enviar vira sugestão com o
+  motivo, e toda decisão fica registrada no caso. O webhook continua respondendo
+  202 sem esperar o modelo: o atendimento roda em `after()`, depois da resposta.
 
 Para produção ainda é obrigatório acrescentar cofre de credenciais por conta,
 banco com criptografia, trilha de auditoria e política de retenção das

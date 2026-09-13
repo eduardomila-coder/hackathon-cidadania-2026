@@ -17,8 +17,10 @@ os nomes, rotas e tipos daqui; se precisar mudar algo, muda aqui também.
   `package.json`.
 - Todo acesso ao modelo passa por `perguntarJson` (`lib/claude.ts`).
 - Estado em arquivos JSON em `data/` (fora do git), sempre via `lib/banco.ts`.
-- Nenhuma mensagem sai para o cliente sem clique do advogado. A IA redige;
-  o advogado envia.
+- Nada sai para o cliente sem controle do advogado. Por padrão a IA redige e
+  ele envia; com o **estagiário virtual** ligado naquela conversa (módulo 3), o
+  robô pode responder sozinho, dentro das travas: confiança mínima, envio
+  automático ou só sugestão, e decisão de responder vinda do próprio modelo.
 - Cada rota de API do escritório carrega o advogado da sessão e filtra tudo
   por `advogadoId`. Um advogado nunca vê dado de outro (teste isso).
 - CSS: cada módulo em arquivo próprio (`app/escritorio/<modulo>.css`),
@@ -245,7 +247,10 @@ Arquivos: `app/api/whatsapp/webhook/route.ts`, `app/api/whatsapp/conexao/route.t
   `extendedTextMessage.text`; mídia vira texto "[imagem]", "[áudio]",
   "[documento]" sem baixar nada), `fromMe`, `messageTimestamp`, `key.id`;
   guarda `Mensagem` (idempotente por `idExterno`), com `casoId` do caso mais
-  recente cujo cliente tem esse telefone, se houver. Responde 202.
+  recente cujo cliente tem esse telefone, se houver. Responde 202. Depois da
+  resposta, se o estagiário virtual está ligado naquela conversa, ele é acionado
+  (`after()` do Next), com as mensagens seguidas do cliente virando um
+  atendimento só.
 - `lib/evolution.ts`: `enviarTexto(usuario, numero, texto)` → `POST
   /message/sendText/{instancia}` `{ number, text }`; erro claro se a instância
   não está `open`.
@@ -271,17 +276,60 @@ motivo: string }`.
 
 ### Telas
 
-- `/escritorio/mensagens`: duas colunas; à esquerda as conversas (nome ou
-  número, última mensagem, badge de não lidas, caso vinculado); à direita a
-  conversa (balões, hora), caixa de resposta com "Sugerir resposta" (preenche
-  a caixa, editável) e "Enviar pelo WhatsApp"; ações "Vincular a um caso"
-  (select dos casos) e "Abrir caso com esta conversa". Atualiza a cada 10 s.
-  Sem WhatsApp conectado → aviso com link para `/escritorio/whatsapp`.
-- `app/escritorio/Conversa.tsx` (cliente): `props { contato: string | null, casoId: string }`;
-  mostra a conversa com esse contato e a mesma caixa de resposta/sugestão;
-  sem contato → "Cadastre o telefone do cliente para ver a conversa aqui."
+- `/escritorio/mensagens`: caixa alta com a lista de conversas à esquerda
+  (avatar de iniciais, busca, selo de não lidas, caso vinculado) e a conversa à
+  direita, no visual do painel de mensagens da Mila (papel de parede, balão com
+  rabicho, agrupamento na mesma sequência, separador de dia, hora e marca de
+  enviada, compositor com emoji). Na coluna de contexto, em tela larga ou pelo
+  botão do cabeçalho, ficam o caso vinculado, o vínculo e o painel do
+  **estagiário virtual**. Atualiza a cada 10 s. Sem WhatsApp conectado → aviso
+  com link para `/escritorio/whatsapp`.
+- `app/escritorio/Conversa.tsx` (cliente): `props { contato, casoId?, aoAtualizar?, sugestao?, aoEnviarSugestao?, aoDescartarSugestao? }`;
+  mostra a conversa com esse contato, a caixa de resposta com "Sugerir resposta"
+  e "Enviar pelo WhatsApp", e a resposta preparada pelo estagiário quando houver
+  (`Enviar como está`, `Editar na caixa`, `Descartar`); sem contato → "Cadastre o
+  telefone do cliente para ver a conversa aqui."
 - `/escritorio/whatsapp`: o cartão "Canal profissional" atual (cadastro do
   número, QR, estado, desconectar, remover), tirado da página antiga.
+
+### Estagiário virtual — `lib/estagiario.ts`
+
+Ligado pelo advogado **por conversa**, atende o cliente no WhatsApp com as regras
+do robô da Estagiária da Mila (`ai_robot.py` da automação processual): não
+inventar fato, não revelar nota interna, não prometer resultado, não falar de
+prazo, não repetir o que já foi dito, não responder agradecimento, mensagem curta
+= resposta curta. A decisão de 12/09 dizia que o WhatsApp não enviava resposta
+automática; agora envia, com as travas abaixo, e a mudança está registrada no
+cofre.
+
+Estado (sempre via `lib/banco.ts`):
+
+- `data/escritorio-estagiario.json`: `{ advogadoId, contato, ativo, autoEnviar,
+  confiancaMinima, instrucao, avisarQueEDeMaquina, atualizadoEm, atualizadoPor }`.
+  Padrão: desligado, `autoEnviar: true`, confiança 0,72.
+- `data/escritorio-estagiario-sugestoes.json`: `{ advogadoId, contato, casoId,
+  texto, motivo, estado: "pendente" | "enviada" | "descartada", quando }`.
+- `Mensagem` ganhou `doEstagiario?: boolean`: a tela marca o balão com o selo
+  "estagiário", para ninguém confundir quem falou.
+
+Contrato com o modelo (`DecisaoDoEstagiarioSchema`):
+`{ mensagem, enviar, confianca, intencao, faltando, fontes, motivoDeSilencio }`.
+
+As travas, na ordem: estar `ativo` naquela conversa, `enviar` verdadeiro,
+`confianca >= confiancaMinima` e `autoEnviar`. Se qualquer uma barrar, o texto
+vira sugestão com o motivo e nada sai; se o modelo não escreveu texto, só fica o
+registro do motivo. Toda decisão entra como registro no caso, inclusive a de
+ficar quieto. Sem WhatsApp conectado, o envio falha e o texto não se perde:
+vira sugestão com o erro no motivo.
+
+Rotas:
+
+- `GET /api/escritorio/estagiario?contato=` → `{ config, sugestao, confiancas, whatsapp }`.
+- `POST /api/escritorio/estagiario` `{ contato, ativo?, autoEnviar?, confiancaMinima?, instrucao?, avisarQueEDeMaquina? }` → grava e devolve o mesmo.
+- `POST /api/escritorio/estagiario/atender` `{ contato }` → simulação: roda mesmo
+  com ele desligado, nunca envia, devolve `{ resultado, ligado, sugestao }`.
+- `POST /api/escritorio/estagiario/sugestao` `{ id, acao: "enviar" | "descartar", texto? }`
+  → envia pelo WhatsApp do advogado (marcando `doEstagiario`) ou descarta.
 
 ## 4. Painel da equipe, processos e documentação
 
@@ -310,4 +358,5 @@ Arquivos: `app/painel/Advogados.tsx` (e ligação em `app/painel/page.tsx`),
    consulta processo, vê mensagens; e o teste de isolamento: um segundo
    advogado não enxerga nada do primeiro.
 5. Revisão adversarial: autenticação, isolamento entre advogados, webhook,
-   envio só com clique, nada de segredo na tela ou no git.
+   as travas do estagiário virtual (ele nunca fala fora delas), nada de segredo
+   na tela ou no git.
