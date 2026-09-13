@@ -18,6 +18,7 @@ const TRACOS: Record<string, React.ReactNode> = {
   training: <><path d="m3 9 9-5 9 5-9 5z" /><path d="M7 12v5c3 2 7 2 10 0v-5" /></>,
   oab: <><circle cx="12" cy="12" r="9" /><path d="M8 12h8M12 8v8" /></>,
   gov: <path d="M4 20h16M6 17h12M8 17V9M12 17V9M16 17V9M5 9h14L12 4z" />,
+  cert: <><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M9 10V7a3 3 0 0 1 6 0v3" /></>,
 };
 
 export type Contagens = { nomeacoes: number; prazos: number; mensagens: number };
@@ -43,6 +44,7 @@ const GRUPOS: Array<{ grupo: string; ligacoes: Ligacao[] }> = [
       { destino: "/escritorio/pesquisa", nome: "Pesquisa jurídica", icone: "search" },
       { destino: "/escritorio/honorarios", nome: "Honorários dativos", icone: "money" },
       { destino: "/escritorio/formacao", nome: "Formação e habilitações", icone: "training" },
+      { destino: "/escritorio/certificado", nome: "Certificado digital", icone: "cert" },
     ],
   },
   {

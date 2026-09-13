@@ -1,5 +1,6 @@
 import type { Resultado } from "./analise";
 import { FichaDeNomeacaoSchema, normalizarFicha, type FichaDeNomeacao } from "./assistente";
+import { createHash } from "node:crypto";
 import { agora, alterar, listar, novoId } from "./banco";
 
 // Modelo de dados do escritório e todo o CRUD. Cada advogado só enxerga o que
@@ -42,6 +43,22 @@ export type Documento = { id: string; casoId: string; nome: string; detalhe: str
 export type Tarefa = { id: string; casoId: string; titulo: string; prazo: string | null; concluida: boolean; criadoEm: string };
 export type TipoRegistro = "registro" | "assistente" | "humano" | "whatsapp";
 export type Registro = { id: string; casoId: string; tipo: TipoRegistro; texto: string; quando: string };
+// Assinatura feita pelo certificado do advogado. Guardamos o que foi assinado, o
+// hash e a assinatura — nunca a chave, que não sai do computador dele. `origem`
+// diz se veio do token A3 ou do certificado de demonstração do conector, e a
+// tela mostra essa diferença: demonstração não tem fé pública.
+export type Assinatura = {
+  id: string;
+  advogadoId: string;
+  casoId: string | null;
+  documento: string;
+  conteudo: string;
+  hash: string;
+  assinatura: string;
+  certificado: string;
+  origem: "a3" | "demonstracao";
+  quando: string;
+};
 export type Triagem = { id: string; casoId: string; quando: string; resultado: Resultado };
 export type Mensagem = {
   id: string;
@@ -105,6 +122,7 @@ const PROCESSOS = "escritorio-processos";
 const NOMEACOES = "escritorio-nomeacoes";
 const EVENTOS = "escritorio-eventos";
 const HONORARIOS = "escritorio-honorarios";
+const ASSINATURAS = "escritorio-assinaturas";
 
 // Os quatro documentos que todo caso começa pedindo.
 export const DOCUMENTOS_PADRAO: Array<Pick<Documento, "nome" | "detalhe" | "essencial">> = [
@@ -902,4 +920,60 @@ export function dossieDoCaso(advogadoId: string, casoId: string): DossieDoCaso |
     eventos: eventosDoCaso(advogadoId, casoId),
     honorarios: honorariosDoCaso(advogadoId, casoId),
   };
+}
+
+// ----------------------------------------------------------- assinaturas
+
+export function assinaturasDo(advogadoId: string): Assinatura[] {
+  return listar<Assinatura>(ASSINATURAS).filter((item) => item.advogadoId === advogadoId).sort(porDataDesc<Assinatura>("quando"));
+}
+
+export function assinaturasDoCaso(advogadoId: string, casoId: string): Assinatura[] {
+  exigirCaso(advogadoId, casoId);
+  return assinaturasDo(advogadoId).filter((item) => item.casoId === casoId);
+}
+
+// O servidor confere o hash do conteúdo antes de guardar: assinatura que não
+// corresponde ao texto recebido não entra. Ele não valida a cadeia ICP-Brasil —
+// isso é trabalho de quem recebe a peça, e está escrito na tela.
+export async function registrarAssinatura(advogadoId: string, dados: {
+  casoId?: string | null;
+  documento: string;
+  conteudo: string;
+  hash: string;
+  assinatura: string;
+  certificado: string;
+  origem: "a3" | "demonstracao";
+}): Promise<Assinatura> {
+  const documento = texto(dados.documento, 200);
+  const conteudo = texto(dados.conteudo, 20000);
+  if (!documento) throw new ErroEscritorio("Diga o que está sendo assinado.");
+  if (!conteudo) throw new ErroEscritorio("Não há conteúdo para assinar.");
+  if (dados.casoId) exigirCaso(advogadoId, dados.casoId);
+
+  const conferido = createHash("sha256").update(conteudo, "utf8").digest("hex");
+  if (conferido !== (dados.hash ?? "").toLowerCase()) {
+    throw new ErroEscritorio("O hash não corresponde ao texto assinado.");
+  }
+  if (!/^[A-Za-z0-9+/=]{64,}$/.test(dados.assinatura ?? "")) {
+    throw new ErroEscritorio("Assinatura inválida.");
+  }
+
+  const assinatura: Assinatura = {
+    id: novoId(),
+    advogadoId,
+    casoId: dados.casoId ?? null,
+    documento,
+    conteudo,
+    hash: conferido,
+    assinatura: dados.assinatura,
+    certificado: texto(dados.certificado, 300) || "Certificado sem identificação",
+    origem: dados.origem === "a3" ? "a3" : "demonstracao",
+    quando: agora(),
+  };
+  await alterar<Assinatura>(ASSINATURAS, (itens) => { itens.push(assinatura); });
+  if (assinatura.casoId) {
+    await registrar(advogadoId, assinatura.casoId, "registro", `Documento assinado com certificado digital: ${documento}.`);
+  }
+  return assinatura;
 }
