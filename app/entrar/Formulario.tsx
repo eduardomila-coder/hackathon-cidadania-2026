@@ -29,7 +29,7 @@ export function Formulario({ destino }: { destino: string }) {
     }
   }
 
-  return <form className="pd-entrar-form" onSubmit={entrar}>
+  return <form className="pd-login-form" onSubmit={entrar}>
     <div className="pd-campo">
       <label htmlFor="usuario">Usuário</label>
       <input className="pd-entrada" id="usuario" name="usuario" value={usuario} onChange={(evento) => setUsuario(evento.target.value)} autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} required autoFocus />
@@ -38,7 +38,7 @@ export function Formulario({ destino }: { destino: string }) {
       <label htmlFor="senha">Senha</label>
       <input className="pd-entrada" id="senha" name="senha" type="password" value={senha} onChange={(evento) => setSenha(evento.target.value)} autoComplete="current-password" required />
     </div>
-    {erro && <p className="pd-entrar-erro" role="alert">{erro}</p>}
+    {erro && <p className="pd-login-erro" role="alert">{erro}</p>}
     <button type="submit" className="pd-botao pd-botao-primario pd-botao-bloco" disabled={enviando || !usuario.trim() || !senha}>{enviando ? "Entrando…" : "Entrar"}</button>
   </form>;
 }

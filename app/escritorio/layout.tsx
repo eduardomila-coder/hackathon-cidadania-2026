@@ -4,14 +4,23 @@ import { redirect } from "next/navigation";
 import { advogadoAtual } from "@/lib/sessao";
 import { resumoDoEscritorio } from "@/lib/escritorio";
 import { AdvogadoProvider } from "./Advogado";
-import { BotaoSair, Navegacao } from "./Navegacao";
+import { Barra, BotaoSair, Navegacao } from "./Navegacao";
 import "./escritorio.css";
 
 export const metadata: Metadata = { title: "Escritório · Escritório Dativo" };
 export const dynamic = "force-dynamic";
 
-// Casca de todas as telas do escritório. O proxy já barrou quem não tem
-// cookie válido; aqui se confirma que a conta existe e continua ativa.
+// Iniciais para o avatar do rodapé do menu, como no protótipo.
+function iniciais(nome: string) {
+  const partes = nome.trim().split(/\s+/).filter(Boolean);
+  const primeira = partes[0]?.[0] ?? "";
+  const ultima = partes.length > 1 ? partes[partes.length - 1][0] : "";
+  return `${primeira}${ultima}`.toUpperCase() || "?";
+}
+
+// Casca de todas as telas do escritório, no desenho do protótipo: menu lateral
+// fixo, topbar com breadcrumb e faixa de demonstração. O proxy já barrou quem
+// não tem cookie válido; aqui se confirma que a conta existe e continua ativa.
 export default async function LayoutDoEscritorio({ children }: { children: React.ReactNode }) {
   const advogado = await advogadoAtual();
   if (!advogado) redirect("/entrar");
@@ -21,13 +30,12 @@ export default async function LayoutDoEscritorio({ children }: { children: React
   return <AdvogadoProvider advogado={advogado}>
     <div className="pd-escritorio">
       <aside className="pd-menu">
-        <Link href="/escritorio" className="pd-menu-marca" aria-label="Escritório Dativo, ir para casos">
-          <svg className="pd-menu-simbolo" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-            <path d="M4 5.5h12.5l4.5 4.5v12.5H4z" fill="#0873B9" />
-            <path d="M8 10h8M8 14h5.5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
-            <path d="M17 5.5V10h4" stroke="#D7493F" strokeWidth="2" strokeLinejoin="round" />
-          </svg>
-          <span>Escritório <b>Dativo</b><small>Ambiente do advogado</small></span>
+        <Link href="/escritorio" className="pd-menu-marca" aria-label="Escritório Dativo, ir para o início">
+          <span className="pd-simbolo" aria-hidden="true" />
+          <span className="pd-menu-marca-texto">
+            <strong>Escritório Dativo</strong>
+            <small>OAB Paraná · Advocacia Dativa</small>
+          </span>
         </Link>
         <Navegacao contagens={{
           casos: resumo.casosAbertos,
@@ -36,14 +44,21 @@ export default async function LayoutDoEscritorio({ children }: { children: React
           mensagens: resumo.mensagensNovas,
         }} />
         <div className="pd-menu-conta">
-          <div className="pd-menu-quem"><strong>{advogado.nome}</strong><small>{advogado.oab}</small></div>
+          <div className="pd-menu-quem">
+            <span className="pd-avatar" aria-hidden="true">{iniciais(advogado.nome)}</span>
+            <span className="pd-menu-quem-texto">
+              <strong>{advogado.nome}</strong>
+              <small>{advogado.oab}</small>
+            </span>
+          </div>
           <BotaoSair />
         </div>
       </aside>
       <div className="pd-coluna">
-        <section className="pd-faixa" aria-label="Estado do ambiente">
+        <Barra />
+        <section className="pd-faixa" aria-label="Aviso de demonstração">
           <strong>Demonstração</strong>
-          <p>Use dados fictícios ou casos que você pode tratar. Este ambiente não é um sistema oficial.</p>
+          <p>Dados fictícios. A decisão técnica, o prazo e o ato processual são sempre de responsabilidade do advogado. Este ambiente não é um sistema oficial.</p>
         </section>
         <main className="pd-conteudo">{children}</main>
       </div>
