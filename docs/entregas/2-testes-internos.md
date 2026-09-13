@@ -145,4 +145,10 @@ faz o React devolver o campo ao estado inicial e o botão de entrar fica apagado
 como se a página estivesse morta. A tela está pronta quando o botão acende ao
 digitar.
 
-**Print:** `prints/2026-09-13-testes/06-endereco-publico-entrar.png`.
+Criada uma conta de advogado pela API da equipe (`eduardo`) e testado o login
+pelo endereço público: `/escritorio` mandou para o login, o login abriu o painel
+com o nome e a OAB no cabeçalho, a faixa de demonstração e o estado vazio
+orientando o primeiro caso.
+
+**Prints:** `prints/2026-09-13-testes/06-endereco-publico-entrar.png` e
+`07-escritorio-no-endereco-publico.png`.
