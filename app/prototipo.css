@@ -40,7 +40,12 @@
   --header:67px;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+/* Escala da interface. O protótipo foi desenhado em tipos de 10 a 13px, que no
+   monitor do evento ficam pequenos demais para ler de longe. Em vez de mexer em
+   cada regra, a página inteira é ampliada por aqui: mude só este número.
+   1 = o desenho original. */
+:root{--pd-escala:1.18}
+html{scroll-behavior:smooth;zoom:var(--pd-escala)}
 body{
   margin:0;background:var(--bg);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
