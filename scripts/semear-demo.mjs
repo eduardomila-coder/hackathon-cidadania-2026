@@ -23,6 +23,10 @@ function emDias(dias) {
   return data.toISOString().slice(0, 10);
 }
 
+// Três contas, três casos cada, cobrindo as telas do escritório: mesa de
+// trabalho, nomeações, agenda (tarefas vencendo, adiante, sem data e
+// concluídas), documentos (checklist em estados variados), pesquisa (triagens)
+// e processos (consulta pontual ao DataJud). Tudo fictício, sem pessoa real.
 const CONTAS = [
   {
     nome: "Ana Souza",
@@ -32,6 +36,7 @@ const CONTAS = [
       {
         titulo: "Busca e apreensão de moto financiada",
         origem: "nomeacao",
+        situacao: "em_andamento",
         cliente: { nome: "Marcos Vinícius Alves", telefone: "5541998112233" },
         processo: "00012589820208160171",
         orgao: "Juízo Único da Comarca de Tomazina",
@@ -43,6 +48,7 @@ const CONTAS = [
           "O cliente financiou uma moto em 2023 e pagou as parcelas até março. Ficou desempregado, atrasou três parcelas e recebeu a ação de busca e apreensão sem nenhum aviso do banco antes. Ele quer pagar o que deve e ficar com a moto. Tem os comprovantes de pagamento, o contrato de financiamento e as conversas com a loja.",
         recebidos: ["Documento de identificação", "Conversas e comprovantes"],
         tarefas: [
+          { titulo: "Contestação protocolada", prazo: emDias(-1), concluida: true },
           { titulo: "Conferir a data da ciência no processo oficial", prazo: emDias(1) },
           { titulo: "Pedir ao cliente o contrato de financiamento completo", prazo: null },
         ],
@@ -56,6 +62,7 @@ const CONTAS = [
       {
         titulo: "Plano de saúde negou a cirurgia",
         origem: "particular",
+        situacao: "em_andamento",
         cliente: { nome: "Joana Ribeiro dos Santos", telefone: "5541997445566" },
         processo: null,
         orgao: "2º Juizado Especial Cível de Curitiba",
@@ -65,11 +72,37 @@ const CONTAS = [
           "Plano negou cirurgia de vesícula alegando carência. Cliente paga o plano há dois anos e o médico indicou urgência.",
         relato:
           "A cliente teve a cirurgia de vesícula negada pelo plano de saúde, que alegou carência. Ela paga o plano há dois anos e o médico disse que a cirurgia é urgente, com risco de agravamento. Ela tem o pedido médico, o número de protocolo da negativa e as faturas do plano.",
-        recebidos: ["Documento de identificação"],
-        tarefas: [{ titulo: "Conferir no contrato o prazo de carência aplicado", prazo: null }],
+        recebidos: ["Documento de identificação", "Comprovante de endereço"],
+        tarefas: [
+          { titulo: "Conferir no contrato o prazo de carência aplicado", prazo: null },
+          { titulo: "Reunir protocolo da negativa e pedido médico", prazo: emDias(3) },
+        ],
         registros: [{ tipo: "registro", texto: "Atendimento no escritório. Cliente trouxe pedido médico e protocolo da negativa." }],
         consultarProcesso: false,
         triar: true,
+      },
+      {
+        titulo: "Nomeação: contestar cobrança de energia",
+        origem: "nomeacao",
+        situacao: "novo",
+        cliente: { nome: "Eliana Castro Pires", telefone: "5541996778899" },
+        processo: "00045678920268160101",
+        orgao: "Juizado Especial Cível da Comarca de Irati",
+        ato: "Contestação em ação de cobrança de energia elétrica",
+        prazo: emDias(2),
+        resumo:
+          "Nomeação em ação de cobrança de energia. A cliente contesta o valor da fatura e alega que a leitura foi estimada por meses. Prazo a conferir no processo oficial.",
+        relato:
+          "A cliente recebeu uma ação de cobrança da distribuidora de energia. Ela contesta o valor da fatura, diz que a leitura foi estimada por três meses seguidos e que já reclamou na ouvidoria sem resposta. Tem as faturas, os protocolos de reclamação e as fotos do medidor.",
+        recebidos: [],
+        tarefas: [
+          { titulo: "Conferir íntegra da intimação e a data de ciência", prazo: emDias(2) },
+          { titulo: "Confirmar prazo no processo oficial", prazo: emDias(2) },
+          { titulo: "Pedir à cliente as faturas e protocolos", prazo: emDias(9) },
+        ],
+        registros: [{ tipo: "registro", texto: "Intimação de nomeação recebida. Ficha criada a partir do texto colado." }],
+        consultarProcesso: false,
+        triar: false,
       },
     ],
   },
@@ -81,6 +114,7 @@ const CONTAS = [
       {
         titulo: "Pensão alimentícia atrasada há quatro meses",
         origem: "nomeacao",
+        situacao: "aguardando_cliente",
         cliente: { nome: "Tatiana Moraes", telefone: "5541993334455" },
         processo: null,
         orgao: "Vara de Família e Sucessões de São José dos Pinhais",
@@ -92,6 +126,7 @@ const CONTAS = [
           "A cliente tem uma filha de sete anos e o pai está sem pagar a pensão há quatro meses, apesar de estar trabalhando registrado. Ela quer a retomada do pagamento e a cobrança dos valores atrasados. Tem a sentença que fixou a pensão, os comprovantes das despesas da filha e as mensagens em que ele promete pagar.",
         recebidos: ["Documento de identificação", "Conversas e comprovantes"],
         tarefas: [
+          { titulo: "Atender a cliente e colher os documentos", prazo: emDias(-3), concluida: true },
           { titulo: "Conferir se cabe execução de alimentos ou ação de cobrança", prazo: null },
           { titulo: "Levantar o valor atualizado dos atrasados", prazo: emDias(7) },
         ],
@@ -102,6 +137,7 @@ const CONTAS = [
       {
         titulo: "Acordo trabalhista não pago no prazo",
         origem: "plantao",
+        situacao: "em_andamento",
         cliente: { nome: "João Carlos Bueno", telefone: "5541996223311" },
         processo: null,
         orgao: "Vara do Trabalho de Curitiba",
@@ -112,8 +148,36 @@ const CONTAS = [
         relato:
           "O cliente trabalhou em uma transportadora por dois anos e saiu sem receber as verbas rescisórias. Fez acordo na audiência, a empresa não pagou no prazo combinado e até hoje não depositou nada. Ele tem a ata da audiência e o cálculo do que ficou acertado.",
         recebidos: ["Documento de identificação"],
-        tarefas: [{ titulo: "Localizar a ata da audiência e conferir o prazo do acordo", prazo: null }],
+        tarefas: [
+          { titulo: "Localizar a ata da audiência e conferir o prazo do acordo", prazo: null },
+          { titulo: "Calcular o valor da execução com correção", prazo: emDias(14) },
+        ],
         registros: [{ tipo: "humano", texto: "Cliente avisado de que a cobrança depende do trânsito em julgado do acordo." }],
+        consultarProcesso: false,
+        triar: true,
+      },
+      {
+        titulo: "Regularização de guarda e visitação",
+        origem: "particular",
+        situacao: "concluido",
+        cliente: { nome: "Renato Faria Lima", telefone: "5541992887766" },
+        processo: null,
+        orgao: "Vara de Família e Sucessões de Curitiba",
+        ato: null,
+        prazo: null,
+        resumo:
+          "Acordo de guarda compartilhada e visitação homologado. Caso encerrado, com o checklist completo.",
+        relato:
+          "O cliente queria regularizar a guarda e a visitação do filho de dez anos. Após a audiência de conciliação, as partes chegaram a um acordo de guarda compartilhada, com visitas em finais de semana alternados. O acordo foi homologado e o caso foi concluído.",
+        recebidos: ["Documento de identificação", "Comprovante de endereço", "Contrato ou proposta", "Conversas e comprovantes"],
+        tarefas: [
+          { titulo: "Audiência de conciliação", prazo: emDias(-20), concluida: true },
+          { titulo: "Acordo homologado", prazo: emDias(-15), concluida: true },
+        ],
+        registros: [
+          { tipo: "registro", texto: "Caso aberto com a certidão de nascimento e o pedido de guarda." },
+          { tipo: "humano", texto: "Acordo de guarda compartilhada homologado em audiência. Caso concluído." },
+        ],
         consultarProcesso: false,
         triar: false,
       },
@@ -127,6 +191,7 @@ const CONTAS = [
       {
         titulo: "Atraso de dois anos na entrega do apartamento",
         origem: "particular",
+        situacao: "em_andamento",
         cliente: { nome: "Helena Prado Camargo", telefone: "5541995566778" },
         processo: null,
         orgao: "1ª Vara Cível de Curitiba",
@@ -140,6 +205,7 @@ const CONTAS = [
         tarefas: [
           { titulo: "Conferir o valor atualizado do contrato e o limite do Juizado", prazo: null },
           { titulo: "Pedir os comprovantes de aluguel do período de atraso", prazo: null },
+          { titulo: "Notificar a construtora extrajudicialmente", prazo: emDias(11) },
         ],
         registros: [{ tipo: "registro", texto: "Primeira reunião. Cliente trouxe contrato e comprovantes de pagamento." }],
         consultarProcesso: false,
@@ -148,6 +214,7 @@ const CONTAS = [
       {
         titulo: "Tarifa bancária cobrada sem contratada",
         origem: "particular",
+        situacao: "novo",
         cliente: { nome: "Paulo Sérgio Andrade", telefone: "5541994455667" },
         processo: null,
         orgao: "3º Juizado Especial Cível de Curitiba",
@@ -157,8 +224,33 @@ const CONTAS = [
         relato:
           "O cliente recebe o salário em conta salário e notou que o banco cobra um pacote de serviços que ele nunca contratou, há oito meses. Ele tem os extratos de todos os meses e já reclamou no aplicativo, sem resposta.",
         recebidos: ["Conversas e comprovantes"],
-        tarefas: [{ titulo: "Somar as tarifas cobradas e pedir a devolução em dobro", prazo: null }],
+        tarefas: [
+          { titulo: "Separar os extratos do período cobrado", prazo: emDias(5) },
+          { titulo: "Somar as tarifas cobradas e pedir a devolução em dobro", prazo: null },
+        ],
         registros: [{ tipo: "registro", texto: "Cliente enviou os extratos por WhatsApp do escritório." }],
+        consultarProcesso: false,
+        triar: true,
+      },
+      {
+        titulo: "Nomeação: contestar ação de despejo",
+        origem: "nomeacao",
+        situacao: "novo",
+        cliente: { nome: "Valdir Antunes Rocha", telefone: "5541992334455" },
+        processo: "00078901220268160202",
+        orgao: "Vara Cível da Comarca de Campo Largo",
+        ato: "Defesa em ação de despejo por falta de pagamento",
+        prazo: emDias(5),
+        resumo:
+          "Nomeação em ação de despejo por falta de pagamento. O cliente contesta os valores cobrados e quer apresentar defesa. Prazo a conferir no processo oficial.",
+        relato:
+          "O cliente é inquilino e recebeu uma ação de despejo por falta de pagamento. Ele contesta os valores, diz que parte dos aluguéis foi paga e que houve um acordo verbal de parcelamento com a imobiliária. Tem os comprovantes de pagamento, o contrato de locação e as conversas com a imobiliária.",
+        recebidos: [],
+        tarefas: [
+          { titulo: "Conferir íntegra da intimação e a data de ciência", prazo: emDias(5) },
+          { titulo: "Confirmar prazo no processo oficial", prazo: emDias(5) },
+        ],
+        registros: [{ tipo: "registro", texto: "Intimação de nomeação recebida. Ficha criada a partir do texto colado." }],
         consultarProcesso: false,
         triar: false,
       },
@@ -214,13 +306,22 @@ async function semearCaso(cookie, caso) {
   if (aberto.status !== 201) throw new Error(`não abriu "${caso.titulo}": HTTP ${aberto.status} ${aberto.texto.slice(0, 120)}`);
   const id = aberto.json.id;
 
+  // O caso nasce "novo"; a situação que o roteiro pede entra por PATCH.
+  if (caso.situacao && caso.situacao !== "novo") {
+    const alterada = await pedir(`/api/escritorio/casos/${id}`, { metodo: "PATCH", cookie, corpo: { situacao: caso.situacao } });
+    if (alterada.status !== 200) console.log(`    aviso: não mudou a situação para ${caso.situacao} (HTTP ${alterada.status})`);
+  }
+
   const dossie = await pedir(`/api/escritorio/casos/${id}`, { cookie });
   for (const nome of caso.recebidos) {
     const documento = (dossie.json.documentos ?? []).find((d) => d.nome === nome);
     if (documento) await pedir(`/api/escritorio/casos/${id}/documentos`, { metodo: "PATCH", cookie, corpo: { id: documento.id, recebido: true } });
   }
   for (const tarefa of caso.tarefas) {
-    await pedir(`/api/escritorio/casos/${id}/tarefas`, { metodo: "POST", cookie, corpo: tarefa });
+    const criada = await pedir(`/api/escritorio/casos/${id}/tarefas`, { metodo: "POST", cookie, corpo: { titulo: tarefa.titulo, prazo: tarefa.prazo } });
+    if (tarefa.concluida && criada.status === 201) {
+      await pedir(`/api/escritorio/casos/${id}/tarefas`, { metodo: "PATCH", cookie, corpo: { id: criada.json.id, concluida: true } });
+    }
   }
   for (const registro of caso.registros) {
     await pedir(`/api/escritorio/casos/${id}/registros`, { metodo: "POST", cookie, corpo: registro });
