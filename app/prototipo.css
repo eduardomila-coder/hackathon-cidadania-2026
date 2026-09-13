@@ -1769,7 +1769,6 @@ body{
   .public-footer .public-inner{align-items:flex-start;flex-direction:column}
 }
 
-
 /* =========================================================
    V6 — DESIGN ESPECÍFICO, EDITORIAL E OPERACIONAL
    Consistente, não uniforme.
@@ -2346,3 +2345,50 @@ body{
   .principle-list>div{grid-template-columns:1fr;gap:4px}
 }
 
+/* Mobile first, deixado por último para prevalecer sobre as camadas V3 a V6.
+   Mantém as telas operacionais legíveis sem zoom e sem exigir precisão de
+   mouse: menu, abas, formulários e ações cabem no polegar. */
+@media (max-width:850px){
+  html{zoom:1}
+  body{min-width:320px;overflow-x:hidden}
+  .sidebar-backdrop{position:fixed;z-index:90;inset:0;border:0;background:rgba(8,30,45,.42)}
+  .sidebar{z-index:100;box-shadow:16px 0 36px rgba(8,30,45,.22)}
+  .topbar{min-height:58px;height:auto;padding:10px 13px}
+  .breadcrumb{min-width:0;overflow:hidden;white-space:nowrap}
+  .breadcrumb strong{overflow:hidden;text-overflow:ellipsis}
+  .top-actions .oab-chip,.top-actions .status{display:none}
+  .demo{padding:8px 13px;font-size:9px;line-height:1.4}
+  .content{padding:18px max(14px, env(safe-area-inset-right)) calc(88px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left))}
+  .page-head,.pd-pagina-cabeca{gap:12px;margin-bottom:16px}
+  .page-head h1,.pd-pagina-cabeca h1{font-size:25px}
+  .btn,.pd-botao,.icon-btn,.nav-item,.tabs .tab,.case-tab,.pd-aba{min-height:44px}
+  .btn,.pd-botao{padding-left:14px;padding-right:14px}
+  .input,.select,.textarea,.pd-entrada,.pd-selecao,.pd-area-texto{font-size:16px}
+  .tabs,.case-tabs,.pd-abas{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .tabs .tab,.case-tab,.pd-aba{flex:0 0 auto;scroll-snap-align:start}
+  .tabs{width:100%}
+  .case-tabs{padding-bottom:2px}
+  .case-tab{padding:11px 14px}
+  .case-top,.hero-case,.welcome-obsolete,.central-hero{padding:16px}
+  .case-top h1,.hero-case h1{font-size:21px}
+  .case-situacao,.pdc-situacao,.case-deadline-plain{min-width:0;width:100%;text-align:left}
+  .case-top .pdc-vincular-campos{grid-template-columns:1fr}
+  .calendar{margin-right:-2px}
+  .week-head,.week-grid{min-width:640px}
+}
+
+@media (max-width:520px){
+  .topbar{gap:8px}
+  .top-actions{margin-left:auto}
+  .top-actions .icon-btn{width:40px;height:40px}
+  .mobile-menu{width:44px;height:44px}
+  .page-head .inline,.pd-pagina-acoes{width:100%}
+  .page-head .btn,.pd-pagina-acoes .pd-botao{flex:1 1 100%}
+  .security-row{grid-template-columns:1fr}
+  .login-main{padding:24px 16px}
+  .login-aside{min-height:220px;padding:24px}
+  .product-lockup{margin:30px 0 12px}
+  .product-lockup h1{font-size:33px}
+  .id-row{grid-template-columns:42px minmax(0,1fr)}
+  .id-row .status{display:none}
+}

@@ -71,3 +71,29 @@
 .rodape { display: flex; align-items: center; gap: 18px; max-width: 1420px; margin: 0 auto; padding: 24px max(4vw, 28px) 30px; color: var(--tinta-3); font-size: 11px; }.rodape strong { color: var(--marinho); font-size: 13px; }.rodape small { margin-left: auto; }.rodape a { color: var(--azul-escuro); font-weight: 800; }
 @media (max-width: 900px) { .abertura, .caso { grid-template-columns: 1fr; }.hoje { max-width: 600px; }.linhasFluxo { grid-template-columns: 1fr 1fr; }.linhasFluxo article:nth-child(2) { border-right: 0; }.linhasFluxo article:nth-child(-n + 2) { border-bottom: 1px solid var(--linha); }.listaDuvidas { gap: 0 24px; }.corpoCaso { grid-template-columns: 1fr; }.providencia, .resumoCaso { border-right: 0; }.chamadaFinal { align-items: start; flex-direction: column; } }
 @media (max-width: 680px) { .cabecalho { flex-wrap: wrap; gap: 16px; padding-top: 16px; padding-bottom: 14px; }.navegacao { order: 3; justify-content: flex-start; width: 100%; gap: 20px; overflow-x: auto; }.entrar { margin-left: auto; }.abertura, .fluxo, .responsabilidades, .caso, .duvidas { padding-top: 58px; padding-bottom: 58px; }.abertura h1 { font-size: 66px; }.filaHoje li { grid-template-columns: 9px 1fr; padding: 15px 18px; }.filaHoje small { grid-column: 2; max-width: none; text-align: left; }.linhasFluxo { grid-template-columns: 1fr; }.linhasFluxo article, .linhasFluxo article + article { min-height: auto; padding: 20px 0; border-right: 0; border-bottom: 1px solid var(--linha); }.linhasFluxo article:last-child { border-bottom: 0; }.linhasFluxo h3 { margin-top: 18px; }.tabelaResponsabilidades { overflow-x: auto; }.tabelaResponsabilidades > div { min-width: 620px; }.tabelaResponsabilidades span, .tabelaResponsabilidades strong { padding: 13px; }.listaDuvidas { grid-template-columns: 1fr; }.listaDuvidas details:nth-last-child(2) { border-bottom: 0; }.listaDuvidas details:last-child { border-bottom: 1px solid var(--linha-forte); }.previaTopo { padding: 18px; }.previaTopo > b { display: none; }.abasCaso { padding: 0 18px; }.corpoCaso > div { padding: 18px; }.rodape { flex-wrap: wrap; }.rodape small { margin-left: 0; width: 100%; }.chamadaFinal { padding-top: 58px; padding-bottom: 58px; } }
+
+@media (max-width: 520px) {
+  .cabecalho { position:sticky; top:0; z-index:20; padding:12px 16px 10px; gap:12px; background:rgba(246,247,247,.97); backdrop-filter:blur(12px); }
+  .marca { font-size:18px; }
+  .marca span { font-size:8px; letter-spacing:.08em; }
+  .entrar { min-height:44px; padding:10px 14px; }
+  .navegacao { gap:18px; padding:4px 0 2px; scrollbar-width:none; }
+  .navegacao::-webkit-scrollbar { display:none; }
+  .navegacao a { flex:0 0 auto; min-height:40px; display:inline-flex; align-items:center; }
+  .abertura, .fluxo, .responsabilidades, .caso, .duvidas { padding:46px 18px; }
+  .abertura { gap:32px; }
+  .abertura h1 { font-size:54px; line-height:.88; }
+  .chamada { font-size:24px; }
+  .introducao { font-size:15px; }
+  .acoesAbertura { align-items:stretch; gap:16px; }
+  .entrarPrincipal { width:100%; min-height:48px; }
+  .linkSecundario { min-height:44px; display:inline-flex; align-items:center; }
+  .hojeCabecalho { padding:18px; }
+  .filaHoje li { padding:14px 18px; }
+  .tabelaResponsabilidades > div { min-width:560px; }
+  .abasCaso { scrollbar-width:none; }
+  .abasCaso::-webkit-scrollbar { display:none; }
+  .chamadaFinal { padding:46px 18px; }
+  .entrarFinal { width:100%; min-height:48px; }
+  .rodape { padding:22px 18px 30px; }
+}
