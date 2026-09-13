@@ -2,13 +2,13 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 // A base jurídica mora em docs/juridico/*.md, um "## Art. N" por artigo.
-// Aqui ela vira uma lista de trechos com id estável (ex.: L9099-3), que o
-// modelo é obrigado a citar. Busca por termos (BM25), sem banco e sem rede.
+// Aqui ela vira uma lista de trechos com id estável (ex.: L9099-3, L10406-1.583),
+// que o modelo é obrigado a citar. Busca por termos (BM25), sem banco e sem rede.
 
 export type Trecho = {
   id: string;        // ex.: "L9099-3"
   lei: string;       // ex.: "Lei 9.099/1995"
-  artigo: number;
+  artigo: string;    // como a lei numera: "3", "1.583", "12-A"
   texto: string;
 };
 
@@ -52,8 +52,10 @@ function lerCorpus() {
     const md = readFileSync(join(PASTA, arquivo), "utf8");
     const titulo = (md.match(/^# (.+)$/m)?.[1] ?? arquivo).split(" — ")[0].trim();
     const sigla = "L" + (titulo.match(/[\d.]+/)?.[0].replace(/\./g, "") ?? arquivo.replace(/\W/g, "").slice(0, 6));
-    for (const m of md.matchAll(/^## Art\. (\d+)\s*\n([\s\S]*?)(?=^## Art\. |\s*$(?![\s\S]))/gm)) {
-      const artigo = Number(m[1]);
+    // O número do artigo vem como a lei o escreve: "3" (Lei 9.099/1995),
+    // "1.583" (Código Civil) ou "12-A" (artigo acrescentado).
+    for (const m of md.matchAll(/^## Art\. ([\d.]+(?:-[A-Z])?)\s*\n([\s\S]*?)(?=^## Art\. |\s*$(?![\s\S]))/gm)) {
+      const artigo = m[1];
       const texto = m[2].trim();
       if (!texto) continue;
       const ts = termos(texto);

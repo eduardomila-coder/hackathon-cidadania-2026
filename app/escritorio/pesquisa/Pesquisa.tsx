@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-export type FonteDaBase = { id: string; lei: string; artigo: number };
+export type FonteDaBase = { id: string; lei: string; artigo: string };
 
 export type TriagemNaTela = {
   id: string;

@@ -27,6 +27,12 @@ function emDias(dias) {
 // trabalho, nomeações, agenda (tarefas vencendo, adiante, sem data e
 // concluídas), documentos (checklist em estados variados), pesquisa (triagens)
 // e processos (consulta pontual ao DataJud). Tudo fictício, sem pessoa real.
+//
+// A conta do Eduardo tem também a carteira da área de família da advocacia
+// dativa: violência doméstica, guarda e divórcio. São os casos que a advocacia
+// dativa mais recebe e os que puxam a base jurídica da família em docs/juridico.
+// Cada um traz documentos próprios do tema (boletim de ocorrência, certidão de
+// nascimento, matrícula do imóvel), porque o checklist padrão é de consumo.
 const CONTAS = [
   {
     nome: "Eduardo Mila",
@@ -100,6 +106,109 @@ const CONTAS = [
           { titulo: "Somar o que foi cobrado depois do cancelamento", prazo: emDias(4) },
         ],
         registros: [{ tipo: "registro", texto: "Primeiro contato. Falta reunir as faturas do período." }],
+        consultarProcesso: false,
+        triar: false,
+      },
+      {
+        // Violência doméstica: nomeação para acompanhar a ofendida na medida
+        // protetiva de urgência, o que a PGE-PR e a OAB-PR acordaram pagar à
+        // dativa. O relato fica no que a lei chama de violência psicológica e
+        // patrimonial, sem detalhe de agressão.
+        titulo: "Nomeação: acompanhar medida protetiva de urgência",
+        origem: "nomeacao",
+        situacao: "em_andamento",
+        cliente: { nome: "Vanessa Aparecida Teles", telefone: "5541998550117" },
+        processo: "00045678920268160030",
+        orgao: "1º Juizado de Violência Doméstica e Familiar contra a Mulher de Curitiba",
+        ato: "Acompanhar a ofendida e requerer a manutenção das medidas protetivas",
+        prazo: emDias(2),
+        resumo:
+          "Nomeação para acompanhar a ofendida em medida protetiva de urgência: afastamento do agressor do lar e proibição de aproximação. Ela quer a manutenção das medidas, a guarda do filho de cinco anos e a partilha do imóvel comum. Prazo informado na intimação, a conferir no processo oficial.",
+        relato:
+          "A assistida registrou boletim de ocorrência na Delegacia da Mulher depois de ameaças e de uma discussão em que o companheiro quebrou objetos da casa. O juízo concedeu, de imediato, o afastamento dele do lar e a proibição de aproximação a menos de 300 metros. Ela quer a manutenção das medidas enquanto o caso corre, a guarda do filho do casal e a definição do que fica com cada um no apartamento comprado pelos dois. Ela tem o boletim de ocorrência, o pedido de medida protetiva, a decisão judicial e as fotos dos objetos quebrados. Ele continua mandando recado pelos amigos da família.",
+        recebidos: ["Documento de identificação", "Conversas e comprovantes"],
+        documentos: [
+          { nome: "Boletim de ocorrência", detalhe: "Registro da Delegacia da Mulher, com o número do procedimento.", essencial: true, recebido: true },
+          { nome: "Decisão das medidas protetivas", detalhe: "Decisão que concedeu o afastamento do lar e a proibição de aproximação.", essencial: true, recebido: true },
+          { nome: "Certidão de nascimento do filho", detalhe: "Para o pedido de guarda e de alimentos.", essencial: false, recebido: false },
+        ],
+        tarefas: [
+          { titulo: "Conferir no processo o prazo de vigência das medidas e o que já foi cumprido", prazo: emDias(1) },
+          { titulo: "Orientar a assistida sobre a Delegacia da Mulher e o Ligue 180", prazo: emDias(2) },
+          { titulo: "Avaliar pedido de guarda e de alimentos junto com as medidas protetivas", prazo: null },
+          { titulo: "Reunir a matrícula do imóvel para a partilha", prazo: null },
+        ],
+        registros: [
+          { tipo: "registro", texto: "Nomeação recebida pela Central. Ficha criada a partir do texto da intimação; prazo a conferir no processo." },
+          { tipo: "humano", texto: "Assistida atendida no escritório com a decisão das medidas em mãos. Avisada de que o acompanhamento é gratuito e de que a medida é urgente." },
+        ],
+        consultarProcesso: false,
+        triar: true,
+      },
+      {
+        // Guarda: o caso mais comum do plantão. A guarda compartilhada é a
+        // regra do art. 1.584 do Código Civil, e os alimentos seguem o binômio
+        // necessidade do filho e possibilidade do genitor.
+        titulo: "Guarda compartilhada e alimentos do filho de seis anos",
+        origem: "plantao",
+        situacao: "em_andamento",
+        cliente: { nome: "Simone Barreto da Luz", telefone: "5541998660228" },
+        processo: null,
+        orgao: "Vara de Família e Sucessões de Curitiba",
+        ato: "Propor a ação de guarda com alimentos",
+        prazo: null,
+        resumo:
+          "Mãe quer regularizar a guarda do filho de seis anos e fixar alimentos. O pai visita de vez em quando e passa valores soltos, sem dia certo. Não existe acordo escrito nem processo.",
+        relato:
+          "A assistida e o pai do menino se separaram há dois anos e a criança mora com ela desde então. O pai, pintor autônomo, faz visitas irregulares, ajuda com valores soltos e não participa das decisões da escola nem da saúde do filho. Ela quer a guarda compartilhada com a criança morando com ela, visitação em finais de semana alternados e alimentos fixados por mês, de acordo com o que ele recebe. Ela tem a certidão de nascimento, os comprovantes das despesas do menino (escola, plano de saúde e farmácia) e as conversas em que ele promete ajudar.",
+        recebidos: ["Documento de identificação", "Conversas e comprovantes"],
+        documentos: [
+          { nome: "Certidão de nascimento do filho", detalhe: "Para o pedido de guarda e de alimentos.", essencial: true, recebido: true },
+          { nome: "Comprovantes de despesas do filho", detalhe: "Escola, plano de saúde e farmácia dos últimos três meses.", essencial: true, recebido: true },
+          { nome: "Comprovação de renda do genitor", detalhe: "Notas de serviço ou declaração de imposto de renda do pai.", essencial: false, recebido: false },
+        ],
+        tarefas: [
+          { titulo: "Somar as despesas do menino dos últimos três meses", prazo: emDias(4) },
+          { titulo: "Pedir a comprovação de renda do genitor; se não vier, pedir ofício ao juízo", prazo: emDias(7) },
+          { titulo: "Minutar a ação de guarda com alimentos e o pedido de alimentos provisórios", prazo: null },
+        ],
+        registros: [
+          { tipo: "registro", texto: "Atendimento no plantão. Assistida trouxe a certidão de nascimento e os comprovantes de despesas." },
+          { tipo: "humano", texto: "Explicado que guarda compartilhada não é moradia alternada e que os alimentos dependem da necessidade do filho e da possibilidade do pai." },
+        ],
+        consultarProcesso: false,
+        triar: true,
+      },
+      {
+        // Família: divórcio com partilha, em que o obstáculo não é o fim do
+        // casamento, e sim o imóvel financiado em nome dos dois. Regime de
+        // comunhão parcial, arts. 1.571 e 1.658 do Código Civil.
+        titulo: "Nomeação: contestar divórcio com partilha do imóvel financiado",
+        origem: "nomeacao",
+        situacao: "aguardando_cliente",
+        cliente: { nome: "Ademir Kaminski", telefone: "5541998770339" },
+        processo: "00067890120268160030",
+        orgao: "Vara de Família e Sucessões de Curitiba",
+        ato: "Contestar a ação de divórcio e tratar a partilha",
+        prazo: emDias(8),
+        resumo:
+          "Réu em ação de divórcio. Casamento em comunhão parcial, apartamento financiado em nome dos dois e um carro comprado na constância do casamento. Ele concorda com o divórcio e quer manter o apartamento, assumindo o financiamento. Prazo informado na intimação, a conferir no processo oficial.",
+        relato:
+          "O assistido é casado há doze anos em comunhão parcial de bens e está separado de fato desde janeiro, quando a esposa saiu de casa. Os dois compraram um apartamento financiado, ainda em pagamento, e um carro em nome dele, usado no trabalho. Ela propôs a ação pedindo o divórcio, a partilha do imóvel e metade do valor do carro. Ele concorda com o divórcio, quer ficar com o apartamento assumindo o financiamento e compensando a parte dela, e diz que não tem como pagar honorários. Ele tem a certidão de casamento, a matrícula do imóvel, o contrato do financiamento e os comprovantes das parcelas.",
+        recebidos: ["Documento de identificação", "Contrato ou proposta"],
+        documentos: [
+          { nome: "Certidão de casamento", detalhe: "Com o regime de bens, que define o que entra na partilha.", essencial: true, recebido: true },
+          { nome: "Matrícula do imóvel e contrato do financiamento", detalhe: "Titularidade e saldo devedor do apartamento.", essencial: true, recebido: true },
+          { nome: "Comprovantes das parcelas do financiamento", detalhe: "Quem pagou o quê desde a separação de fato.", essencial: false, recebido: false },
+        ],
+        tarefas: [
+          { titulo: "Conferir o saldo devedor do financiamento e o valor do imóvel", prazo: emDias(5) },
+          { titulo: "Levantar o que foi pago depois da separação de fato", prazo: emDias(9) },
+          { titulo: "Avaliar acordo de partilha antes da audiência de conciliação", prazo: null },
+        ],
+        registros: [
+          { tipo: "registro", texto: "Intimação de nomeação recebida. Ficha criada a partir do texto colado; prazo a conferir no processo." },
+        ],
         consultarProcesso: false,
         triar: false,
       },
@@ -403,6 +512,17 @@ async function semearCaso(cookie, caso) {
     const documento = (dossie.json.documentos ?? []).find((d) => d.nome === nome);
     if (documento) await pedir(`/api/escritorio/casos/${id}/documentos`, { metodo: "PATCH", cookie, corpo: { id: documento.id, recebido: true } });
   }
+  // Documentos que só existem neste tema: boletim de ocorrência, certidão de
+  // nascimento, matrícula do imóvel. O checklist padrão é de consumo.
+  for (const documento of caso.documentos ?? []) {
+    const criado = await pedir(`/api/escritorio/casos/${id}/documentos`, {
+      metodo: "POST",
+      cookie,
+      corpo: { nome: documento.nome, detalhe: documento.detalhe, essencial: documento.essencial },
+    });
+    if (criado.status !== 201) { console.log(`    aviso: não criou o documento "${documento.nome}" (HTTP ${criado.status})`); continue; }
+    if (documento.recebido) await pedir(`/api/escritorio/casos/${id}/documentos`, { metodo: "PATCH", cookie, corpo: { id: criado.json.id, recebido: true } });
+  }
   for (const tarefa of caso.tarefas) {
     const criada = await pedir(`/api/escritorio/casos/${id}/tarefas`, { metodo: "POST", cookie, corpo: { titulo: tarefa.titulo, prazo: tarefa.prazo } });
     if (tarefa.concluida && criada.status === 201) {
@@ -457,6 +577,42 @@ const CONVERSAS = [
       { de: "cliente", hora: -28, texto: "O pedido é 884213. O Pix foi em 12 de junho, 3.480 reais." },
       { de: "mim", hora: -27, texto: "Anotado. Com esse valor o caso cabe no Juizado Especial. Até 20 salários mínimos o senhor pode entrar sem advogado, mas eu acompanho." },
       { de: "cliente", hora: -2, texto: "Prefiro com o senhor acompanhando. Quando a gente entra?" },
+    ],
+  },
+  {
+    contato: "5541998550117",
+    nome: "Vanessa Aparecida Teles",
+    falas: [
+      { de: "cliente", hora: -22, texto: "Doutor, boa tarde. Recebi uma ligação do fórum sobre a medida. Eu preciso ir lá?" },
+      { de: "mim", hora: -21, texto: "Boa tarde, Vanessa. A medida protetiva foi concedida e eu recebi a nomeação para acompanhar o seu caso. A senhora não vai sozinha: eu aviso quando tiver audiência." },
+      { de: "cliente", hora: -20, texto: "Ele saiu de casa no mesmo dia, mas continua mandando recado pelos amigos da família. Isso conta como descumprimento?" },
+      { de: "mim", hora: -19, texto: "Conta. Guarde as mensagens e anote quem procurou a senhora, sem responder. Descumprir medida protetiva é crime: eu junto isso ao processo e peço as providências ao juízo." },
+      { de: "cliente", hora: -4, texto: "Doutor, o juiz marcou a audiência para a semana que vem. Meu filho de cinco anos vai precisar falar?" },
+      { de: "mim", hora: -3, texto: "Não precisa. A audiência é sobre as medidas e sobre a guarda. Eu passo aí antes para a gente combinar tudo com calma." },
+    ],
+  },
+  {
+    contato: "5541998660228",
+    nome: "Simone Barreto da Luz",
+    falas: [
+      { de: "cliente", hora: -28, texto: "Doutor, boa tarde. Consegui os comprovantes da escola e do plano do meu filho. Levo aí?" },
+      { de: "mim", hora: -27, texto: "Boa tarde, Simone. Pode mandar por aqui que eu junto no caso. Me diga também o que o pai dele recebe por mês, se a senhora souber." },
+      { de: "cliente", hora: -26, texto: "Ele é pintor, trabalha por conta. Não sei quanto tira certo, mas tem carro e mora com os pais." },
+      { de: "mim", hora: -25, texto: "Então a gente pede a comprovação e, se ele não apresentar, o juízo oficia. O valor dos alimentos sai da necessidade do menino e do que o pai pode pagar, não de acordo entre vocês." },
+      { de: "cliente", hora: -2, texto: "Doutor, ele falou que não vai aceitar a guarda compartilhada, que quer que o menino fique com ele. Isso muda alguma coisa?" },
+      { de: "mim", hora: -1, texto: "Não muda o que a lei manda olhar, que é o melhor para o menino. A discordância dele entra no processo e a gente leva isso para a audiência." },
+    ],
+  },
+  {
+    contato: "5541998770339",
+    nome: "Ademir Kaminski",
+    falas: [
+      { de: "cliente", hora: -24, texto: "Doutor, boa tarde. Recebi a carta do fórum. Fiquei sabendo que a minha ex-mulher entrou com o divórcio e com a partilha." },
+      { de: "mim", hora: -23, texto: "Boa tarde, Ademir. Eu recebi a nomeação para te defender nessa ação. Preciso da certidão de casamento, da matrícula do apartamento e do contrato do financiamento." },
+      { de: "cliente", hora: -22, texto: "Tenho tudo em casa. Ela quer metade do carro também, mas o carro é do meu trabalho." },
+      { de: "mim", hora: -21, texto: "O carro foi comprado depois do casamento e o regime é comunhão parcial, então entra na partilha mesmo no seu nome. O que a gente discute é a forma de compensar." },
+      { de: "cliente", hora: -3, texto: "Doutor, ela aceitou conversar sobre a partilha antes da audiência. Vale a pena?" },
+      { de: "mim", hora: -2, texto: "Vale. Acordo homologado resolve mais rápido e mais barato, e o juízo marca a audiência de conciliação. Eu preparo a proposta com a compensação do financiamento." },
     ],
   },
 ];
