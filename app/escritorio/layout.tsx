@@ -6,7 +6,7 @@ import { AdvogadoProvider } from "./Advogado";
 import { BotaoSair, Navegacao } from "./Navegacao";
 import "./escritorio.css";
 
-export const metadata: Metadata = { title: "Escritório — Ponto Dativo" };
+export const metadata: Metadata = { title: "Escritório · Ponto Dativo" };
 export const dynamic = "force-dynamic";
 
 // Casca de todas as telas do escritório. O proxy já barrou quem não tem

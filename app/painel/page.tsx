@@ -185,7 +185,7 @@ export default async function Painel() {
             <h2 className="cfp-subtitulo">Na pasta do Drive agora</h2>
             <article className="cfp-cartao cfp-drive-lista">
               <p>
-                <a href={DRIVE.url} target="_blank" rel="noreferrer">{DRIVE.nome} ↗</a> — repositório oficial. Suba aqui o arquivo de cada entrega; a lista atualiza a cada abertura.
+                <a href={DRIVE.url} target="_blank" rel="noreferrer">{DRIVE.nome} ↗</a>: repositório oficial. Suba aqui o arquivo de cada entrega; a lista atualiza a cada abertura.
               </p>
               {arquivos.length === 0 ? (
                 <p className="cfp-vazio">Ainda não consegui ler a pasta, ou ela está vazia.</p>
@@ -272,13 +272,13 @@ export default async function Painel() {
               </article>
               <aside className="cfp-cartao">
                 <span className="cfp-eyebrow">Último ensaio</span>
-                <h1 className="cfp-ensaio-tempo">—:—</h1>
+                <h1 className="cfp-ensaio-tempo">--:--</h1>
                 <span className="cfp-badge ambar">Ainda sem ensaio</span>
                 <div className="cfp-ensaio">
                   <div><strong>0</strong>ensaios</div>
                   <div><strong>0</strong>travamentos</div>
                   <div><strong>0</strong>ajustes</div>
-                  <div><strong>—</strong>demo</div>
+                  <div><strong>0</strong>demos</div>
                 </div>
               </aside>
             </div>

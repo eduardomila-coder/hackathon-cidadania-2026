@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const advogado = await advogadoAtual();
   const dossie = advogado ? dossieDoCaso(advogado.id, id) : null;
-  return { title: dossie ? `${dossie.caso.titulo} — Ponto Dativo` : "Caso — Ponto Dativo" };
+  return { title: dossie ? `${dossie.caso.titulo} · Ponto Dativo` : "Caso · Ponto Dativo" };
 }
 
 // A página do caso lê o dossiê inteiro no servidor; o componente cliente

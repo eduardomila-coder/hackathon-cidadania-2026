@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       ato: ficha.ato,
       // A data da intimação não entra aqui: `normalizarFicha` já a tirou de
       // `dataPrazo`, senão o painel anunciaria vencimento onde só começa a
-      // contagem — alarme falso para o advogado.
+      // contagem: alarme falso para o advogado.
       prazo: ficha.dataPrazo,
       resumo: ficha.resumo,
       fundamentos: ficha.fundamentosAAvaliar,

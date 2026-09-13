@@ -166,7 +166,7 @@ Regras:
 - "ato": para que o advogado foi nomeado (audiência, defesa, contestação, recurso, acompanhamento...), como o texto diz; null se não dá para saber.
 - "prazoInformado": o prazo como está escrito (ex.: "15 dias", "audiência em 20/10/2026 às 14h"); null se o texto não fala de prazo.
 - "dataCiencia": a DATA explícita da intimação ou da ciência, em AAAA-MM-DD, se o texto trouxer. É a data a partir da qual um prazo em dias começa a contar.
-- "dataPrazo": SÓ a data explícita de vencimento do prazo ou de um ato já designado (ex.: audiência marcada para 20/10/2026), em AAAA-MM-DD. NUNCA repita aqui a data da intimação/ciência: quando o prazo vem em dias ("15 dias"), "dataPrazo" é null mesmo que a data da intimação esteja escrita no texto, porque você NÃO calcula prazo — quem conta é o advogado.
+- "dataPrazo": SÓ a data explícita de vencimento do prazo ou de um ato já designado (ex.: audiência marcada para 20/10/2026), em AAAA-MM-DD. NUNCA repita aqui a data da intimação/ciência: quando o prazo vem em dias ("15 dias"), "dataPrazo" é null mesmo que a data da intimação esteja escrita no texto, porque você NÃO calcula prazo: quem conta é o advogado.
 - "resumo": duas ou três frases sobre o que é o caso e o que se espera do advogado, sem juridiquês.
 - "fundamentosAAvaliar": pontos a examinar (ex.: "verificar se cabe justiça gratuita", "checar se houve citação válida"), como ideias, não como teses prontas nem conclusões. Lista vazia se o texto não permite.
 - "documentosAPedir": o que o advogado deve pedir ao cliente ou buscar nos autos, um por item.

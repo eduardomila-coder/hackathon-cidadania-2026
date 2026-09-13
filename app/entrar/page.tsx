@@ -5,7 +5,7 @@ import { advogadoAtual } from "@/lib/sessao";
 import { Formulario } from "./Formulario";
 import "../escritorio/escritorio.css";
 
-export const metadata: Metadata = { title: "Entrar — Ponto Dativo" };
+export const metadata: Metadata = { title: "Entrar · Ponto Dativo" };
 export const dynamic = "force-dynamic";
 
 // Só aceita voltar para um caminho deste site. Qualquer outra coisa (outro

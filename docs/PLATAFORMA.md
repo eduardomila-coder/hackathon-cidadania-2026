@@ -178,7 +178,7 @@ Arquivos: `app/escritorio/page.tsx`, `app/escritorio/casos/[id]/page.tsx`,
 - `POST /api/escritorio/nomeacao` `{ texto }` (o advogado cola a intimação de
   nomeação) → `fichaDeNomeacao(texto)` da IA → cria `Caso` com `origem:
   "nomeacao"`, `titulo`, `processo`, `orgao`, `ato`, `prazo` igual a
-  `ficha.dataPrazo` — que só existe quando a intimação traz a data do
+  `ficha.dataPrazo`, que só existe quando a intimação traz a data do
   vencimento ou de um ato já designado; prazo em dias ("15 dias") e data da
   intimação **não** viram `prazo` do caso (ver abaixo), `resumo`,
   `fundamentos`, documentos sugeridos e tarefas "Conferir íntegra da
@@ -200,7 +200,7 @@ vencimento ou de ato designado. `normalizarFicha` ainda trava, no código, o
 caso em que o modelo repete a data da intimação em `dataPrazo`: ela volta para
 `dataCiencia`, o `prazo` fica `null` e entra o alerta de que quem conta o prazo
 é o advogado. Sem essa trava o painel anunciava "vence hoje" para um prazo que
-só começa a contar naquela data — alarme falso onde o erro custa caro.
+só começa a contar naquela data: alarme falso onde o erro custa caro.
 
 ### Telas
 
