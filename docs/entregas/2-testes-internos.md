@@ -152,3 +152,28 @@ orientando o primeiro caso.
 
 **Prints:** `prints/2026-09-13-testes/06-endereco-publico-entrar.png` e
 `07-escritorio-no-endereco-publico.png`.
+
+### Contas e casos de demonstração
+
+Para a auditoria não depender de digitar dados na hora, três advogados fictícios
+foram criados e semeados pela API da equipe, com
+`SENHA_DEMO=... node --env-file=.env.local scripts/semear-demo.mjs <endereço>`.
+O script não guarda senha: ela vem do ambiente, porque o repositório é público.
+A senha das quatro contas de demonstração está em `.contas-demo.txt`, na pasta
+do clone `-live`, fora do git.
+
+| Conta | Casos | O que demonstra |
+|---|---|---|
+| `ana.souza` (OAB/PR 12345) | Busca e apreensão de moto financiada (nomeação, com processo real no DataJud) e plano de saúde que negou cirurgia | Ficha de nomeação, consulta ao TJPR e uma triagem já feita, com 1 de 4 requisitos comprovados |
+| `bruno.lima` (OAB/PR 54321) | Pensão atrasada há quatro meses e acordo trabalhista não pago | Casos que **não** cabem no Juizado, com o motivo na tela |
+| `carla.mendes` (OAB/PR 67890) | Atraso de dois anos na entrega do apartamento (acima de oitenta mil) e tarifa bancária indevida | O caso do limite do Juizado e um consumidor pequeno |
+
+Cada caso já nasceu com o checklist de documentos, com um ou dois documentos
+marcados como recebidos, tarefas com prazo e linha do tempo com registro. O
+painel de cada conta mostra os cartões preenchidos, e os prazos aparecem em
+vermelho quando vencem na semana.
+
+**Isolamento conferido na tela, no endereço público:** as três contas entraram em
+navegador, cada uma viu só os dois casos dela e nenhum título de caso das outras.
+Prints: `08-demo-ana-painel.png`, `09-demo-bruno-painel.png` e
+`10-demo-carla-painel.png`.
