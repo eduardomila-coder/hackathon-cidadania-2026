@@ -291,7 +291,7 @@ function ConversaDoContato({ contato, casoId, aoAtualizar, sugestao, aoEnviarSug
           className="wa-composer-campo"
           value={texto}
           onChange={(evento) => { setTexto(evento.target.value); if (motivo) setMotivo(null); }}
-          placeholder="Escreva aqui ou peça uma sugestão ao assistente"
+          placeholder="Escreva aqui ou peça uma sugestão"
           maxLength={4000}
           rows={1}
           disabled={enviando}

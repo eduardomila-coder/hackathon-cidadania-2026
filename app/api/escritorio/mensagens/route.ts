@@ -5,7 +5,8 @@ export const dynamic = "force-dynamic";
 
 // Caixa de mensagens do advogado logado. Sem `?contato=`, devolve as
 // conversas (uma linha por telefone); com `?contato=`, as mensagens daquele
-// telefone, já marcadas como lidas. Tudo filtrado pelo advogado da sessão.
+// telefone, já marcadas como lidas. Tudo filtrado pelo advogado da sessão e
+// só de assistido cadastrado: contato pessoal não aparece no atendimento.
 
 type Conversa = {
   contato: string;
@@ -56,10 +57,10 @@ export async function GET(request: Request) {
     const advogado = await exigirAdvogado();
     const contato = new URL(request.url).searchParams.get("contato")?.replace(/\D/g, "") ?? "";
     if (contato) {
-      const mensagens = mensagensDo(advogado.id, { contato });
+      const mensagens = mensagensDo(advogado.id, { contato, somenteAssistidos: true });
       await marcarLidas(advogado.id, contato);
       return Response.json(mensagens.map((mensagem) => ({ ...mensagem, lida: true })));
     }
-    return Response.json(conversasDe(advogado.id, mensagensDo(advogado.id)));
+    return Response.json(conversasDe(advogado.id, mensagensDo(advogado.id, { somenteAssistidos: true })));
   } catch (e) { return erro(e); }
 }
