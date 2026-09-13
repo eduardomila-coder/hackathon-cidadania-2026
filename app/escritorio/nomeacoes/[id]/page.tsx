@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { nomeacaoPorId } from "@/lib/escritorio";
 import { advogadoAtual } from "@/lib/sessao";
 import { PaginaDaNomeacao } from "./Nomeacao";
-import "../nomeacoes.css";
+
 
 export const dynamic = "force-dynamic";
 

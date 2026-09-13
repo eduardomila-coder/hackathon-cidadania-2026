@@ -4,7 +4,6 @@ import { documentosDoCaso, listarCasosComDetalhes } from "@/lib/escritorio";
 import { advogadoAtual } from "@/lib/sessao";
 import { formatarMomento, NOMES_DA_SITUACAO } from "../casos/formatos";
 import { Documentos, type GrupoDeDocumentos } from "./Documentos";
-import "./documentos.css";
 
 export const metadata: Metadata = { title: "Documentos · Escritório Dativo" };
 export const dynamic = "force-dynamic";
@@ -36,6 +35,7 @@ export default async function PaginaDeDocumentos() {
         essencial: documento.essencial,
         recebido: documento.recebido,
         atualizadoEm: formatarMomento(documento.atualizadoEm, { comAno: false }),
+        atualizadoOrdem: documento.atualizadoEm,
       })),
     });
   }

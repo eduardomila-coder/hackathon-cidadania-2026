@@ -77,10 +77,10 @@ export default function PaginaDeMensagens() {
 // aparece sozinha: o selo sempre traz o texto do estado.
 function estadoDaConexao(whatsApp: EstadoWhatsApp | null) {
   if (!whatsApp || !whatsApp.configurado) return null;
-  if (whatsApp.estado === "open") return { classe: "pd-estado-ok", texto: "WhatsApp conectado" };
-  if (whatsApp.estado === "connecting") return { classe: "pd-estado-info", texto: "Aguardando leitura do QR" };
-  if (whatsApp.estado === "sem_numero") return { classe: "pd-estado-atencao", texto: "Sem número cadastrado" };
-  return { classe: "pd-estado-atencao", texto: "WhatsApp desconectado" };
+  if (whatsApp.estado === "open") return { classe: "st-ok", texto: "WhatsApp conectado" };
+  if (whatsApp.estado === "connecting") return { classe: "st-info", texto: "Aguardando leitura do QR" };
+  if (whatsApp.estado === "sem_numero") return { classe: "st-warn", texto: "Sem número cadastrado" };
+  return { classe: "st-warn", texto: "WhatsApp desconectado" };
 }
 
 function Mensagens() {
@@ -317,21 +317,14 @@ function Mensagens() {
   const seloConexao = estadoDaConexao(whatsApp);
 
   return <section className={`pd-mensagens ${selecionado ? "pd-mensagens-aberta" : ""}`}>
-    <div className="pd-pagina-cabeca">
-      <div>
-        <p className="pd-eyebrow">Atendimento</p>
-        <h1>Mensagens</h1>
-        <p className="pd-auxiliar">O que os clientes mandam para o seu número chega aqui. O assistente escreve o rascunho; quem envia é você, salvo nas conversas em que você liga o estagiário virtual.</p>
-      </div>
-      <div className="pd-pagina-acoes">
-        {seloConexao && <span className={`pd-estado ${seloConexao.classe}`}>{seloConexao.texto}</span>}
-      </div>
+    <div className="page-head">
+      <div><div className="eyebrow">Atendimento centralizado</div><h1>Mensagens</h1><p>Conversas vinculadas aos casos. Sugestões são rascunhos: nenhuma mensagem é enviada sem ação humana, salvo nas conversas em que você liga o estagiário virtual.</p></div>
+      {seloConexao && <span className={`status ${seloConexao.classe}`}>{seloConexao.texto}</span>}
     </div>
-
-    {whatsApp && !whatsApp.configurado && <p className="pd-aviso pd-aviso-atencao" role="status">
+    {whatsApp && !whatsApp.configurado && <p className="notice warn" style={{ marginBottom: 13 }} role="status">
       A integração do WhatsApp ainda não está ligada neste servidor. As conversas aparecem aqui quando ela estiver ativa.
     </p>}
-    {whatsApp?.configurado && semConexao && <p className="pd-aviso pd-aviso-atencao" role="status">
+    {whatsApp?.configurado && semConexao && <p className="notice warn" style={{ marginBottom: 13 }} role="status">
       {whatsApp.estado === "sem_numero" ? "Você ainda não cadastrou o seu WhatsApp." : "O seu WhatsApp não está conectado agora."}{" "}
       <Link className="pd-aviso-link" href="/escritorio/whatsapp">{whatsApp.estado === "sem_numero" ? "Cadastrar e conectar" : "Conectar de novo"}</Link>. Enquanto isso, nada novo chega nem sai por aqui; o que já chegou continua guardado abaixo.
     </p>}
@@ -339,22 +332,7 @@ function Mensagens() {
     <div className={`pd-caixa${contextoAberto ? " pd-caixa-larga" : ""}`}>
       <div className="pd-caixa-grade">
         <aside className="pd-conversas" aria-label="Conversas">
-          <div className="pd-conversas-cabeca">
-            <div>
-              <h2>Conversas</h2>
-              <p>{conversas === null ? "carregando…" : `${visiveis.length} ${visiveis.length === 1 ? "conversa" : "conversas"}`}</p>
-            </div>
-            <button type="button" className="pd-conversas-atualizar" onClick={() => { void carregarConversas(); }} disabled={conversas === null} title="Atualizar lista" aria-label="Atualizar lista">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
-            </button>
-          </div>
-
-          <div className="pd-conversas-busca">
-            <div className="pd-conversas-busca-campo">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
-              <input value={busca} onChange={(evento) => setBusca(evento.target.value)} placeholder="Buscar conversa" aria-label="Buscar conversa" />
-            </div>
-          </div>
+          <div className="conv-search"><input className="input" value={busca} onChange={(evento) => setBusca(evento.target.value)} placeholder="Buscar conversa" aria-label="Buscar conversa" /></div>
 
           <div className="pd-conversas-rolagem">
             {conversas === null && <p className="pd-conversas-nota">Carregando…</p>}
@@ -367,26 +345,20 @@ function Mensagens() {
             {visiveis.map((conversa) => <button
               key={conversa.contato}
               type="button"
-              className={`pd-conversa-item${conversa.contato === selecionado ? " pd-conversa-ativa" : ""}`}
+              className={`conv-item${conversa.contato === selecionado ? " active" : ""}`}
               onClick={() => abrir(conversa.contato)}
               aria-current={conversa.contato === selecionado ? "true" : undefined}
             >
-              <span className="pd-avatar" aria-hidden="true">{iniciais(nomeDaConversa(conversa))}</span>
-              <span className="pd-conversa-meio">
-                <span className="pd-conversa-linha">
-                  <strong>{nomeDaConversa(conversa)}</strong>
-                  <time dateTime={conversa.quando}>{quandoResumido(conversa.quando)}</time>
-                </span>
-                <span className="pd-conversa-previa">{conversa.ultimaMensagem || "[sem texto]"}</span>
-                <span className="pd-conversa-rodape">
-                  {conversa.casoId ? <em>caso vinculado</em> : <em className="pd-sem-caso">sem caso</em>}
-                  {conversa.naoLidas > 0 && <b aria-label={`${conversa.naoLidas} não lidas`}>{conversa.naoLidas}</b>}
-                </span>
-              </span>
+              <div className="avatar" aria-hidden="true">{iniciais(nomeDaConversa(conversa))}</div>
+              <div style={{ minWidth: 0 }}>
+                <strong>{nomeDaConversa(conversa)}</strong>
+                <p>{conversa.ultimaMensagem || "[sem texto]"}</p>
+                <p>{conversa.casoId ? "caso vinculado" : "sem caso"}{conversa.naoLidas > 0 ? ` · ${conversa.naoLidas} não lida${conversa.naoLidas > 1 ? "s" : ""}` : ""}</p>
+              </div>
+              <time dateTime={conversa.quando}>{quandoResumido(conversa.quando)}</time>
             </button>)}
           </div>
 
-          <p className="pd-conversas-rodape">As conversas ficam guardadas na sua conta. Nada sai para o cliente sem o seu clique, salvo nas conversas com o estagiário virtual ligado.</p>
         </aside>
 
         <div className="pd-chat">

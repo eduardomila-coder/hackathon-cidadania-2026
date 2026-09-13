@@ -11,6 +11,7 @@ export type DocumentoNaTela = {
   essencial: boolean;
   recebido: boolean;
   atualizadoEm: string;
+  atualizadoOrdem: string;
 };
 
 export type GrupoDeDocumentos = {
@@ -22,11 +23,30 @@ export type GrupoDeDocumentos = {
 };
 
 type Resumo = { pendentes: number; essenciaisPendentes: number; recebidos: number; grupos: number };
+type Aba = "recentes" | "porCaso" | "pendentes" | "recebidos";
+
+const ABAS: Array<{ chave: Aba; nome: string }> = [
+  { chave: "recentes", nome: "Recentes" },
+  { chave: "porCaso", nome: "Por caso" },
+  { chave: "pendentes", nome: "Pendentes" },
+  { chave: "recebidos", nome: "Recebidos" },
+];
+
+// Sigla do cartão pelo nome do documento, como o protótipo mostra PDF/IMG/DOC.
+function sigla(nome: string) {
+  const n = nome.toLowerCase();
+  if (/(contrato|proposta|procura|declara|peti|manifesta)/.test(n)) return "DOC";
+  if (/(foto|print|imagem)/.test(n)) return "IMG";
+  if (/(rg|cnh|identifica|cpf)/.test(n)) return "ID";
+  return "PDF";
+}
 
 // A marcação de recebido grava pela rota do caso (PATCH /api/escritorio/casos/
-// [id]/documentos), a mesma que a página do caso usa. O estado muda na hora e
-// a lista se reordena na próxima abertura.
+// [id]/documentos), a mesma que a página do caso usa. Não há envio de arquivo
+// nesta demonstração: o cartão diz o que o documento é e se já chegou.
 export function Documentos({ grupos, resumo }: { grupos: GrupoDeDocumentos[]; resumo: Resumo }) {
+  const [aba, setAba] = useState<Aba>("recentes");
+  const [busca, setBusca] = useState("");
   const [mudancas, setMudancas] = useState<Record<string, boolean>>({});
   const [salvando, setSalvando] = useState<string | null>(null);
   const [recado, setRecado] = useState<string | null>(null);
@@ -50,91 +70,66 @@ export function Documentos({ grupos, resumo }: { grupos: GrupoDeDocumentos[]; re
     }
   }
 
-  return <div className="pd-documentos">
-    <div className="pd-pagina-cabeca">
-      <div>
-        <p className="pd-eyebrow">Documentos</p>
-        <h1>Documentos por caso</h1>
-        <p className="pd-auxiliar">O checklist de cada caso, com o que já chegou e o que falta pedir. Os itens marcados como essenciais são os que travam o andamento quando faltam. Cada documento pertence ao caso de onde veio.</p>
+  const termo = busca.trim().toLowerCase();
+  const todos = grupos.flatMap((grupo) => grupo.documentos.map((documento) => ({ grupo, documento })));
+  const filtrados = todos.filter(({ grupo, documento }) => (!termo || documento.nome.toLowerCase().includes(termo) || grupo.titulo.toLowerCase().includes(termo) || (grupo.cliente ?? "").toLowerCase().includes(termo))
+    && (aba === "pendentes" ? !estadoDe(documento) : aba === "recebidos" ? estadoDe(documento) : true));
+  const recentes = [...filtrados].sort((a, b) => b.documento.atualizadoOrdem.localeCompare(a.documento.atualizadoOrdem));
+
+  function Cartao({ grupo, documento }: { grupo: GrupoDeDocumentos; documento: DocumentoNaTela }) {
+    const recebido = estadoDe(documento);
+    return <div className="doc-card">
+      <div className="doc-icon">{sigla(documento.nome)}</div>
+      <div style={{ minWidth: 0 }}>
+        <strong>{documento.nome}</strong>
+        <p>{grupo.cliente ?? grupo.titulo} · {recebido ? `recebido ${documento.atualizadoEm}` : documento.detalhe || "a pedir"}</p>
+        <button type="button" className="btn btn-quiet btn-sm doc-acao" onClick={() => alternar(grupo.casoId, documento)} disabled={salvando === documento.id}>
+          {salvando === documento.id ? "Salvando…" : recebido ? "Desmarcar" : "Marcar recebido"}
+        </button>
       </div>
-      <div className="pd-pagina-acoes">
-        <Link className="pd-botao pd-botao-secundario" href="/escritorio">Abrir meus casos</Link>
-      </div>
+      {recebido
+        ? <span className="status st-ok">Cliente</span>
+        : documento.essencial ? <span className="status st-risk">Essencial</span> : <span className="status st-warn">Pendente</span>}
+    </div>;
+  }
+
+  return <>
+    <div className="page-head">
+      <div><div className="eyebrow">Arquivos</div><h1>Documentos</h1><p>Documentos recebidos e a receber em cada caso. O envio de arquivo não está ligado nesta demonstração: o que o cliente manda pela conversa, você marca aqui como recebido.</p></div>
+      <div className="inline"><Link href="/escritorio/casos" className="btn btn-secondary">Abrir casos</Link></div>
     </div>
-
-    <p className="pd-aviso">
-      <strong>O que esta tela guarda.</strong> Cada caso abre com o checklist padrão de quatro documentos, e é ele que aparece aqui: nome, para que serve e se já foi recebido. O envio de arquivo ainda não está ligado nesta demonstração, e nada entra sozinho no checklist: o que o cliente manda por WhatsApp não vira documento aqui, é você que marca o item como recebido quando ele chega.
-    </p>
-
-    <dl className="pd-metricas">
-      <div className={`pd-metrica${resumo.pendentes > 0 ? " pd-documentos-metrica-alerta" : ""}`}><dt>Pendentes</dt><dd>{resumo.pendentes}</dd><small>documentos ainda não recebidos</small></div>
-      <div className={`pd-metrica${resumo.essenciaisPendentes > 0 ? " pd-documentos-metrica-risco" : ""}`}><dt>Essenciais pendentes</dt><dd>{resumo.essenciaisPendentes}</dd><small>travam o andamento quando faltam</small></div>
-      <div className="pd-metrica"><dt>Recebidos</dt><dd>{resumo.recebidos}</dd><small>já conferidos e marcados</small></div>
-      <div className="pd-metrica"><dt>Casos com checklist</dt><dd>{resumo.grupos}</dd><small>casos com documentos a pedir</small></div>
-    </dl>
-
-    <p className="pd-documentos-recado" role="status" aria-live="polite">{erro ? <span className="pd-documentos-erro">{erro}</span> : recado}</p>
-
-    {grupos.length === 0
-      ? <div className="pd-vazio">
-        <strong>Nenhum checklist ainda.</strong>
-        O checklist de documentos nasce junto com o caso: abra <Link href="/escritorio">um caso</Link> ou registre uma nomeação, e os quatro documentos padrão aparecem aqui para acompanhar.
+    <section className="metrics" style={{ marginBottom: 16 }}>
+      <div className="metric"><label>Pendentes</label><strong>{resumo.pendentes}</strong><small>ainda não recebidos</small></div>
+      <div className="metric"><label>Essenciais pendentes</label><strong>{resumo.essenciaisPendentes}</strong><small>travam o andamento</small></div>
+      <div className="metric"><label>Recebidos</label><strong>{resumo.recebidos}</strong><small>conferidos e marcados</small></div>
+      <div className="metric"><label>Casos com checklist</label><strong>{resumo.grupos}</strong><small>com documentos a pedir</small></div>
+    </section>
+    <div className="toolbar">
+      <div className="tabs" role="tablist">
+        {ABAS.map(({ chave, nome }) => <button key={chave} type="button" role="tab" aria-selected={aba === chave} className={`tab${aba === chave ? " active" : ""}`} onClick={() => setAba(chave)}>{nome}</button>)}
       </div>
-      : grupos.map((grupo) => {
-        const pendentes = grupo.documentos.filter((documento) => !estadoDe(documento));
-        const essenciais = pendentes.filter((documento) => documento.essencial).length;
-        // Pendente primeiro, essencial na frente; o que já foi marcado desce.
-        const ordenados = [...grupo.documentos].sort((a, b) => {
-          const recebidoDe = (documento: DocumentoNaTela) => (estadoDe(documento) ? 1 : 0);
-          return recebidoDe(a) - recebidoDe(b) || Number(b.essencial) - Number(a.essencial) || a.nome.localeCompare(b.nome, "pt-BR");
-        });
+      <input className="input" style={{ width: 230 }} placeholder="Buscar documento" value={busca} onChange={(evento) => setBusca(evento.target.value)} aria-label="Buscar documento" />
+    </div>
+    <p className="small" role="status" aria-live="polite" style={{ minHeight: 18, margin: "0 0 10px", color: erro ? "var(--risk)" : "var(--ink-3)" }}>{erro ?? recado}</p>
 
-        return <section className="pd-cartao" key={grupo.casoId}>
-          <div className="pd-cartao-cabeca pd-documentos-cabeca">
-            <div className="pd-documentos-caso">
-              <h2>{grupo.titulo}</h2>
-              <p className="pd-linha-meta">{grupo.cliente ?? "sem cliente vinculado"} · {grupo.situacao}</p>
-            </div>
-            <div className="pd-documentos-caso-acoes">
-              {essenciais > 0
-                ? <span className="pd-estado pd-estado-risco">{essenciais} {essenciais === 1 ? "essencial pendente" : "essenciais pendentes"}</span>
-                : pendentes.length > 0
-                  ? <span className="pd-estado pd-estado-atencao">{pendentes.length} {pendentes.length === 1 ? "pendente" : "pendentes"}</span>
-                  : <span className="pd-estado pd-estado-ok">Checklist completo</span>}
-              <Link className="pd-botao pd-botao-pequeno pd-botao-secundario" href={`/escritorio/casos/${grupo.casoId}`}>Abrir caso</Link>
-            </div>
-          </div>
+    {todos.length === 0 && <div className="card"><div className="vazio"><strong>Nenhum checklist ainda.</strong>O checklist de documentos nasce junto com o caso: abra um caso ou registre uma nomeação.</div></div>}
 
-          <div className="pd-lista">
-            {ordenados.map((documento) => {
-              const recebido = estadoDe(documento);
-              return <div className="pd-linha pd-documentos-linha" key={documento.id}>
-                <div className="pd-documentos-celula">
-                  <p className="pd-linha-titulo">{documento.nome}</p>
-                  <p className="pd-linha-meta">{documento.detalhe || "sem observação"}</p>
-                </div>
-                <div className="pd-documentos-celula">
-                  {recebido
-                    ? <span className="pd-estado pd-estado-ok">Recebido</span>
-                    : documento.essencial
-                      ? <span className="pd-estado pd-estado-risco">Pendente essencial</span>
-                      : <span className="pd-estado pd-estado-atencao">Pendente</span>}
-                  <p className="pd-linha-meta">
-                    {mudancas[documento.id] === undefined ? `atualizado em ${documento.atualizadoEm}` : "alterado agora"}
-                  </p>
-                </div>
-                <div className="pd-documentos-acao">
-                  <button
-                    type="button"
-                    className={`pd-botao pd-botao-pequeno ${recebido ? "pd-botao-quieto" : "pd-botao-secundario"}`}
-                    onClick={() => alternar(grupo.casoId, documento)}
-                    disabled={salvando === documento.id}
-                  >{salvando === documento.id ? "Salvando…" : recebido ? "Desmarcar" : "Marcar recebido"}</button>
-                </div>
-              </div>;
-            })}
+    {aba === "porCaso"
+      ? grupos.map((grupo) => {
+        const itens = filtrados.filter((item) => item.grupo.casoId === grupo.casoId);
+        if (itens.length === 0) return null;
+        const pendentes = itens.filter(({ documento }) => !estadoDe(documento)).length;
+        return <section key={grupo.casoId} style={{ marginBottom: 18 }}>
+          <div className="inline" style={{ justifyContent: "space-between", marginBottom: 8 }}>
+            <div><strong className="small">{grupo.cliente ?? grupo.titulo}</strong><span className="tiny muted"> · {grupo.titulo} · {grupo.situacao}</span></div>
+            <div className="inline">{pendentes > 0 ? <span className="status st-warn">{pendentes} {pendentes === 1 ? "pendente" : "pendentes"}</span> : <span className="status st-ok">Completo</span>}<Link href={`/escritorio/casos/${grupo.casoId}`} className="btn btn-quiet btn-sm">Abrir caso</Link></div>
           </div>
+          <div className="doc-grid">{itens.map(({ documento }) => <Cartao key={documento.id} grupo={grupo} documento={documento} />)}</div>
         </section>;
-      })}
-  </div>;
+      })
+      : <div className="doc-grid">
+        {recentes.map(({ grupo, documento }) => <Cartao key={documento.id} grupo={grupo} documento={documento} />)}
+        {todos.length > 0 && recentes.length === 0 && <div className="vazio" style={{ gridColumn: "1 / -1" }}><strong>Nada aqui.</strong>Troque de aba ou limpe a busca.</div>}
+      </div>}
+  </>;
 }

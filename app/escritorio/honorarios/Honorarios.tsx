@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { chamar, mensagemDeErro } from "../casos/api";
 
@@ -12,13 +13,18 @@ type Dados = { id: string; casoId: string; etapas: Etapa[]; pendencias: Pendenci
 type Resposta = { honorarios: Dados | null };
 type Campo = "etapas" | "pendencias" | "registros";
 
+// As cinco etapas do fluxo, como no protótipo. Entram quando o
+// acompanhamento é iniciado; o advogado edita, remove ou acrescenta.
+export const ETAPAS_PADRAO = ["Arbitramento", "Certidão judicial", "Checklist", "Requerimento", "Acompanhamento"];
+
 function idTemporario() {
   return `novo-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-export function Honorarios({ casos }: { casos: Caso[] }) {
+export function Honorarios({ casos, casoInicial }: { casos: Caso[]; casoInicial?: string }) {
   const idBase = useId();
-  const [casoId, setCasoId] = useState(casos[0]?.id ?? "");
+  const router = useRouter();
+  const [casoId, setCasoId] = useState(casoInicial || casos[0]?.id || "");
   const [dados, setDados] = useState<Dados | null>(null);
   const [carregando, setCarregando] = useState(Boolean(casoId));
   const [salvando, setSalvando] = useState<Campo | "criar" | null>(null);
@@ -45,9 +51,10 @@ export function Honorarios({ casos }: { casos: Caso[] }) {
     setErro(null);
     setRecado(null);
     try {
-      const criado = await chamar<Dados>(url, { metodo: "POST", corpo: {} });
+      const criado = await chamar<Dados>(url, { metodo: "POST", corpo: { etapas: ETAPAS_PADRAO.map((titulo) => ({ titulo, concluida: false })) } });
       setDados(criado);
-      setRecado("Acompanhar honorários foi iniciado para este caso.");
+      setRecado("Acompanhamento iniciado com as cinco etapas do fluxo.");
+      router.refresh();
     } catch (e) {
       setErro(mensagemDeErro(e));
     } finally {
@@ -65,6 +72,7 @@ export function Honorarios({ casos }: { casos: Caso[] }) {
       const atualizado = await chamar<Dados>(url, { metodo: "PATCH", corpo: { [campo]: dados[campo] } });
       setDados(atualizado);
       setRecado("Alterações salvas neste caso.");
+      router.refresh();
     } catch (e) {
       setErro(mensagemDeErro(e));
     } finally {
@@ -83,28 +91,17 @@ export function Honorarios({ casos }: { casos: Caso[] }) {
     setRecado(null);
   }
 
-  if (casos.length === 0) return <div className="pd-honorarios">
-    <div className="pd-pagina-cabeca"><div><p className="pd-eyebrow">Honorários</p><h1>Andamento por caso</h1></div></div>
-    <div className="pd-vazio"><strong>Nenhum caso cadastrado.</strong>Abra <Link href="/escritorio">meus casos</Link> para iniciar o acompanhamento administrativo.</div>
-  </div>;
+  if (casos.length === 0) return <div className="card"><div className="vazio"><strong>Nenhum caso cadastrado.</strong>Abra <Link href="/escritorio/casos">um caso</Link> para iniciar o acompanhamento administrativo.</div></div>;
 
-  return <div className="pd-honorarios">
-    <div className="pd-pagina-cabeca">
-      <div>
-        <p className="pd-eyebrow">Honorários</p>
-        <h1>Andamento por caso</h1>
-        <p className="pd-auxiliar">Registre etapas, pendências e anotações administrativas do caso. Não há valores, cálculo ou pagamentos nesta tela.</p>
+  return <div className="pd-honorarios card">
+    <div className="card-head">
+      <h2>Acompanhamento por caso</h2>
+      <div className="inline">
+        <select id={`${idBase}-caso`} className="select" style={{ width: 320 }} aria-label="Caso" value={casoId} onChange={(evento) => mudarCaso(evento.target.value)}>
+          {casos.map((caso) => <option key={caso.id} value={caso.id}>{caso.titulo}</option>)}
+        </select>
+        <Link className="btn btn-secondary btn-sm" href={`/escritorio/casos/${casoId}`}>Abrir caso</Link>
       </div>
-    </div>
-
-    <p className="pd-aviso pd-aviso-atencao"><strong>Sem tabela ou integração institucional.</strong>Este acompanhamento é preenchido pelo escritório e não confirma direito, valor, pagamento ou situação perante qualquer instituição.</p>
-
-    <div className="pd-honorarios-seletor pd-cartao-corpo">
-      <label htmlFor={`${idBase}-caso`}>Caso</label>
-      <select id={`${idBase}-caso`} className="pd-entrada" value={casoId} onChange={(evento) => mudarCaso(evento.target.value)}>
-        {casos.map((caso) => <option key={caso.id} value={caso.id}>{caso.titulo}</option>)}
-      </select>
-      <Link className="pd-botao pd-botao-secundario" href={`/escritorio/casos/${casoId}`}>Abrir caso</Link>
     </div>
 
     <p className="pd-honorarios-recado" role="status" aria-live="polite">{erro ? <span className="pd-honorarios-erro">{erro}</span> : recado}</p>
@@ -114,7 +111,7 @@ export function Honorarios({ casos }: { casos: Caso[] }) {
       : !dados
         ? <section className="pd-cartao">
           <div className="pd-cartao-cabeca"><h2>Sem acompanhamento iniciado</h2><span className="pd-estado">Sem registros</span></div>
-          <div className="pd-cartao-corpo"><p className="pd-vazio"><strong>Nenhuma etapa, pendência ou registro foi salvo neste caso.</strong>Inicie o acompanhamento para anotar apenas o andamento administrativo que você informar.</p><button type="button" className="pd-botao" onClick={criar} disabled={salvando === "criar"}>{salvando === "criar" ? "Iniciando..." : "Iniciar acompanhamento"}</button></div>
+          <div className="pd-cartao-corpo"><p className="pd-vazio"><strong>Nenhuma etapa, pendência ou registro foi salvo neste caso.</strong>Inicie o acompanhamento para anotar apenas o andamento administrativo que você informar.</p><button type="button" className="btn btn-primary" onClick={criar} disabled={salvando === "criar"}>{salvando === "criar" ? "Iniciando..." : "Iniciar acompanhamento"}</button></div>
         </section>
         : <div className="pd-honorarios-paineis">
           <form className="pd-cartao" onSubmit={(evento) => salvar(evento, "etapas")}>

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { listarCasosComDetalhes, triagensDoCaso } from "@/lib/escritorio";
 import { BASE_FIXA, porId } from "@/lib/juridico/corpus";
 import { advogadoAtual } from "@/lib/sessao";
 import { formatarMomento } from "../casos/formatos";
 import { Pesquisa, type CasoPesquisado, type FonteDaBase, type TriagemNaTela } from "./Pesquisa";
-import "./pesquisa.css";
 
 export const metadata: Metadata = { title: "Pesquisa jurídica · Escritório Dativo" };
 export const dynamic = "force-dynamic";
@@ -103,5 +103,11 @@ export default async function PaginaDePesquisa() {
     return trecho ? [{ id: trecho.id, lei: trecho.lei, artigo: trecho.artigo }] : [];
   });
 
-  return <Pesquisa casos={casosPesquisados} fontes={fontes} base={base} totalDeTriagens={totalDeTriagens} />;
+  return <>
+    <div className="page-head">
+      <div><div className="eyebrow">Pesquisa jurídica</div><h1>Pesquisa jurídica</h1><p>O assistente trabalha sobre o contexto do caso e mostra as fontes utilizadas. Não decide estratégia nem ato processual. Aqui fica a memória de pesquisa: as triagens já feitas, sem análise nova.</p></div>
+      <Link href="/escritorio/casos" className="btn btn-secondary">Nova pesquisa em um caso</Link>
+    </div>
+    <Pesquisa casos={casosPesquisados} fontes={fontes} base={base} totalDeTriagens={totalDeTriagens} />
+  </>;
 }
