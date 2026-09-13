@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { pedirAoConector } from "../conector";
 
-// O serviço de consulta roda na máquina do advogado, ao lado do conector de
-// certificado, e escuta só em 127.0.0.1. O PIN, a senha e o código do
-// autenticador vão deste navegador direto para lá: não passam pelo servidor do
-// escritório, que nunca os vê nem os guarda.
-const CONSULTA = "http://127.0.0.1:8767";
+// Quem fala com o PROJUDI é o serviço de consulta que roda na máquina do
+// advogado; quem leva o pedido até lá é o conector dele. O servidor do
+// escritório só encaminha: PIN, senha e código do autenticador atravessam
+// cifrados até o computador do advogado e não são guardados em lugar nenhum.
+// O tribunal continua vendo o acesso do advogado, com a identidade dele.
 
 type Estado = { consulta: string; versao: string; autenticado: boolean };
 type ProcessoNaCarteira = { numero?: string; classe?: string; orgao?: string; parte?: string; [chave: string]: unknown };
@@ -26,10 +27,19 @@ export function Projudi() {
 
   const consultarEstado = useCallback(async () => {
     try {
-      const resposta = await fetch(`${CONSULTA}/saude`).then((r) => r.json()) as Estado;
-      setEstado(resposta);
-    } catch {
-      setEstado(null);
+      // Uma consulta vazia à carteira serve de sinal de vida: se o serviço
+      // responde (ou reclama que falta entrar), ele está de pé.
+      const { resultado } = await pedirAoConector("projudi-carteira", {}, 8000);
+      const dados = resultado as { processos?: ProcessoNaCarteira[] };
+      setEstado({ consulta: "projudi", versao: "1.0.0", autenticado: true });
+      setCarteira(dados.processos ?? []);
+    } catch (e: unknown) {
+      const mensagem = e instanceof Error ? e.message : "";
+      if (/entrar no PROJUDI/i.test(mensagem)) {
+        setEstado({ consulta: "projudi", versao: "1.0.0", autenticado: false });
+      } else {
+        setEstado(null);
+      }
     } finally {
       setProcurando(false);
     }
@@ -46,13 +56,9 @@ export function Projudi() {
     setEntrando(true);
     try {
       const corpo = modo === "a3" ? { modo, pin } : { modo, cpf, senha, totp };
-      const resposta = await fetch(`${CONSULTA}/entrar`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(corpo),
-      });
-      const dados = await resposta.json() as { autenticado?: boolean; erro?: string };
-      if (!resposta.ok || !dados.autenticado) throw new Error(dados.erro ?? "Não entrou no PROJUDI.");
+      const { resultado } = await pedirAoConector("projudi-entrar", corpo);
+      const dados = resultado as { autenticado?: boolean };
+      if (!dados.autenticado) throw new Error("Não entrou no PROJUDI.");
       // As credenciais somem da tela assim que a sessão existe: elas vivem no
       // serviço local, em memória, e não têm por que continuar aqui.
       setPin(""); setSenha(""); setTotp("");
@@ -69,9 +75,8 @@ export function Projudi() {
     setErro(null);
     setCarregandoCarteira(true);
     try {
-      const dados = await fetch(`${CONSULTA}/carteira`).then((r) => r.json()) as { processos?: ProcessoNaCarteira[]; erro?: string };
-      if (dados.erro) throw new Error(dados.erro);
-      setCarteira(dados.processos ?? []);
+      const { resultado } = await pedirAoConector("projudi-carteira");
+      setCarteira((resultado as { processos?: ProcessoNaCarteira[] }).processos ?? []);
     } catch (e: unknown) {
       setErro(e instanceof Error ? e.message : "Não foi possível ler a carteira.");
     } finally {
@@ -93,9 +98,9 @@ export function Projudi() {
             <strong>O serviço de consulta não está rodando nesta máquina.</strong>
             Ele usa o seu próprio acesso ao PROJUDI, no seu computador. O escritório não guarda senha, PIN nem sessão do tribunal.
           </div>
-          <p className="tiny muted">Para ligar: <code className="mono">python3 consulta/servico.py</code>. As dependências ficam em <code className="mono">consulta/requirements.txt</code>.</p>
+          <p className="tiny muted">Para ligar: <code className="mono">python3 consulta/servico.py</code> (dependências em <code className="mono">consulta/requirements.txt</code>), com o conector da tela <strong>Certificado digital</strong> ligado à sua conta — é ele que leva os pedidos até o serviço.</p>
         </>}
-        {estado && <p className="tiny muted">Serviço versão {estado.versao}. As credenciais vão deste navegador direto para o serviço local e ficam só na memória dele.</p>}
+        {estado && <p className="tiny muted">As credenciais atravessam cifradas até o seu computador e ficam só na memória do serviço, enquanto ele estiver aberto. O servidor do escritório não as guarda.</p>}
       </div>
     </section>
 

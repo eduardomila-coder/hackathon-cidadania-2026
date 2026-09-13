@@ -4,16 +4,11 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { chamar, mensagemDeErro } from "../casos/api";
 import { formatarMomento } from "../casos/formatos";
-
-// O conector roda na máquina do advogado e escuta só em 127.0.0.1. Quem fala
-// com ele é este navegador, nunca o servidor: por isso a chave e o PIN não
-// atravessam a rede. Se o conector não estiver rodando, a tela diz como ligar.
-const CONECTOR = "http://127.0.0.1:8766";
+import { estadoDoConector, gerarChave, pedirAoConector, type Caminho } from "../conector";
 
 type Caso = { id: string; titulo: string };
 type AssinaturaNaTela = { id: string; documento: string; certificado: string; origem: "a3" | "demonstracao"; hash: string; quando: string };
 type CertificadoDisponivel = { id: string; titular: string; validade?: string | null; origem: "a3" | "demonstracao" };
-type Saude = { conector: string; versao: string; modo: "a3" | "demonstracao" };
 
 async function hashDe(texto: string) {
   const bytes = new TextEncoder().encode(texto);
@@ -21,16 +16,19 @@ async function hashDe(texto: string) {
   return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function Certificado({ advogado, casos, assinaturas }: {
+export function Certificado({ advogado, casos, assinaturas, endereco }: {
   advogado: { nome: string; oab: string };
   casos: Caso[];
   assinaturas: AssinaturaNaTela[];
+  endereco: string;
 }) {
   const router = useRouter();
-  const [saude, setSaude] = useState<Saude | null>(null);
-  const [procurando, setProcurando] = useState(true);
+  const [pareamento, setPareamento] = useState<{ criadoEm: string; ultimoContato: string | null } | null>(null);
+  const [chaveNova, setChaveNova] = useState<string | null>(null);
   const [disponiveis, setDisponiveis] = useState<CertificadoDisponivel[]>([]);
+  const [caminho, setCaminho] = useState<Caminho | null>(null);
   const [escolhido, setEscolhido] = useState("");
+  const [procurando, setProcurando] = useState(true);
   const [casoId, setCasoId] = useState(casos[0]?.id ?? "");
   const [documento, setDocumento] = useState("Declaração de atuação como advogado dativo");
   const [conteudo, setConteudo] = useState("");
@@ -38,34 +36,29 @@ export function Certificado({ advogado, casos, assinaturas }: {
   const [erro, setErro] = useState<string | null>(null);
   const [recado, setRecado] = useState<string | null>(null);
 
-  // Sem `setState` no começo: quando isto roda dentro do efeito, mudar estado de
-  // forma síncrona dispara renderização em cascata (o lint reclama, com razão).
-  // O botão é que marca "procurando" antes de chamar.
-  const procurarConector = useCallback(async () => {
+  const procurarCertificados = useCallback(async () => {
     try {
-      const estado = await fetch(`${CONECTOR}/saude`).then((r) => r.json()) as Saude;
-      setSaude(estado);
-      const lista = await fetch(`${CONECTOR}/certificados`).then((r) => r.json()) as { certificados: CertificadoDisponivel[] };
-      setDisponiveis(lista.certificados ?? []);
-      setEscolhido((lista.certificados ?? [])[0]?.id ?? "");
+      setPareamento(await estadoDoConector());
+      const { resultado, caminho: porOnde } = await pedirAoConector("certificados", {}, 8000);
+      const lista = (resultado as { certificados?: CertificadoDisponivel[] }).certificados ?? [];
+      setDisponiveis(lista);
+      setEscolhido(lista[0]?.id ?? "");
+      setCaminho(porOnde);
     } catch {
-      setSaude(null);
       setDisponiveis([]);
+      setCaminho(null);
     } finally {
       setProcurando(false);
     }
   }, []);
 
-  // A procura sai do ciclo de renderização de propósito: o conector pode não
-  // existir nesta máquina e a resposta demora o que a rede local demorar; o
-  // React não deve ficar preso a isso nem renderizar em cascata por causa dele.
+  // Fora do ciclo de renderização: o conector pode não existir e a espera é da
+  // rede, não do React.
   useEffect(() => {
-    const marca = setTimeout(() => { void procurarConector(); }, 0);
+    const marca = setTimeout(() => { void procurarCertificados(); }, 0);
     return () => clearTimeout(marca);
-  }, [procurarConector]);
+  }, [procurarCertificados]);
 
-  // O texto que vai ser assinado. Fica à vista, inteiro, antes de assinar:
-  // ninguém assina o que não leu.
   const textoPadrao = () => {
     const caso = casos.find((item) => item.id === casoId);
     const data = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
@@ -77,6 +70,16 @@ export function Certificado({ advogado, casos, assinaturas }: {
     ].join("\n");
   };
 
+  async function ligarEsteComputador() {
+    setErro(null);
+    try {
+      setChaveNova(await gerarChave());
+      setPareamento(await estadoDoConector());
+    } catch (e: unknown) {
+      setErro(mensagemDeErro(e));
+    }
+  }
+
   async function assinar(evento: FormEvent) {
     evento.preventDefault();
     setErro(null);
@@ -85,13 +88,9 @@ export function Certificado({ advogado, casos, assinaturas }: {
     setAssinando(true);
     try {
       const hash = await hashDe(texto);
-      const resposta = await fetch(`${CONECTOR}/assinar`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ certificadoId: escolhido, hash }),
-      });
-      const assinada = await resposta.json() as { assinatura?: string; origem?: "a3" | "demonstracao"; erro?: string };
-      if (!resposta.ok || !assinada.assinatura) throw new Error(assinada.erro ?? "O conector não conseguiu assinar.");
+      const { resultado } = await pedirAoConector("assinar", { certificadoId: escolhido || "demonstracao", hash });
+      const assinada = resultado as { assinatura?: string; origem?: "a3" | "demonstracao" };
+      if (!assinada.assinatura) throw new Error("O conector não devolveu a assinatura.");
 
       await chamar("/api/escritorio/assinaturas", {
         metodo: "POST",
@@ -102,7 +101,7 @@ export function Certificado({ advogado, casos, assinaturas }: {
           hash,
           assinatura: assinada.assinatura,
           certificado: disponiveis.find((item) => item.id === escolhido)?.titular ?? "Certificado do advogado",
-          origem: assinada.origem ?? saude?.modo ?? "demonstracao",
+          origem: assinada.origem ?? "demonstracao",
         },
       });
       setRecado("Documento assinado e guardado no caso.");
@@ -115,33 +114,35 @@ export function Certificado({ advogado, casos, assinaturas }: {
     }
   }
 
-  const modoDemonstracao = saude?.modo === "demonstracao";
+  const achou = disponiveis.length > 0;
+  const modoDemonstracao = disponiveis.some((item) => item.origem === "demonstracao");
+  const comando = `ESCRITORIO=${endereco} CHAVE=${chaveNova ?? ""} node conector/conector.mjs`;
 
   return <>
     <section className="card">
       <div className="card-head">
         <h2>Conector no seu computador</h2>
-        <span className={`status ${saude ? (modoDemonstracao ? "st-warn" : "st-ok") : "st-neutral"}`}>
-          {procurando ? "Procurando" : saude ? (modoDemonstracao ? "Modo demonstração" : "Token A3 conectado") : "Não encontrado"}
+        <span className={`status ${achou ? (modoDemonstracao ? "st-warn" : "st-ok") : "st-neutral"}`}>
+          {procurando ? "Procurando" : achou ? (modoDemonstracao ? "Modo demonstração" : "Token A3 conectado") : "Não encontrado"}
         </span>
       </div>
       <div className="card-body">
-        {!saude && !procurando && <>
+        {!achou && !procurando && <>
           <div className="vazio">
-            <strong>O conector não está rodando nesta máquina.</strong>
+            <strong>Nenhum conector respondeu.</strong>
             Ele é um programa pequeno que fica ao lado do seu token e assina o que o escritório pedir. Sem ele, o escritório continua funcionando: só não assina.
           </div>
-          <p className="tiny muted">Para ligar, na pasta do projeto: <code className="mono">node conector/conector.mjs</code>. Com token A3, aponte o driver: <code className="mono">PKCS11=/caminho/do/driver.so node conector/conector.mjs</code>.</p>
+          <p className="tiny muted">Nesta máquina basta <code className="mono">node conector/conector.mjs</code>. Abrindo o escritório pelo endereço público, o navegador não alcança o seu computador — aí ligue o conector à sua conta, no botão abaixo.</p>
         </>}
 
-        {saude && <>
+        {achou && <>
           <div className="agg">
-            <div className="agg-item"><label>Conector</label><strong>versão {saude.versao}</strong></div>
-            <div className="agg-item"><label>Modo</label><strong>{modoDemonstracao ? "Demonstração" : "Token A3"}</strong></div>
             <div className="agg-item"><label>Certificados vistos</label><strong>{disponiveis.length}</strong></div>
+            <div className="agg-item"><label>Modo</label><strong>{modoDemonstracao ? "Demonstração" : "Token A3"}</strong></div>
+            <div className="agg-item"><label>Caminho</label><strong>{caminho === "local" ? "Direto nesta máquina" : "Pela sua conta"}</strong></div>
           </div>
           {modoDemonstracao && <div className="notice">
-            <strong>Este certificado é de demonstração.</strong> Ele foi criado pelo conector nesta máquina para a tela poder ser mostrada, e <strong>não tem fé pública</strong>: não é ICP-Brasil, não vale para protocolo em tribunal e não substitui o seu token. Com o token plugado e o driver informado, o mesmo fluxo passa a usar o certificado de verdade, sem mudar nada aqui.
+            <strong>Este certificado é de demonstração.</strong> Ele foi criado pelo conector na sua máquina para a tela poder ser mostrada, e <strong>não tem fé pública</strong>: não é ICP-Brasil, não vale para protocolo em tribunal e não substitui o seu token. Com o token plugado e o driver informado, o mesmo fluxo passa a usar o certificado de verdade, sem mudar nada aqui.
           </div>}
           <ul className="cert-lista">
             {disponiveis.map((certificado) => <li key={certificado.id}>
@@ -150,9 +151,25 @@ export function Certificado({ advogado, casos, assinaturas }: {
             </li>)}
           </ul>
         </>}
-        <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setProcurando(true); setErro(null); void procurarConector(); }} disabled={procurando}>
-          {procurando ? "Procurando…" : "Procurar de novo"}
-        </button>
+
+        <div className="cert-acoes">
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setProcurando(true); setErro(null); void procurarCertificados(); }} disabled={procurando}>
+            {procurando ? "Procurando…" : "Procurar de novo"}
+          </button>
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => void ligarEsteComputador()}>
+            {pareamento ? "Gerar chave nova" : "Ligar este computador"}
+          </button>
+          {pareamento && <span className="tiny muted">
+            Ligado em {formatarMomento(pareamento.criadoEm, { comAno: false })}
+            {pareamento.ultimoContato ? ` · último contato ${formatarMomento(pareamento.ultimoContato, { comAno: false })}` : " · ainda não falou"}
+          </span>}
+        </div>
+
+        {chaveNova && <div className="notice" style={{ marginTop: 12 }}>
+          <strong>Chave gerada. Ela aparece uma vez só.</strong> No seu computador, na pasta do projeto, rode:
+          <code className="mono cert-comando">{comando}</code>
+          A chave fica guardada aqui apenas como impressão digital: se vazar do servidor, não serve para nada. Gerar outra desliga o conector anterior.
+        </div>}
       </div>
     </section>
 
@@ -177,11 +194,11 @@ export function Certificado({ advogado, casos, assinaturas }: {
           </label>
           {erro && <p className="cert-erro">{erro}</p>}
           {recado && <p className="cert-ok">{recado}</p>}
-          <button type="submit" className="btn btn-primary" disabled={!saude || assinando || !escolhido}>
+          <button type="submit" className="btn btn-primary" disabled={!achou || assinando}>
             {assinando ? "Assinando no seu computador…" : "Assinar com o certificado"}
           </button>
         </form>
-        <p className="tiny muted">O escritório calcula o hash do texto aqui no navegador, manda só o hash para o conector e guarda a assinatura que volta. A chave privada não passa pela rede e o servidor nunca a recebe.</p>
+        <p className="tiny muted">O escritório calcula o hash do texto aqui no navegador, manda só o hash ao conector e guarda a assinatura que volta. A chave privada não passa pela rede e o servidor nunca a recebe.</p>
       </div>
     </section>
 

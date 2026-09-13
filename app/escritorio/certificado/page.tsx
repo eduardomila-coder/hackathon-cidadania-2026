@@ -27,6 +27,7 @@ export default async function PaginaDoCertificado() {
       </div>
     </div>
     <Certificado
+      endereco={process.env.APP_URL ?? "http://127.0.0.1:3000"}
       advogado={{ nome: advogado.nome, oab: advogado.oab }}
       casos={casos.map((caso) => ({ id: caso.id, titulo: caso.cliente ? `${caso.cliente.nome} · ${caso.titulo}` : caso.titulo }))}
       assinaturas={assinaturas.map((assinatura) => ({

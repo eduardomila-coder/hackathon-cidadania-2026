@@ -11,6 +11,12 @@
 //   node conector/conector.mjs                      (modo demonstração)
 //   PKCS11=/caminho/do/driver.so node conector/conector.mjs   (token A3)
 //
+// Para o escritório aberto no endereço público, o navegador não alcança esta
+// máquina — então é o conector que procura o escritório. Pegue a chave em
+// Certificado digital → "Ligar este computador" e rode:
+//
+//   ESCRITORIO=https://habeastitas.eduardomila.adv.br CHAVE=pd_... node conector/conector.mjs
+//
 // O PIN, quando existe, é digitado aqui no terminal e fica só na memória deste
 // processo. Não vai para arquivo, não vai para o servidor, não vai para log.
 
@@ -195,9 +201,97 @@ const servidor = createServer(async (req, res) => {
   }
 });
 
+// ------------------------------------------------------------ fila remota
+
+// Quando o escritório é aberto pelo endereço público, o navegador não consegue
+// falar com esta máquina. Aí a conversa se inverte: o conector pergunta ao
+// escritório se há algo para fazer. Nenhuma porta é aberta para a internet e
+// nada sigiloso trafega — vai o pedido, volta a resposta.
+const ESCRITORIO = (process.env.ESCRITORIO ?? "").replace(/\/$/, "");
+const CHAVE = process.env.CHAVE ?? "";
+const INTERVALO = Number(process.env.INTERVALO ?? 2000);
+const CONSULTA = process.env.CONSULTA ?? "http://127.0.0.1:8767";
+
+// Os pedidos do PROJUDI vão para o serviço de consulta, que é outro programa
+// nesta mesma máquina. Daqui para lá é localhost falando com localhost: nada
+// atravessa a rede.
+async function noServicoDeConsulta(caminho, metodo, corpo) {
+  const resposta = await fetch(`${CONSULTA}${caminho}`, {
+    method: metodo,
+    headers: corpo ? { "content-type": "application/json" } : undefined,
+    body: corpo ? JSON.stringify(corpo) : undefined,
+  });
+  const dados = await resposta.json().catch(() => ({}));
+  if (!resposta.ok) throw new Error(dados.erro ?? `O serviço de consulta devolveu ${resposta.status}.`);
+  return dados;
+}
+
+async function atender(pedido) {
+  const dados = pedido.dados ?? {};
+  switch (pedido.tipo) {
+    case "certificados":
+      return { certificados: await listarCertificados() };
+    case "assinar":
+      return assinar(dados.certificadoId ?? "demonstracao", String(dados.hash ?? ""));
+    case "projudi-entrar":
+      return noServicoDeConsulta("/entrar", "POST", dados);
+    case "projudi-carteira":
+      return noServicoDeConsulta("/carteira", "GET");
+    case "projudi-processo":
+      return noServicoDeConsulta(`/processo?cnj=${encodeURIComponent(String(dados.cnj ?? ""))}`, "GET");
+    default:
+      throw new Error(`Pedido desconhecido: ${pedido.tipo}`);
+  }
+}
+
+async function umaRodadaDaFila() {
+  const resposta = await fetch(`${ESCRITORIO}/api/conector/fila`, { headers: { authorization: `Bearer ${CHAVE}` } });
+  if (resposta.status === 401) throw new Error("O escritório não reconheceu a chave. Gere outra na tela e rode de novo.");
+  if (!resposta.ok) throw new Error(`O escritório respondeu ${resposta.status}.`);
+  const { pedidos = [] } = await resposta.json();
+  for (const pedido of pedidos) {
+    let corpo;
+    try {
+      corpo = { id: pedido.id, resultado: await atender(pedido) };
+      console.log(`  atendido: ${pedido.tipo}`);
+    } catch (e) {
+      corpo = { id: pedido.id, erro: e instanceof Error ? e.message : "Falhou aqui no seu computador." };
+      console.log(`  recusado: ${pedido.tipo} — ${corpo.erro}`);
+    }
+    await fetch(`${ESCRITORIO}/api/conector/fila`, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${CHAVE}` },
+      body: JSON.stringify(corpo),
+    });
+  }
+}
+
+function acompanharEscritorio() {
+  let avisouQueCaiu = false;
+  const rodar = async () => {
+    try {
+      await umaRodadaDaFila();
+      if (avisouQueCaiu) { console.log("Escritório de volta."); avisouQueCaiu = false; }
+    } catch (e) {
+      if (!avisouQueCaiu) {
+        console.log(`Sem falar com o escritório: ${e instanceof Error ? e.message : e}`);
+        avisouQueCaiu = true;
+      }
+    }
+  };
+  setInterval(() => { void rodar(); }, INTERVALO);
+  void rodar();
+}
+
 // Só 127.0.0.1: o conector não aceita conexão de fora da máquina. Quem fala com
 // ele é o navegador do próprio advogado, não o servidor do escritório.
 servidor.listen(PORTA, "127.0.0.1", () => {
   console.log(`Conector do Escritório Dativo na porta ${PORTA}, modo ${driver ? "A3 (token)" : "demonstração"}.`);
   console.log("A chave privada não sai desta máquina. Ctrl+C encerra.");
+  if (ESCRITORIO && CHAVE) {
+    console.log(`Atendendo também os pedidos de ${ESCRITORIO}, a cada ${INTERVALO / 1000}s.`);
+    acompanharEscritorio();
+  } else {
+    console.log("Sem ESCRITORIO e CHAVE: atende só o navegador desta máquina.");
+  }
 });
