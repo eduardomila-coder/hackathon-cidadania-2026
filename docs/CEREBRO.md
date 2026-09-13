@@ -151,3 +151,18 @@ no Segundo Cérebro em `~/Claude/Projects/segundo-cerebro/`.
 | 2026-09-12 | Claude segue principal; DeepSeek continua alternativa por `MODEL` e `ANTHROPIC_BASE_URL` | Trocar o modelo a uma hora da Entrega 2 arriscaria a demo; DeepSeek entra como argumento de custo |
 | 2026-09-12 | Produto passa a se chamar Ponto Dativo, escritório de apoio demonstrativo | Direção do Eduardo: foco no fluxo da Advocacia Dativa OAB/PR, com atendimento, documentos, agenda, WhatsApp e assistente sem presumir parceria formal ou uso da marca OAB |
 | 2026-09-12 (18h) | O escritório deixa de ser tela de demonstração com estado no navegador e vira plataforma com login por advogado, tudo gravado no servidor (`docs/PLATAFORMA.md`); contas criadas pela equipe no painel; base + 3 módulos (casos, mensagens, painel/processos/documentação) em paralelo | Decisão do Eduardo: o advogado precisa trabalhar nos casos dele de verdade, e a auditoria precisa ver isolamento entre contas e envio só com clique. Continua rotulado como ambiente de demonstração, sem marca da OAB nem promessa de produção |
+
+## Servidor compartilhado roda em produção (13/09, tarde)
+
+O `habeastitas.eduardomila.adv.br` deixou de rodar `next dev` e passou a rodar
+`next build` + `next start`. Motivo: no modo dev o Turbopack recompila com a
+página aberta e o React às vezes recebia um módulo de cliente ainda não
+resolvido — "Element type is invalid. Received a promise that resolves to:
+undefined" —, um erro que aparecia para quem estava usando o endereço sem nada
+de errado no código. O `npm run build` passa limpo e leva ~9 s.
+
+O que muda para a equipe: nada no jeito de trabalhar. O endereço continua
+puxando a `main` a cada 60 s. A diferença é que agora ele **constrói antes de
+trocar**: se o build falhar, o site fica no ar com a versão anterior e o erro
+aparece em `~/Library/Logs/hackathon-live.log`. Ou seja, `main` quebrada não
+derruba mais a demonstração.

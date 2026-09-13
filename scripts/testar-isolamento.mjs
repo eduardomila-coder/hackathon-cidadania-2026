@@ -6,10 +6,21 @@
 //
 // Uso: node --env-file=.env.local scripts/testar-isolamento.mjs [http://127.0.0.1:3000]
 // Precisa de PAINEL_USUARIOS no ambiente (o --env-file lê o .env.local, como o app).
+//
+// Rode contra um servidor já usado: o `next dev` compila cada rota na primeira
+// chamada, e a primeira rodada contra servidor recém-subido pode falhar em rotas
+// frias (foi o que aconteceu em 13/09: 7 de 29 na primeira, 29 de 29 na
+// seguinte). O aquecimento abaixo cobre as rotas principais; se ainda falhar em
+// rota de caso, rode de novo antes de procurar defeito no isolamento.
 import { randomUUID } from "node:crypto";
 
 const base = process.argv[2] ?? "http://127.0.0.1:3000";
 const marcador = randomUUID().slice(0, 8);
+
+for (const caminho of ["/entrar", "/escritorio", "/api/escritorio/resumo", "/api/escritorio/casos", "/api/escritorio/mensagens"]) {
+  await fetch(base + caminho, { redirect: "manual" }).catch(() => {});
+}
+await new Promise((acordar) => setTimeout(acordar, 1000));
 
 const equipe = (process.env.PAINEL_USUARIOS ?? "")
   .split(";")

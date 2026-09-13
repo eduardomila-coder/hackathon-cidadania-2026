@@ -287,6 +287,15 @@ async function garantirConta(conta) {
   throw new Error(`não criou a conta ${conta.usuario}: HTTP ${criada.status} ${criada.texto.slice(0, 120)}`);
 }
 
+// Os títulos que a conta já tem. Serve para rodar o seed de novo num ambiente
+// já semeado sem duplicar caso: o roteiro cresceu de 2 para 3 casos por conta,
+// e o servidor da demonstração já tinha os 2 primeiros.
+async function titulosJaSemeados(cookie) {
+  const lista = await pedir("/api/escritorio/casos", { cookie });
+  if (lista.status !== 200 || !Array.isArray(lista.json)) return new Set();
+  return new Set(lista.json.map((caso) => caso.titulo));
+}
+
 async function semearCaso(cookie, caso) {
   const aberto = await pedir("/api/escritorio/casos", {
     metodo: "POST",
@@ -349,8 +358,11 @@ for (const conta of CONTAS) {
   const estado = await garantirConta(conta);
   const entrada = await pedir("/api/entrar", { metodo: "POST", corpo: { usuario: conta.usuario, senha: SENHA } });
   if (entrada.status !== 200 || !entrada.cookieEmitido) throw new Error(`não entrou como ${conta.usuario}: HTTP ${entrada.status}`);
-  console.log(`${conta.nome} (${conta.usuario}) · ${estado} · ${conta.casos.length} caso(s)`);
-  for (const caso of conta.casos) await semearCaso(entrada.cookieEmitido, caso);
+  const jaTem = await titulosJaSemeados(entrada.cookieEmitido);
+  const pendentes = conta.casos.filter((caso) => !jaTem.has(caso.titulo));
+  const repetidos = conta.casos.length - pendentes.length;
+  console.log(`${conta.nome} (${conta.usuario}) · ${estado} · ${pendentes.length} caso(s) a semear${repetidos ? ` · ${repetidos} já estava(m) lá` : ""}`);
+  for (const caso of pendentes) await semearCaso(entrada.cookieEmitido, caso);
   console.log("");
 }
 console.log("Pronto. Cada conta enxerga só os casos dela: é o isolamento por advogadoId.");
