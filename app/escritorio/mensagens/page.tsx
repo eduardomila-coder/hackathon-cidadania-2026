@@ -70,7 +70,17 @@ async function lerErro(resposta: Response, padrao: string) {
 
 // `useSearchParams` precisa de Suspense em volta para o build não reclamar.
 export default function PaginaDeMensagens() {
-  return <Suspense fallback={<p className="pd-lista-nota">Carregando…</p>}><Mensagens /></Suspense>;
+  return <Suspense fallback={<p className="pd-conversas-nota">Carregando…</p>}><Mensagens /></Suspense>;
+}
+
+// Estado da conexão em uma frase, para o selo do cabeçalho. A cor nunca
+// aparece sozinha: o selo sempre traz o texto do estado.
+function estadoDaConexao(whatsApp: EstadoWhatsApp | null) {
+  if (!whatsApp || !whatsApp.configurado) return null;
+  if (whatsApp.estado === "open") return { classe: "pd-estado-ok", texto: "WhatsApp conectado" };
+  if (whatsApp.estado === "connecting") return { classe: "pd-estado-info", texto: "Aguardando leitura do QR" };
+  if (whatsApp.estado === "sem_numero") return { classe: "pd-estado-atencao", texto: "Sem número cadastrado" };
+  return { classe: "pd-estado-atencao", texto: "WhatsApp desconectado" };
 }
 
 function Mensagens() {
@@ -304,49 +314,54 @@ function Mensagens() {
     || (conversa.ultimaMensagem ?? "").toLowerCase().includes(buscaLimpa)
     || conversa.contato.includes(buscaLimpa.replace(/\D/g, "")));
 
-  return <section className={`pd-mensagens ${selecionado ? "pd-mensagens-aberta" : ""}`}>
-    <header className="pd-mensagens-topo">
-      <div>
-        <p className="md-eyebrow">Mensagens</p>
-        <h1>Conversas do WhatsApp</h1>
-      </div>
-      <p className="pd-mensagens-sub">O que os clientes mandam para o seu número chega aqui. O assistente sugere a resposta; quem envia é você.</p>
-    </header>
+  const seloConexao = estadoDaConexao(whatsApp);
 
-    {whatsApp && !whatsApp.configurado && <p className="pd-aviso-conexao" role="status">
-      O servidor ainda não tem a integração do WhatsApp configurada. As conversas aparecem aqui quando ela estiver ativa.
+  return <section className={`pd-mensagens ${selecionado ? "pd-mensagens-aberta" : ""}`}>
+    <div className="pd-pagina-cabeca">
+      <div>
+        <p className="pd-eyebrow">Atendimento</p>
+        <h1>Mensagens</h1>
+        <p className="pd-auxiliar">O que os clientes mandam para o seu número chega aqui. O assistente escreve o rascunho; quem envia é você.</p>
+      </div>
+      <div className="pd-pagina-acoes">
+        {seloConexao && <span className={`pd-estado ${seloConexao.classe}`}>{seloConexao.texto}</span>}
+      </div>
+    </div>
+
+    {whatsApp && !whatsApp.configurado && <p className="pd-aviso pd-aviso-atencao" role="status">
+      A integração do WhatsApp ainda não está ligada neste servidor. As conversas aparecem aqui quando ela estiver ativa.
     </p>}
-    {whatsApp?.configurado && semConexao && <p className="pd-aviso-conexao" role="status">
+    {whatsApp?.configurado && semConexao && <p className="pd-aviso pd-aviso-atencao" role="status">
       {whatsApp.estado === "sem_numero" ? "Você ainda não cadastrou o seu WhatsApp." : "O seu WhatsApp não está conectado agora."}{" "}
-      <Link href="/escritorio/whatsapp">{whatsApp.estado === "sem_numero" ? "Cadastrar e conectar" : "Conectar de novo"}</Link>. Enquanto isso, nada novo chega nem sai por aqui; o que já chegou continua guardado abaixo.
+      <Link className="pd-aviso-link" href="/escritorio/whatsapp">{whatsApp.estado === "sem_numero" ? "Cadastrar e conectar" : "Conectar de novo"}</Link>. Enquanto isso, nada novo chega nem sai por aqui; o que já chegou continua guardado abaixo.
     </p>}
 
     <div className={`pd-caixa${contextoAberto ? " pd-caixa-larga" : ""}`}>
       <div className="pd-caixa-grade">
-        <aside className="pd-lista" aria-label="Conversas">
-          <div className="pd-lista-cabeca">
+        <aside className="pd-conversas" aria-label="Conversas">
+          <div className="pd-conversas-cabeca">
             <div>
               <h2>Conversas</h2>
               <p>{conversas === null ? "carregando…" : `${visiveis.length} ${visiveis.length === 1 ? "conversa" : "conversas"}`}</p>
             </div>
-            <button type="button" className="pd-lista-atualizar" onClick={() => { void carregarConversas(); }} disabled={conversas === null} title="Atualizar lista" aria-label="Atualizar lista">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
+            <button type="button" className="pd-conversas-atualizar" onClick={() => { void carregarConversas(); }} disabled={conversas === null} title="Atualizar lista" aria-label="Atualizar lista">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 3v6h-6" /></svg>
             </button>
           </div>
 
-          <div className="pd-busca">
-            <div className="pd-busca-campo">
+          <div className="pd-conversas-busca">
+            <div className="pd-conversas-busca-campo">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
-              <input value={busca} onChange={(evento) => setBusca(evento.target.value)} placeholder="Buscar conversa…" aria-label="Buscar conversa" />
+              <input value={busca} onChange={(evento) => setBusca(evento.target.value)} placeholder="Buscar conversa" aria-label="Buscar conversa" />
             </div>
           </div>
 
-          <div className="pd-lista-rolagem">
-            {conversas === null && <p className="pd-lista-nota">Carregando…</p>}
-            {conversas && conversas.length === 0 && <p className="pd-lista-nota">
+          <div className="pd-conversas-rolagem">
+            {conversas === null && <p className="pd-conversas-nota">Carregando…</p>}
+            {conversas && conversas.length === 0 && <p className="pd-conversas-nota">
               Nenhuma conversa ainda. Quando alguém escrever para o seu WhatsApp conectado, a conversa aparece aqui.
             </p>}
-            {conversas && conversas.length > 0 && visiveis.length === 0 && <p className="pd-lista-nota">
+            {conversas && conversas.length > 0 && visiveis.length === 0 && <p className="pd-conversas-nota">
               Nenhuma conversa com “{busca}”.
             </p>}
             {visiveis.map((conversa) => <button
@@ -371,12 +386,12 @@ function Mensagens() {
             </button>)}
           </div>
 
-          <p className="pd-lista-rodape">As conversas ficam guardadas na sua conta. Nada sai para o cliente sem o seu clique.</p>
+          <p className="pd-conversas-rodape">As conversas ficam guardadas na sua conta. Nada sai para o cliente sem o seu clique.</p>
         </aside>
 
         <div className="pd-chat">
           {!selecionado && <div className="pd-chat-vazio">
-            <p className="md-eyebrow">Conversa</p>
+            <p className="pd-eyebrow">Conversa</p>
             <h2>Escolha uma conversa ao lado.</h2>
             <p>As mensagens ficam guardadas na sua conta e podem ser ligadas a um caso para aparecerem na página dele.</p>
           </div>}
@@ -500,8 +515,8 @@ function Mensagens() {
                 </label>
 
                 <div className="pd-estagiario-botoes">
-                  <button type="button" className="secundario" onClick={() => { void salvarEstagiario({ instrucao }); }} disabled={salvandoEstagiario}>Salvar instrução</button>
-                  <button type="button" onClick={() => { void testarEstagiario(); }} disabled={testando || salvandoEstagiario}>{testando ? "Atendendo…" : "Testar agora"}</button>
+                  <button type="button" className="pd-botao pd-botao-secundario pd-botao-pequeno" onClick={() => { void salvarEstagiario({ instrucao }); }} disabled={salvandoEstagiario}>Salvar instrução</button>
+                  <button type="button" className="pd-botao pd-botao-primario pd-botao-pequeno" onClick={() => { void testarEstagiario(); }} disabled={testando || salvandoEstagiario}>{testando ? "Atendendo…" : "Testar agora"}</button>
                 </div>
                 <p className="pd-estagiario-motivo">
                   O teste não envia nada: mostra a resposta que ele daria e por que.
@@ -519,22 +534,22 @@ function Mensagens() {
               <label htmlFor="vincular-caso">Escolher um caso aberto</label>
               <div>
                 <select id="vincular-caso" value={casoEscolhido} onChange={(evento) => setCasoEscolhido(evento.target.value)} disabled={vinculando}>
-                  <option value="">{casos.length ? "Escolha o caso…" : "Nenhum caso aberto ainda"}</option>
+                  <option value="">{casos.length ? "Escolha o caso" : "Nenhum caso aberto ainda"}</option>
                   {casos.map((caso) => <option key={caso.id} value={caso.id}>{caso.titulo}{caso.situacao ? ` (${NOMES_DA_SITUACAO[caso.situacao] ?? caso.situacao})` : ""}</option>)}
                 </select>
-                <button type="submit" disabled={vinculando || !casoEscolhido}>{vinculando ? "Vinculando…" : "Vincular"}</button>
+                <button type="submit" className="pd-botao pd-botao-primario pd-botao-pequeno" disabled={vinculando || !casoEscolhido}>{vinculando ? "Vinculando…" : "Vincular"}</button>
               </div>
             </form>
             <form className="pd-vincular-forma" onSubmit={(evento) => { evento.preventDefault(); if (tituloNovo.trim()) void vincular({ novoCaso: { titulo: tituloNovo.trim() } }); }}>
               <label htmlFor="novo-caso">Ou abrir um caso com esta conversa</label>
               <div>
                 <input id="novo-caso" value={tituloNovo} onChange={(evento) => setTituloNovo(evento.target.value)} maxLength={200} placeholder={`Ex.: Atendimento de ${conversaAberta ? nomeDaConversa(conversaAberta) : "cliente"}`} disabled={vinculando} />
-                <button type="submit" disabled={vinculando || !tituloNovo.trim()}>{vinculando ? "Abrindo…" : "Abrir caso"}</button>
+                <button type="submit" className="pd-botao pd-botao-primario pd-botao-pequeno" disabled={vinculando || !tituloNovo.trim()}>{vinculando ? "Abrindo…" : "Abrir caso"}</button>
               </div>
             </form>
           </div>}
 
-          {aviso && <p className={`pd-resposta-aviso pd-aviso-${aviso.tipo}`} role={aviso.tipo === "erro" ? "alert" : "status"}>{aviso.texto}</p>}
+          {aviso && <p className={`pd-resposta-aviso ${aviso.tipo}`} role={aviso.tipo === "erro" ? "alert" : "status"}>{aviso.texto}</p>}
         </aside>}
       </div>
     </div>

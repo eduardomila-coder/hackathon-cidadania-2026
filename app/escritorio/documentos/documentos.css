@@ -1,0 +1,40 @@
+/* Tela /escritorio/documentos: o checklist de cada caso, agrupado por caso.
+   Reaproveita .pd-cartao, .pd-lista, .pd-linha, .pd-estado, .pd-metricas,
+   .pd-aviso e os botões .pd-botao-* de globals.css. */
+
+.pd-documentos { display: grid; gap: 16px; }
+.pd-documentos .pd-aviso { margin: 0; }
+.pd-documentos .pd-aviso strong { display: block; margin-bottom: 3px; }
+
+/* Contagem em alerta: cor mais texto, nunca cor sozinha. */
+.pd-documentos-metrica-alerta dd { color: var(--atencao); }
+.pd-documentos-metrica-risco dd { color: var(--risco); }
+
+/* Recado da última ação e erro. Vazio não ocupa espaço. */
+.pd-documentos-recado { margin: 0; font-size: 12px; color: var(--ok); }
+.pd-documentos-recado:empty { display: none; }
+.pd-documentos-erro { color: var(--risco); font-weight: 700; }
+
+.pd-documentos-cabeca { align-items: flex-start; flex-wrap: wrap; }
+.pd-documentos-caso { min-width: 0; }
+.pd-documentos-caso h2 { font-size: 15px; }
+.pd-documentos-caso .pd-linha-meta { margin-top: 3px; }
+.pd-documentos-caso-acoes { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.pd-documentos .pd-linha { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) auto; align-items: start; }
+.pd-documentos-celula { min-width: 0; display: grid; gap: 5px; align-content: start; justify-items: start; }
+.pd-documentos-celula > * { margin: 0; }
+.pd-documentos-acao { display: flex; align-items: center; gap: 8px; }
+.pd-documentos-acao .pd-botao { min-height: 32px; }
+
+@media (max-width: 820px) {
+  .pd-documentos .pd-linha { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .pd-documentos-acao { justify-content: flex-start; }
+  /* Alvo de toque no celular. */
+  .pd-documentos-acao .pd-botao { min-height: 44px; }
+}
+
+@media (max-width: 420px) {
+  .pd-documentos-caso-acoes { width: 100%; }
+  .pd-documentos-caso-acoes .pd-botao { min-height: 44px; }
+}

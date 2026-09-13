@@ -1,0 +1,116 @@
+/* Tela /escritorio/pesquisa: as triagens salvas, por caso, com requisitos e
+   fontes. Reaproveita .pd-cartao-cabeca, .pd-estado, .pd-progresso, .pd-aviso
+   e .pd-vazio de globals.css. */
+
+.pd-pesquisa { display: grid; gap: 16px; }
+.pd-pesquisa .pd-aviso { margin: 0; }
+.pd-pesquisa .pd-aviso strong { display: block; margin-bottom: 3px; }
+
+.pd-pesquisa-layout { display: grid; grid-template-columns: minmax(230px, 290px) minmax(0, 1fr); gap: 16px; align-items: start; }
+
+/* Coluna do contexto: os casos com triagem, como filtro. */
+.pd-pesquisa-contexto {
+  background: var(--papel); border: 1px solid var(--linha);
+  border-radius: var(--raio); overflow: hidden;
+}
+.pd-pesquisa-caso {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; min-height: 44px; padding: 10px 16px; border: 0; border-bottom: 1px solid var(--linha);
+  background: transparent; text-align: left; color: var(--tinta-2); font-size: 12px; font-weight: 700;
+}
+.pd-pesquisa-caso:last-child { border-bottom: 0; }
+.pd-pesquisa-caso:hover { background: var(--papel-2); color: var(--tinta); }
+.pd-pesquisa-caso-ativo { background: var(--azul-claro); color: var(--azul-escuro); font-weight: 800; }
+.pd-pesquisa-caso-ativo:hover { background: var(--azul-claro); color: var(--azul-escuro); }
+.pd-pesquisa-caso-nome { min-width: 0; }
+.pd-pesquisa-caso-contagem {
+  flex: 0 0 auto; padding: 2px 7px; border-radius: 99px;
+  background: var(--papel-3); color: var(--tinta-2);
+  font-family: var(--fonte-numeros); font-size: 12px; font-weight: 700;
+}
+.pd-pesquisa-caso-ativo .pd-pesquisa-caso-contagem { background: #fff; color: var(--azul-escuro); }
+
+.pd-pesquisa-tudo { display: grid; gap: 16px; min-width: 0; }
+
+.pd-pesquisa-grupo { display: grid; gap: 10px; }
+.pd-pesquisa-grupo-cabeca {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.pd-pesquisa-grupo-cabeca h2 { margin: 0; font-size: 15px; }
+.pd-pesquisa-grupo-cabeca .pd-linha-meta { margin-top: 3px; }
+
+/* Uma triagem salva: bloco próprio, com cabeçalho, corpo e rodapé. */
+.pd-pesquisa-triagem {
+  background: var(--papel); border: 1px solid var(--linha);
+  border-radius: var(--raio); padding: 16px; display: grid; gap: 12px;
+}
+.pd-pesquisa-triagem-cabeca {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.pd-pesquisa-triagem-cabeca .pd-linha-meta { margin-top: 5px; }
+
+.pd-pesquisa-forca { display: grid; gap: 8px; }
+.pd-pesquisa-forca strong { display: block; font-size: 13px; }
+.pd-pesquisa-forca small { display: block; margin-top: 2px; color: var(--tinta-3); font-size: 12px; line-height: 1.45; }
+
+.pd-pesquisa-texto { margin: 0; color: var(--tinta-2); font-size: 13px; line-height: 1.55; }
+.pd-pesquisa-bloco { display: grid; gap: 7px; }
+.pd-pesquisa-bloco h3 { margin: 0; }
+.pd-pesquisa-bloco .pd-pesquisa-texto + .pd-pesquisa-texto { margin-top: 4px; }
+
+.pd-pesquisa-requisitos { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.pd-pesquisa-requisitos li { padding: 12px 0; border-top: 1px solid var(--linha); font-size: 13px; }
+.pd-pesquisa-requisitos li:last-child { padding-bottom: 0; }
+.pd-pesquisa-requisito-topo {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap; margin-bottom: 5px;
+}
+.pd-pesquisa-requisito-topo strong { font-size: 13px; }
+
+.pd-pesquisa-fonte { margin: 6px 0 0; color: var(--tinta-3); font-size: 12px; line-height: 1.45; }
+.pd-pesquisa-fonte code, .pd-pesquisa-marcadores code, .pd-pesquisa-base code {
+  padding: 1px 5px; border-radius: 4px; background: var(--papel-3);
+  color: var(--azul-escuro); font-family: var(--fonte-numeros); font-size: 12px;
+  font-weight: 700;
+}
+
+.pd-pesquisa-detalhe {
+  border: 1px solid var(--linha); border-radius: var(--raio-pequeno);
+  padding: 11px 13px; background: var(--papel-2);
+}
+.pd-pesquisa-detalhe summary { cursor: pointer; font-size: 12px; font-weight: 800; color: var(--tinta-2); }
+.pd-pesquisa-detalhe[open] summary { margin-bottom: 9px; }
+.pd-pesquisa-detalhe-alerta { background: var(--atencao-fundo); border-color: #E6D6AE; }
+.pd-pesquisa-detalhe-alerta summary { color: #70551E; }
+
+.pd-pesquisa-marcadores { margin: 0; padding-left: 18px; display: grid; gap: 7px; font-size: 12px; line-height: 1.5; color: var(--tinta-2); }
+
+.pd-pesquisa-colunas { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.pd-pesquisa-colunas h3 { margin: 0 0 7px; font-size: 13px; }
+
+.pd-pesquisa-rodape {
+  margin: 0; padding-top: 11px; border-top: 1px solid var(--linha);
+  color: var(--tinta-3); font-size: 12px; line-height: 1.5;
+}
+
+.pd-pesquisa-base {
+  border: 1px solid var(--linha); border-radius: var(--raio);
+  background: var(--papel); padding: 14px 16px;
+}
+.pd-pesquisa-base summary { cursor: pointer; font-size: 13px; font-weight: 800; color: var(--tinta-2); }
+.pd-pesquisa-base[open] summary { margin-bottom: 10px; }
+.pd-pesquisa-base .pd-pesquisa-texto { margin-bottom: 10px; }
+
+@media (max-width: 980px) {
+  .pd-pesquisa-layout { grid-template-columns: minmax(0, 1fr); }
+  .pd-pesquisa-contexto { display: flex; flex-wrap: wrap; }
+  .pd-pesquisa-contexto .pd-cartao-cabeca { width: 100%; }
+  .pd-pesquisa-caso { width: auto; min-height: 44px; border-bottom: 0; border-right: 1px solid var(--linha); border-radius: 0; }
+  .pd-pesquisa-caso:last-child { border-right: 0; }
+}
+
+@media (max-width: 620px) {
+  .pd-pesquisa-colunas { grid-template-columns: 1fr; }
+  .pd-pesquisa-triagem { padding: 14px; }
+}

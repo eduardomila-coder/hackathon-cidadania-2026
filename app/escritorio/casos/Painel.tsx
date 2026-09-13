@@ -13,6 +13,8 @@ type Props = { resumo: ResumoDoEscritorio; casos: CasoComDetalhes[]; clientes: C
 type Painel = "nenhum" | "novo" | "nomeacao";
 type Filtro = "todos" | Situacao;
 
+// Estado do WhatsApp do escritório. A cor acompanha o texto, nunca o
+// substitui: quem lê a tela entende a situação sem depender do tom.
 const ESTADOS_DO_WHATSAPP: Record<string, { texto: string; tom: "ok" | "atencao" | "neutro" }> = {
   open: { texto: "Conectado", tom: "ok" },
   connecting: { texto: "Conectando", tom: "atencao" },
@@ -23,8 +25,29 @@ const ESTADOS_DO_WHATSAPP: Record<string, { texto: string; tom: "ok" | "atencao"
   indisponivel: { texto: "Indisponível agora", tom: "neutro" },
 };
 
+const CLASSES_DE_TOM: Record<"ok" | "atencao" | "neutro", string> = {
+  ok: "pd-estado-ok",
+  atencao: "pd-estado-atencao",
+  neutro: "",
+};
+
+// Situação do caso. Verde é o que já terminou; âmbar é o que depende de
+// alguém; em andamento fica no neutro, porque não é pendência nem conclusão.
+const TOM_DA_SITUACAO: Record<Situacao, string> = {
+  novo: "pd-estado-atencao",
+  em_andamento: "",
+  aguardando_cliente: "pd-estado-atencao",
+  concluido: "pd-estado-ok",
+};
+
 function plural(quantidade: number, singular: string, pluralizado: string) {
   return `${quantidade} ${quantidade === 1 ? singular : pluralizado}`;
+}
+
+function classeDoTom(tom: string | undefined) {
+  if (tom === "vencido") return "pdl-prazo-risco";
+  if (tom === "hoje" || tom === "urgente") return "pdl-prazo-atencao";
+  return "";
 }
 
 function fraseDoDia(resumo: ResumoDoEscritorio) {
@@ -44,79 +67,145 @@ export function Painel({ resumo, casos, clientes }: Props) {
   const alternar = (qual: Painel) => setPainel((atual) => atual === qual ? "nenhum" : qual);
   const contagem = (situacao: Filtro) => situacao === "todos" ? casos.length : casos.filter((caso) => caso.situacao === situacao).length;
   const visiveis = filtro === "todos" ? casos : casos.filter((caso) => caso.situacao === filtro);
+  const emAndamento = casos.filter((caso) => caso.situacao === "em_andamento").length;
 
-  return <div className="pdc-painel">
-    <header className="pdc-topo">
+  return <div className="pdl-mesa">
+    <div className="pd-pagina-cabeca">
       <div>
-        <p className="md-eyebrow">{dataPorExtenso()}</p>
+        <p className="pd-eyebrow">{dataPorExtenso()}</p>
         <h1>{saudacao()}, {primeiroNome(advogado.nome)}.</h1>
-        <p className="pdc-topo-texto">{fraseDoDia(resumo)}</p>
+        <p className="pd-auxiliar">{fraseDoDia(resumo)}</p>
       </div>
-      <div className="pdc-topo-acoes">
-        <button type="button" className="md-botao-primario" onClick={() => alternar("novo")} aria-pressed={painel === "novo"}>Novo caso <span>+</span></button>
-        <button type="button" className="md-botao-secundario" onClick={() => alternar("nomeacao")} aria-pressed={painel === "nomeacao"}>Nova nomeação</button>
+      <div className="pd-pagina-acoes">
+        <button type="button" className="pd-botao pd-botao-primario" onClick={() => alternar("novo")} aria-pressed={painel === "novo"}>Novo caso</button>
+        <button type="button" className="pd-botao pd-botao-secundario" onClick={() => alternar("nomeacao")} aria-pressed={painel === "nomeacao"}>Nova nomeação</button>
       </div>
-    </header>
+    </div>
 
-    <section className="md-resumo pdc-resumo" aria-label="Resumo do escritório">
-      <article><strong>{resumo.casosAbertos}</strong><span>{resumo.casosAbertos === 1 ? "caso aberto" : "casos abertos"}</span></article>
-      <article className={resumo.prazosProximos.length > 0 ? "pdc-resumo-alerta" : ""}><strong>{resumo.prazosProximos.length}</strong><span>{resumo.prazosProximos.length === 1 ? "prazo" : "prazos"} nos próximos 7 dias</span></article>
-      <Link href="/escritorio/mensagens" className={`pdc-resumo-link${resumo.mensagensNovas > 0 ? " pdc-resumo-destaque" : ""}`}><strong>{resumo.mensagensNovas}</strong><span>{resumo.mensagensNovas === 1 ? "mensagem nova" : "mensagens novas"} no WhatsApp</span></Link>
-      <article><strong>{resumo.documentosPendentes}</strong><span>{resumo.documentosPendentes === 1 ? "documento pendente" : "documentos pendentes"}</span></article>
-      <EstadoDoWhatsapp />
-    </section>
+    <dl className="pd-metricas pdl-metricas">
+      <div className="pd-metrica">
+        <dt>Casos abertos</dt>
+        <dd>{resumo.casosAbertos}</dd>
+        <small>{emAndamento === 0 ? "nenhum em andamento" : `${emAndamento} em andamento`}</small>
+      </div>
+      <div className="pd-metrica">
+        <dt>Prazos em 7 dias</dt>
+        <dd>{resumo.prazosProximos.length}</dd>
+        <small>a conferir no processo oficial</small>
+      </div>
+      <div className={`pd-metrica${resumo.mensagensNovas > 0 ? " pdl-metrica-destaque" : ""}`}>
+        <dt>Mensagens novas</dt>
+        <dd>{resumo.mensagensNovas}</dd>
+        <small><Link href="/escritorio/mensagens">ver as conversas no WhatsApp</Link></small>
+      </div>
+      <div className="pd-metrica">
+        <dt>Documentos pendentes</dt>
+        <dd>{resumo.documentosPendentes}</dd>
+        <small>a pedir ou conferir nos casos</small>
+      </div>
+    </dl>
 
     {painel === "novo" && <NovoCaso clientes={clientes} aoFechar={() => setPainel("nenhum")} />}
     {painel === "nomeacao" && <NovaNomeacao aoFechar={() => setPainel("nenhum")} />}
 
-    <div className="pdc-corpo">
-      <section className="pd-cartao pdc-lista" aria-label="Seus casos">
-        <div className="md-titulo-linha">
-          <div><p className="md-eyebrow">Casos</p><h2>Seus casos</h2></div>
-          <span className="md-contador">{plural(casos.length, "caso", "casos")}</span>
+    <div className="pdl-corpo">
+      <section className="pd-cartao" aria-label="Seus casos">
+        <div className="pd-cartao-cabeca">
+          <div><p className="pd-eyebrow">Casos</p><h2>Seus casos</h2></div>
+          <span className="pd-auxiliar">{plural(casos.length, "caso", "casos")}</span>
         </div>
 
-        {casos.length === 0 ? <div className="pdc-vazio-grande">
-          <strong>Nenhum caso ainda.</strong>
-          <p>Abra o primeiro por um dos dois caminhos: <b>Novo caso</b> para um atendimento que você já tem (plantão, particular ou nomeação que você prefere digitar), ou <b>Nova nomeação</b> para colar a intimação e deixar a IA montar a ficha.</p>
-          <div className="md-acoes">
-            <button type="button" className="md-botao-primario" onClick={() => setPainel("novo")}>Novo caso <span>+</span></button>
-            <button type="button" className="md-botao-secundario" onClick={() => setPainel("nomeacao")}>Nova nomeação</button>
+        {casos.length === 0
+          ? <div className="pdl-vazio">
+            <div className="pd-vazio">
+              <strong>Nenhum caso ainda.</strong>
+              Abra o primeiro por um dos dois caminhos: <b>Novo caso</b>, para um atendimento que você já tem (plantão, particular ou uma nomeação que prefere digitar), ou <b>Nova nomeação</b>, para colar a intimação e deixar a IA montar a ficha.
+            </div>
+            <div className="pd-linha-campos">
+              <button type="button" className="pd-botao pd-botao-primario" onClick={() => setPainel("novo")}>Novo caso</button>
+              <button type="button" className="pd-botao pd-botao-secundario" onClick={() => setPainel("nomeacao")}>Nova nomeação</button>
+            </div>
           </div>
-        </div> : <>
-          <div className="pdc-filtros" role="group" aria-label="Filtrar por situação">
-            {(["todos", ...SITUACOES] as Filtro[]).map((opcao) => <button key={opcao} type="button" aria-pressed={filtro === opcao} onClick={() => setFiltro(opcao)}>
-              {opcao === "todos" ? "Todos" : NOMES_DA_SITUACAO[opcao]} <b>{contagem(opcao)}</b>
-            </button>)}
-          </div>
-          {visiveis.length === 0
-            ? <p className="pdc-vazio">Nenhum caso {filtro === "todos" ? "" : `em "${NOMES_DA_SITUACAO[filtro as Situacao].toLowerCase()}"`} por enquanto.</p>
-            : <ul className="pdc-casos">{visiveis.map((caso) => <LinhaDoCaso key={caso.id} caso={caso} />)}</ul>}
-        </>}
+          : <>
+            <div className="pdl-cabeca-lista">
+              <div className="pd-abas" role="tablist" id="pdl-filtro-situacao" aria-label="Filtrar por situação">
+                {(["todos", ...SITUACOES] as Filtro[]).map((opcao) => <button
+                  key={opcao}
+                  type="button"
+                  role="tab"
+                  id={`pdl-aba-${opcao}`}
+                  className="pd-aba"
+                  aria-selected={filtro === opcao}
+                  aria-controls="pdl-lista-casos"
+                  onClick={() => setFiltro(opcao)}
+                >
+                  {opcao === "todos" ? "Todos" : NOMES_DA_SITUACAO[opcao]} <b>{contagem(opcao)}</b>
+                </button>)}
+              </div>
+              <p className="pd-auxiliar pdl-nota-prazo">A data mostrada é a informada no caso. Confira sempre no processo oficial.</p>
+            </div>
+            <div role="tabpanel" id="pdl-lista-casos" aria-labelledby="pdl-filtro-situacao">
+              {visiveis.length === 0
+                ? <div className="pdl-vazio"><div className="pd-vazio">
+                  <strong>Nenhum caso {filtro === "todos" ? "" : `em "${NOMES_DA_SITUACAO[filtro as Situacao].toLowerCase()}"`} por enquanto.</strong>
+                  Troque o filtro acima para ver os outros casos, ou abra um caso novo.
+                </div></div>
+                : <ul className="pd-lista">{visiveis.map((caso) => <LinhaDoCaso key={caso.id} caso={caso} />)}</ul>}
+            </div>
+          </>}
       </section>
 
-      <aside className="pdc-lateral">
-        <section className="pd-cartao pdc-prazos" aria-label="Prazos da semana">
-          <p className="md-eyebrow">Próximos 7 dias</p>
-          <h2>Prazos</h2>
-          {resumo.prazosProximos.length === 0
-            ? <p className="pdc-vazio">Nenhum prazo nesta semana. Os prazos dos casos e das tarefas aparecem aqui.</p>
-            : <ul className="pdc-lista-prazos">{resumo.prazosProximos.map((item) => {
-              const prazo = descreverPrazo(item.prazo);
-              return <li key={`${item.casoId}-${item.titulo}-${item.prazo}`}>
-                <Link href={`/escritorio/casos/${item.casoId}`}>{item.titulo}</Link>
-                <span className={`pdc-prazo tom-${prazo?.tom ?? "normal"}`}>{formatarData(item.prazo)} · {prazo?.texto}</span>
-              </li>;
-            })}</ul>}
+      <aside className="pdl-lateral">
+        <section className="pd-cartao" aria-label="Prazos dos próximos 7 dias">
+          <div className="pd-cartao-cabeca">
+            <div><p className="pd-eyebrow">Próximos 7 dias</p><h2>Prazos</h2></div>
+          </div>
+          <div className="pd-cartao-corpo">
+            {resumo.prazosProximos.length === 0
+              ? <div className="pd-vazio">
+                <strong>Nenhum prazo nesta semana.</strong>
+                Os prazos dos casos e das tarefas aparecem aqui.
+              </div>
+              : <ul className="pdl-prazos">{resumo.prazosProximos.map((item) => {
+                const prazo = descreverPrazo(item.prazo);
+                return <li key={`${item.casoId}-${item.titulo}-${item.prazo}`}>
+                  <Link href={`/escritorio/casos/${item.casoId}`}>{item.titulo}</Link>
+                  <span className={`pdl-prazo ${classeDoTom(prazo?.tom)}`}>
+                    <b>{formatarData(item.prazo)}</b>
+                    <small>{prazo?.texto ? `${prazo.texto} · conferir no processo oficial` : "a conferir no processo oficial"}</small>
+                  </span>
+                </li>;
+              })}</ul>}
+          </div>
         </section>
 
-        <section className="pd-cartao pdc-guia" aria-label="Como o escritório funciona">
-          <p className="md-eyebrow">Como funciona</p>
-          <ol>
-            <li><b>1</b><span><strong>Abra o caso</strong> pelo relato do cliente ou colando a intimação de nomeação.</span></li>
-            <li><b>2</b><span><strong>Triagem com fontes</strong>: a IA organiza requisitos e documentos citando o trecho da lei. Você confere.</span></li>
-            <li><b>3</b><span><strong>Fale com o cliente</strong> pelo WhatsApp do escritório. A IA sugere, só você envia.</span></li>
-          </ol>
+        <section className="pd-cartao" aria-label="WhatsApp do escritório">
+          <div className="pd-cartao-cabeca">
+            <div><p className="pd-eyebrow">Atendimento</p><h2>WhatsApp do escritório</h2></div>
+          </div>
+          <div className="pd-cartao-corpo pdl-atendimento">
+            <EstadoDoWhatsapp />
+          </div>
+        </section>
+
+        <section className="pd-cartao" aria-label="Ações frequentes">
+          <div className="pd-cartao-cabeca">
+            <div><p className="pd-eyebrow">Atalhos</p><h2>Ações frequentes</h2></div>
+          </div>
+          <div className="pd-cartao-corpo pdl-atalhos">
+            <button type="button" className="pdl-atalho" onClick={() => alternar("nomeacao")}>
+              <strong>Nova nomeação</strong><small>Ler uma intimação</small>
+            </button>
+            <button type="button" className="pdl-atalho" onClick={() => alternar("novo")}>
+              <strong>Novo caso</strong><small>Abrir pelo relato</small>
+            </button>
+            <Link href="/escritorio/mensagens" className="pdl-atalho">
+              <strong>Mensagens</strong><small>Conversas dos casos</small>
+            </Link>
+            <Link href="/escritorio/processos" className="pdl-atalho">
+              <strong>Processos</strong><small>Consultar andamento</small>
+            </Link>
+          </div>
         </section>
       </aside>
     </div>
@@ -126,26 +215,32 @@ export function Painel({ resumo, casos, clientes }: Props) {
 function LinhaDoCaso({ caso }: { caso: CasoComDetalhes }) {
   const prazo = descreverPrazo(caso.prazo);
   const concluido = caso.situacao === "concluido";
-  return <li className={`pdc-caso${concluido ? " pdc-caso-concluido" : ""}`}>
-    <Link href={`/escritorio/casos/${caso.id}`} className="pdc-caso-principal">
-      <strong>{caso.titulo}</strong>
-      <small>{caso.cliente ? caso.cliente.nome : "Sem cliente cadastrado"}{caso.processo ? ` · ${formatarCnj(caso.processo)}` : ""}</small>
+  return <li className={`pd-linha pdl-caso${concluido ? " pdl-caso-concluido" : ""}`}>
+    <Link href={`/escritorio/casos/${caso.id}`} className="pdl-caso-principal">
+      <span className="pd-linha-titulo">{caso.titulo}</span>
+      <span className="pd-linha-meta">
+        {caso.cliente ? caso.cliente.nome : "Sem cliente cadastrado"}
+        {" · "}{NOMES_DA_ORIGEM[caso.origem]}
+        {caso.processo ? <>{" · "}<span className="pd-numero">{formatarCnj(caso.processo)}</span></> : null}
+      </span>
     </Link>
-    <div className="pdc-caso-selos">
-      <span className={`pdc-selo pdc-origem-${caso.origem}`}>{NOMES_DA_ORIGEM[caso.origem]}</span>
-      <span className={`pdc-selo pdc-situacao-${caso.situacao}`}>{NOMES_DA_SITUACAO[caso.situacao]}</span>
-    </div>
-    <span className={`pdc-prazo tom-${concluido || !prazo ? "normal" : prazo.tom}`}>
-      {caso.prazo ? <><b>{formatarData(caso.prazo)}</b>{!concluido && prazo ? ` · ${prazo.texto}` : ""}</> : <em>sem prazo</em>}
+    <span className={`pd-estado ${TOM_DA_SITUACAO[caso.situacao]}`.trim()}>{NOMES_DA_SITUACAO[caso.situacao]}</span>
+    <span className={`pdl-prazo ${concluido ? "" : classeDoTom(prazo?.tom)}`}>
+      {caso.prazo
+        ? <><b>{formatarData(caso.prazo)}</b>{!concluido && prazo ? <small>{prazo.texto}</small> : null}</>
+        : <em>sem prazo informado</em>}
     </span>
-    <span className="pdc-caso-ultimo">
-      {caso.ultimoRegistro ? <>{caso.ultimoRegistro.texto}<small>{formatarMomento(caso.ultimoRegistro.quando, { comAno: false })}</small></> : <em>sem registro</em>}
+    <span className="pdl-ultimo">
+      {caso.ultimoRegistro
+        ? <>{caso.ultimoRegistro.texto}<small>{formatarMomento(caso.ultimoRegistro.quando, { comAno: false })}</small></>
+        : <em>sem registro</em>}
     </span>
+    <span className="pd-seta" aria-hidden="true">›</span>
   </li>;
 }
 
-// O estado do WhatsApp vem depois, pela API: a Evolution pode demorar e o
-// painel não espera por ela.
+// O estado do WhatsApp vem depois, pela API: a Evolution pode demorar e a
+// mesa de trabalho não espera por ela.
 function EstadoDoWhatsapp() {
   const [estado, setEstado] = useState<string | null>(null);
   useEffect(() => {
@@ -156,8 +251,9 @@ function EstadoDoWhatsapp() {
     return () => { ativo = false; };
   }, []);
   const descricao = estado ? ESTADOS_DO_WHATSAPP[estado] ?? { texto: estado, tom: "neutro" as const } : { texto: "Verificando…", tom: "neutro" as const };
-  return <Link href="/escritorio/whatsapp" className={`pdc-resumo-link pdc-whatsapp tom-${descricao.tom}`}>
-    <strong><i aria-hidden="true" />{descricao.texto}</strong>
-    <span>WhatsApp do escritório · abrir</span>
-  </Link>;
+  return <>
+    <span className={`pd-estado ${CLASSES_DE_TOM[descricao.tom]}`.trim()}>{descricao.texto}</span>
+    <p className="pd-auxiliar">As mensagens chegam aqui e nenhuma resposta sai sem o seu clique.</p>
+    <Link href="/escritorio/whatsapp" className="pd-botao pd-botao-secundario">Abrir a conexão</Link>
+  </>;
 }
