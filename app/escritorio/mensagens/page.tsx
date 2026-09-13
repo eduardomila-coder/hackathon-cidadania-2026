@@ -63,6 +63,19 @@ function iniciais(nome: string) {
   return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
 }
 
+function AvatarDoContato({ contato, nome, grande = false }: { contato: string; nome: string; grande?: boolean }) {
+  const [temFoto, setTemFoto] = useState(true);
+  const classe = `pd-avatar${grande ? " pd-avatar-grande" : ""}`;
+  if (!temFoto) return <span className={classe} aria-label={`Sem foto de perfil de ${nome}`}>{iniciais(nome)}</span>;
+  return <span className={`${classe} pd-avatar-com-foto`}>
+    <img
+      src={`/api/escritorio/mensagens/foto?contato=${encodeURIComponent(contato)}`}
+      alt={`Foto de perfil de ${nome}`}
+      onError={() => setTemFoto(false)}
+    />
+  </span>;
+}
+
 async function lerErro(resposta: Response, padrao: string) {
   const dados = await resposta.json().catch(() => ({})) as { erro?: string };
   return dados.erro || padrao;
@@ -349,7 +362,7 @@ function Mensagens() {
               onClick={() => abrir(conversa.contato)}
               aria-current={conversa.contato === selecionado ? "true" : undefined}
             >
-              <div className="avatar" aria-hidden="true">{iniciais(nomeDaConversa(conversa))}</div>
+              <AvatarDoContato contato={conversa.contato} nome={nomeDaConversa(conversa)} />
               <div style={{ minWidth: 0 }}>
                 <strong>{nomeDaConversa(conversa)}</strong>
                 <p>{conversa.ultimaMensagem || "[sem texto]"}</p>
@@ -373,7 +386,7 @@ function Mensagens() {
               <button type="button" className="pd-voltar pd-acao-icone" onClick={() => setSelecionado(null)} aria-label="Voltar para a lista de conversas">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
               </button>
-              <span className="pd-avatar pd-avatar-grande" aria-hidden="true">{iniciais(conversaAberta ? nomeDaConversa(conversaAberta) : formatarTelefone(selecionado))}</span>
+              <AvatarDoContato contato={selecionado} nome={conversaAberta ? nomeDaConversa(conversaAberta) : formatarTelefone(selecionado)} grande />
               <div className="pd-chat-cabeca-nome">
                 <strong>{conversaAberta ? nomeDaConversa(conversaAberta) : formatarTelefone(selecionado)}</strong>
                 <small>{formatarTelefone(selecionado)}{conversaAberta?.nome && conversaAberta.clienteNome && conversaAberta.nome !== conversaAberta.clienteNome ? ` · no WhatsApp: ${conversaAberta.nome}` : ""}</small>

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import "./mensagens.css";
 
@@ -214,9 +213,6 @@ function ConversaDoContato({ contato, casoId, aoAtualizar, sugestao, aoEnviarSug
         return <div key={mensagem.id}>
           {mostraDia && <div className="wa-dia"><span>{dia}</span></div>}
           <div className={`wa-linha ${mensagem.deMim ? "out" : "in"}`}>
-            {mensagem.doEstagiario && <div className="wa-perfil-estagiaria" title="Mensagem enviada pelo estagiário virtual">
-              <Image src="/estagiaria-virtual.png" alt="Foto de perfil fictícia da estagiária virtual" width={28} height={28} />
-            </div>}
             <div className={`wa-bubble ${mensagem.deMim ? "out" : "in"}${agrupada ? " grouped" : ""}`}>
               {mensagem.doEstagiario && <p className="wa-nome-estagiaria">Estagiária virtual</p>}
               <p className="wa-message-text">{mensagem.texto}</p>
@@ -235,7 +231,6 @@ function ConversaDoContato({ contato, casoId, aoAtualizar, sugestao, aoEnviarSug
       {sugestao && <div className="pd-estagiario-sugestao">
         <div className="pd-estagiario-cabeca">
           <div className="pd-estagiario-identidade">
-            <Image src="/estagiaria-virtual.png" alt="Foto de perfil fictícia da estagiária virtual" width={28} height={28} />
             <p className="pd-estagiario-etiqueta">Estagiária virtual <span>· rascunho</span></p>
           </div>
           <span className="pd-estagiario-nao-enviado">não enviado</span>
