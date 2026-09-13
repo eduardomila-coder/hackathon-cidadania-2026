@@ -1,0 +1,6 @@
+# Consulta ao PROJUDI. O A3 precisa de PyKCS11 e do driver do fabricante,
+# instalado à parte; sem ele, resta a entrada por CPF, senha e código TOTP.
+requests>=2.31
+beautifulsoup4>=4.12
+PyKCS11>=1.5.12
+pyotp>=2.9
