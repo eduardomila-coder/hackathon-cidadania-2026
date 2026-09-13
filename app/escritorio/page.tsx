@@ -1,13 +1,21 @@
-"use client";
+import { redirect } from "next/navigation";
+import { listarCasosComDetalhes, listarClientes, resumoDoEscritorio } from "@/lib/escritorio";
+import { advogadoAtual } from "@/lib/sessao";
+import { Painel } from "./casos/Painel";
+import "./casos.css";
 
-import { useAdvogado } from "./Advogado";
+export const dynamic = "force-dynamic";
 
-// Esqueleto: o módulo 2 (Casos) substitui esta página pelo painel de verdade.
-export default function Painel() {
-  const advogado = useAdvogado();
-  return <section className="pd-cartao">
-    <p className="md-eyebrow">Painel</p>
-    <h1>Painel do advogado em construção</h1>
-    <p>Olá, {advogado.nome}. Em breve seus casos, prazos e mensagens aparecem aqui.</p>
-  </section>;
+// Painel do advogado: lê tudo no servidor (arquivos em data/) e entrega ao
+// componente cliente, que cuida de filtro, formulários e do estado do
+// WhatsApp (esse vem pela API para não travar a página se a Evolution demorar).
+export default async function PaginaDoPainel() {
+  const advogado = await advogadoAtual();
+  if (!advogado) redirect("/entrar");
+
+  return <Painel
+    resumo={resumoDoEscritorio(advogado.id)}
+    casos={listarCasosComDetalhes(advogado.id)}
+    clientes={listarClientes(advogado.id)}
+  />;
 }

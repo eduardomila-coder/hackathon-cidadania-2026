@@ -79,3 +79,97 @@ Responda SOMENTE com um JSON válido, sem texto antes ou depois, no formato:
   });
   return { texto: dados.texto.trim(), motivo: dados.motivo.trim() };
 }
+// ── Ficha de nomeação ───────────────────────────────────────────────────────
+// O advogado cola o texto da intimação de nomeação e recebe uma ficha com o
+// que está escrito ali, sem cálculo de prazo e sem tese pronta.
+
+export const FichaDeNomeacaoSchema = z.object({
+  processo: z.string().nullable().describe("Número do processo como aparece no texto; null se não aparece"),
+  orgao: z.string().nullable().describe("Vara, juizado ou comarca; null se não aparece"),
+  ato: z.string().nullable().describe("Para que o advogado foi nomeado; null se não dá para saber"),
+  prazoInformado: z.string().nullable().describe("O prazo como está escrito no texto; null se não há"),
+  dataPrazo: z.string().nullable().describe("Data explícita do texto em AAAA-MM-DD; null se o texto não traz data"),
+  resumo: z.string(),
+  fundamentosAAvaliar: z.array(z.string()).describe("Ideias e pontos a examinar, não teses prontas"),
+  documentosAPedir: z.array(z.string()),
+  perguntasAoCliente: z.array(z.string()),
+  alertas: z.array(z.string()),
+});
+export type FichaDeNomeacao = z.infer<typeof FichaDeNomeacaoSchema>;
+
+const TAMANHO_MAXIMO_DA_INTIMACAO = 12000;
+
+function limparLista(itens: string[], maximo = 12): string[] {
+  return itens.map((item) => item.trim()).filter(Boolean).slice(0, maximo);
+}
+
+function textoOuNulo(valor: string | null): string | null {
+  const limpo = (valor ?? "").trim();
+  return limpo ? limpo : null;
+}
+
+// Deixa a ficha do jeito que o caso espera: data só se veio no formato certo
+// (senão vira alerta), listas sem item vazio, textos sem espaço sobrando.
+export function normalizarFicha(bruta: FichaDeNomeacao): FichaDeNomeacao {
+  const alertas = limparLista(bruta.alertas);
+  let dataPrazo = textoOuNulo(bruta.dataPrazo);
+  if (dataPrazo && (!/^\d{4}-\d{2}-\d{2}$/.test(dataPrazo) || Number.isNaN(Date.parse(dataPrazo)))) {
+    alertas.push(`A data "${dataPrazo}" não veio no formato esperado: confira o prazo no ato.`);
+    dataPrazo = null;
+  }
+  const prazoInformado = textoOuNulo(bruta.prazoInformado);
+  if (!dataPrazo) alertas.push(prazoInformado ? `O texto fala em "${prazoInformado}" sem data explícita: conferir no ato e contar a partir da ciência.` : "A intimação não traz data nem prazo explícito: conferir no ato.");
+  return {
+    processo: textoOuNulo(bruta.processo),
+    orgao: textoOuNulo(bruta.orgao),
+    ato: textoOuNulo(bruta.ato),
+    prazoInformado,
+    dataPrazo,
+    resumo: bruta.resumo.trim(),
+    fundamentosAAvaliar: limparLista(bruta.fundamentosAAvaliar),
+    documentosAPedir: limparLista(bruta.documentosAPedir),
+    perguntasAoCliente: limparLista(bruta.perguntasAoCliente),
+    alertas: [...new Set(alertas)],
+  };
+}
+
+export async function fichaDeNomeacao(texto: string): Promise<FichaDeNomeacao> {
+  const intimacao = (texto ?? "").trim().slice(0, TAMANHO_MAXIMO_DA_INTIMACAO);
+  if (intimacao.length < 30) throw new Error("Cole o texto completo da intimação de nomeação.");
+
+  const { dados } = await perguntarJson({
+    schema: FichaDeNomeacaoSchema,
+    maxTokens: 8000,
+    system: `Você é o assistente de um advogado ou advogada dativa no Paraná. Ele colou o texto de uma intimação de nomeação (do Portal da Advocacia Dativa, do processo eletrônico ou de um e-mail). Sua tarefa é só ORGANIZAR o que está escrito ali numa ficha, em português simples, para o advogado conferir.
+
+Regras:
+- "processo": copie o número exatamente como aparece no texto. Se não houver número, null. Nunca invente, complete ou corrija dígitos.
+- "orgao": a vara, o juizado ou a comarca como está no texto; null se não aparece.
+- "ato": para que o advogado foi nomeado (audiência, defesa, contestação, recurso, acompanhamento...), como o texto diz; null se não dá para saber.
+- "prazoInformado": o prazo como está escrito (ex.: "15 dias", "audiência em 20/10/2026 às 14h"); null se o texto não fala de prazo.
+- "dataPrazo": só se o texto trouxer uma DATA explícita (dia, mês e ano) do ato ou do fim do prazo, em AAAA-MM-DD. Se o texto só diz "15 dias" ou "5 dias úteis" sem data, dataPrazo é null: você NÃO calcula prazo, quem conta é o advogado.
+- "resumo": duas ou três frases sobre o que é o caso e o que se espera do advogado, sem juridiquês.
+- "fundamentosAAvaliar": pontos a examinar (ex.: "verificar se cabe justiça gratuita", "checar se houve citação válida"), como ideias, não como teses prontas nem conclusões. Lista vazia se o texto não permite.
+- "documentosAPedir": o que o advogado deve pedir ao cliente ou buscar nos autos, um por item.
+- "perguntasAoCliente": perguntas diretas para o primeiro contato com o cliente.
+- "alertas": o que o advogado precisa checar antes de confiar na ficha (ex.: "a data de ciência não está no texto", "o prazo em dias conta a partir da intimação, não desta leitura").
+- Não dê parecer, não diga se deve aceitar ou recusar a nomeação, não cite lei que não esteja no texto, não invente fato.
+Responda SOMENTE com um JSON válido, sem texto antes ou depois:
+{
+  "processo": string | null,
+  "orgao": string | null,
+  "ato": string | null,
+  "prazoInformado": string | null,
+  "dataPrazo": "AAAA-MM-DD" | null,
+  "resumo": string,
+  "fundamentosAAvaliar": string[],
+  "documentosAPedir": string[],
+  "perguntasAoCliente": string[],
+  "alertas": string[]
+}`,
+    usuario: `Texto da intimação de nomeação:\n"""\n${intimacao}\n"""`,
+  });
+
+  return normalizarFicha(dados);
+}
+

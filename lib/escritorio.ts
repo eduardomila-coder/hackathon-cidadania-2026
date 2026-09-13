@@ -574,3 +574,56 @@ export function resumoDoEscritorio(advogadoId: string): ResumoDoEscritorio {
     documentosPendentes: listar<Documento>(DOCUMENTOS).filter((documento) => idsAbertos.has(documento.casoId) && !documento.recebido).length,
   };
 }
+
+// ---- Composições para as telas de casos ---------------------------------
+
+export type CasoComDetalhes = Caso & { cliente: Cliente | null; ultimoRegistro: Registro | null };
+
+// Lista do painel: cada caso com o cliente e o último registro da linha do
+// tempo, lendo cada coleção uma vez só.
+export function listarCasosComDetalhes(advogadoId: string, filtro: { situacao?: Situacao } = {}): CasoComDetalhes[] {
+  const casos = listarCasos(advogadoId).filter((caso) => !filtro.situacao || caso.situacao === filtro.situacao);
+  const clientes = new Map(listarClientes(advogadoId).map((cliente) => [cliente.id, cliente]));
+  const ultimos = new Map<string, Registro>();
+  for (const registro of listar<Registro>(REGISTROS)) {
+    const atual = ultimos.get(registro.casoId);
+    if (!atual || registro.quando > atual.quando) ultimos.set(registro.casoId, registro);
+  }
+  return casos.map((caso) => ({
+    ...caso,
+    cliente: caso.clienteId ? clientes.get(caso.clienteId) ?? null : null,
+    ultimoRegistro: ultimos.get(caso.id) ?? null,
+  }));
+}
+
+export type DossieDoCaso = {
+  caso: Caso;
+  cliente: Cliente | null;
+  documentos: Documento[];
+  tarefas: Tarefa[];
+  registros: Registro[];
+  triagens: Triagem[];
+  processo: Processo | null;
+  mensagens: Mensagem[];
+};
+
+// Tudo que a página do caso mostra, numa leitura só. null se o caso não é
+// desse advogado (para ele, o caso não existe).
+export function dossieDoCaso(advogadoId: string, casoId: string): DossieDoCaso | null {
+  const caso = casoPorId(advogadoId, casoId);
+  if (!caso) return null;
+  const processos = processosDo(advogadoId);
+  const processo = processos.find((item) => item.casoId === casoId)
+    ?? (caso.processo ? processos.find((item) => item.numero === caso.processo) : undefined)
+    ?? null;
+  return {
+    caso,
+    cliente: caso.clienteId ? clientePorId(advogadoId, caso.clienteId) : null,
+    documentos: documentosDoCaso(advogadoId, casoId),
+    tarefas: tarefasDoCaso(advogadoId, casoId),
+    registros: registrosDoCaso(advogadoId, casoId),
+    triagens: triagensDoCaso(advogadoId, casoId),
+    processo,
+    mensagens: mensagensDo(advogadoId, { casoId }),
+  };
+}
