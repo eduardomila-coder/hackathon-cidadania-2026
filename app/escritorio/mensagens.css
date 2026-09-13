@@ -74,6 +74,9 @@
 .pd-chip-caso:hover{background:#143b65;color:#fff}
 .pd-chip-sem-caso{background:#f2ede6;color:#7a8698}
 .pd-chip-sem-caso:hover{background:#e7e0d6;color:#5b6b80}
+/* Dentro do painel de contexto o botão ocupa a coluna inteira e pode quebrar:
+   na coluna estreita a pílula de 38% cortava o texto do caso. */
+.pd-contexto .pd-chip-caso{max-width:100%;white-space:normal;text-align:left;border-radius:12px}
 .pd-acao-icone{display:grid;flex:none;place-items:center;width:36px;height:36px;border:0;border-radius:11px;background:none;color:#687184;cursor:pointer}
 .pd-acao-icone:hover{background:#f5f1eb;color:#143b65}
 .pd-voltar{display:none}

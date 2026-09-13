@@ -193,7 +193,7 @@ function Mensagens() {
     </p>}
     {whatsApp?.configurado && semConexao && <p className="pd-aviso-conexao" role="status">
       {whatsApp.estado === "sem_numero" ? "Você ainda não cadastrou o seu WhatsApp." : "O seu WhatsApp não está conectado agora."}{" "}
-      <Link href="/escritorio/whatsapp">{whatsApp.estado === "sem_numero" ? "Cadastrar e conectar" : "Conectar de novo"}</Link>. Enquanto isso, nada chega nem sai por aqui.
+      <Link href="/escritorio/whatsapp">{whatsApp.estado === "sem_numero" ? "Cadastrar e conectar" : "Conectar de novo"}</Link>. Enquanto isso, nada novo chega nem sai por aqui; o que já chegou continua guardado abaixo.
     </p>}
 
     <div className={`pd-caixa${contextoAberto ? " pd-caixa-larga" : ""}`}>
