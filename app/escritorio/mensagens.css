@@ -16,10 +16,32 @@
 .pd-mensagens .pd-aviso-link{font-weight:800;text-decoration:underline}
 .pd-mensagens .pd-aviso-link:hover{text-decoration:none}
 
-/* ---- Caixa da tela: duas colunas, a terceira só em tela larga ---- */
-.pd-caixa{height:calc(100dvh - 300px);min-height:0;max-height:940px;overflow:hidden;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);box-shadow:var(--sombra-leve)}
-.pd-caixa-grade{display:grid;height:100%;min-height:0;grid-template-columns:320px minmax(0,1fr)}
-.pd-caixa-larga .pd-caixa-grade{grid-template-columns:320px minmax(0,1fr) 300px}
+/* ---- Caixa da tela: duas colunas, a terceira só em tela larga ----
+   A caixa termina no fim da janela, sem rolagem da página: a rolagem fica
+   dentro das colunas. Em vez de descontar um número fixo da altura da tela
+   (o cabeçalho da página varia com a largura), a casca vira coluna flexível
+   e a caixa ocupa o que sobra. Em tela estreita (abaixo) as colunas empilham
+   e a página volta a rolar. O `html` tem `zoom` (--pd-escala): unidade de
+   janela é medida antes do zoom, então 100dvh precisa ser dividido por ele. */
+@media (min-width:1181px){
+  .app:has(.pd-mensagens){min-height:0}
+  .main:has(.pd-mensagens){display:flex;flex-direction:column;height:calc(100dvh / var(--pd-escala, 1));min-height:0}
+  .content:has(> .pd-mensagens){display:flex;flex-direction:column;flex:1;width:100%;min-height:0;padding-bottom:22px}
+  .pd-mensagens{display:flex;flex-direction:column;flex:1;min-height:0}
+  .pd-mensagens .page-head{flex:none}
+  .pd-mensagens .notice{flex:none}
+}
+.pd-caixa{flex:1;min-height:0;overflow:hidden;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel);box-shadow:var(--sombra-leve)}
+.pd-caixa-grade{position:relative;display:grid;height:100%;min-height:0;grid-template-columns:300px minmax(0,1fr)}
+/* O painel de contexto só vira terceira coluna quando sobra largura de
+   verdade. Antes disso ele abre por cima da conversa, como a gaveta de
+   dados do contato no WhatsApp Web, para a conversa nunca ficar espremida. */
+.pd-caixa-larga .pd-contexto{position:absolute;inset:61px 0 0 auto;z-index:5;width:min(320px,100%);box-shadow:-14px 0 32px rgba(10,34,48,.12)}
+@media (min-width:1500px){
+  .pd-caixa-grade{grid-template-columns:320px minmax(0,1fr)}
+  .pd-caixa-larga .pd-caixa-grade{grid-template-columns:320px minmax(0,1fr) 300px}
+  .pd-caixa-larga .pd-contexto{position:static;width:auto;box-shadow:none}
+}
 
 /* ---- Coluna das conversas ---- */
 .pd-conversas{display:flex;min-width:0;min-height:0;flex-direction:column;border-right:1px solid var(--linha);background:var(--papel-2)}
@@ -44,8 +66,8 @@
 .pd-conversa-ativa{background:var(--azul-claro)}
 .pd-avatar{display:grid;flex:none;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--azul-claro-2);color:var(--azul-profundo);font-size:13px;font-weight:800;letter-spacing:.02em}
 .pd-avatar-grande{width:44px;height:44px;font-size:15px}
-.pd-avatar-com-foto{overflow:hidden;background:var(--papel);border:1px solid var(--linha-forte)}
-.pd-avatar-com-foto img{display:block;width:100%;height:100%;object-fit:cover}
+.pd-avatar-com-foto{position:relative;overflow:hidden}
+.pd-avatar-com-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pd-conversa-meio{min-width:0;flex:1}
 .pd-conversa-linha{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .pd-conversa-linha strong{overflow:hidden;font-size:13.5px;text-overflow:ellipsis;white-space:nowrap}
@@ -57,7 +79,7 @@
 .pd-conversa-rodape b{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--azul-profundo);color:#fff;font-size:11px}
 
 /* ---- Coluna da conversa ---- */
-.pd-chat{display:flex;min-width:0;min-height:0;flex-direction:column;background:var(--papel)}
+.pd-chat{display:flex;min-width:0;min-height:0;flex-direction:column;background:var(--papel);container-type:inline-size}
 .pd-chat-vazio{display:grid;place-content:center;gap:10px;height:100%;padding:40px;text-align:center}
 .pd-chat-vazio h2{margin:0;font:700 24px/1.15 var(--fonte);letter-spacing:-.03em;color:var(--tinta)}
 .pd-chat-vazio p{max-width:420px;margin:0 auto;color:var(--tinta-3);font-size:13px;line-height:1.55}
@@ -83,11 +105,18 @@
 .pd-contexto dl{display:grid;gap:8px;margin:0}
 .pd-contexto dt{color:var(--tinta-3);font-size:11px}
 .pd-contexto dd{margin:2px 0 0;color:var(--tinta);font-size:13px;font-weight:800}
-.pd-contexto-caixa{display:grid;gap:10px;padding:14px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel)}
-.pd-vincular-forma{display:grid;gap:6px}
+.pd-contexto-caixa{display:grid;gap:10px;min-width:0;padding:14px;border:1px solid var(--linha);border-radius:var(--raio);background:var(--papel)}
+.pd-contexto-caixa>*{min-width:0}
+/* `min-width:0` em cada nível: item de grid e de flex não encolhe abaixo do
+   conteúdo por padrão, e o título longo de um caso no `select` empurrava o
+   formulário para fora do painel de 300 px. */
+.pd-vincular-forma{display:grid;gap:6px;min-width:0}
 .pd-vincular-forma label{color:var(--tinta-2);font-size:12px;font-weight:800}
-.pd-vincular-forma>div{display:flex;gap:8px}
-.pd-vincular-forma select,.pd-vincular-forma input{min-width:0;flex:1;padding:9px 11px;border:1px solid var(--linha-forte);border-radius:var(--raio-pequeno);background:var(--papel);color:var(--tinta);font:inherit;font-size:12.5px}
+.pd-vincular-forma>div{display:flex;gap:8px;min-width:0}
+.pd-vincular-forma>div>*{min-width:0}
+.pd-vincular-forma select,.pd-vincular-forma input{flex:1;width:0;padding:9px 11px;border:1px solid var(--linha-forte);border-radius:var(--raio-pequeno);background:var(--papel);color:var(--tinta);font:inherit;font-size:12.5px}
+.pd-vincular-forma select{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd-vincular-forma .pd-botao{flex:none}
 .pd-resposta-aviso{margin:0;padding:9px 12px;border-left:3px solid var(--azul);border-radius:0 var(--raio-pequeno) var(--raio-pequeno) 0;background:var(--azul-claro);color:#31566B;font-size:12px;line-height:1.45}
 .pd-resposta-aviso.ok{border-color:var(--ok);background:var(--ok-fundo);color:var(--ok)}
 .pd-resposta-aviso.erro{border-color:var(--risco);background:var(--risco-fundo);color:var(--risco)}
@@ -144,9 +173,11 @@
 /* Mídia no balão: imagem em tamanho de prévia, figurinha menor e sem fundo,
    como no WhatsApp Web. O clique abre a mídia inteira em outra aba. */
 .wa-midia{display:block;overflow:hidden;border-radius:8px;line-height:0}
-.wa-midia img{display:block;max-width:100%}
-.wa-midia-imagem img{width:min(320px,100%);max-height:360px;object-fit:cover}
-.wa-midia-figurinha img{width:140px;height:140px;object-fit:contain}
+.wa-midia img{display:block;width:100%;height:auto}
+.wa-midia-imagem{width:260px;max-width:100%}
+.wa-midia-imagem img{max-height:300px;object-fit:cover}
+.wa-midia-figurinha{width:120px}
+.wa-midia-figurinha img{height:120px;object-fit:contain}
 .wa-midia + .wa-message-text{margin-top:6px}
 .wa-bubble.wa-bubble-figurinha{background:transparent;border-color:transparent;box-shadow:none}
 .wa-bubble.wa-bubble-figurinha::before{display:none}
@@ -229,13 +260,24 @@
 .pd-codigo-conexao{display:block;max-height:84px;margin:0;padding:10px;overflow:auto;border:1px solid var(--linha);border-radius:var(--raio-pequeno);background:var(--papel);color:var(--tinta-2);font-family:var(--fonte-numeros);font-size:12px;word-break:break-all;white-space:pre-wrap}
 .pd-whatsapp-limite{max-width:760px;margin:0;color:var(--tinta-3);font-size:12px;line-height:1.5}
 
+/* Coluna da conversa estreita (janela média com o painel aberto, ou celular):
+   o compositor quebra em duas linhas e o balão pode ocupar mais da largura.
+   Mede a coluna, não a janela, por isso container query. */
+@container (max-width:560px){
+  .wa-composer{flex-wrap:wrap}
+  .wa-composer-campo{order:-1;flex-basis:100%}
+  .wa-botao-sugerir,.wa-botao-enviar{flex:1}
+  .wa-bubble{max-width:88%}
+  .pd-chip-caso{max-width:46%}
+}
+
 /* ---- Telas estreitas: uma coluna por vez, como no WhatsApp Web ---- */
 @media (max-width:1180px){
-  .pd-caixa,.pd-caixa-larga{height:auto;max-height:none}
+  .pd-caixa,.pd-caixa-larga{flex:none;height:auto}
   .pd-caixa-grade,.pd-caixa-larga .pd-caixa-grade{grid-template-columns:minmax(0,1fr)}
   .pd-conversas{border-right:0}
   .pd-conversas-rolagem{max-height:min(60vh,560px)}
-  .pd-contexto{border-top:1px solid var(--linha);border-left:0}
+  .pd-contexto,.pd-caixa-larga .pd-contexto{position:static;width:auto;border-top:1px solid var(--linha);border-left:0;box-shadow:none}
   .pd-chat{min-height:min(70vh,620px)}
   .pd-whatsapp-corpo{grid-template-columns:minmax(0,1fr);gap:18px}
 }
@@ -256,7 +298,5 @@
 @media (max-width:470px){
   .pd-conversas-cabeca,.pd-conversas-busca,.pd-chat-cabeca,.pd-resposta,.pd-contexto{padding-right:14px;padding-left:14px}
   .pd-vincular-forma>div{flex-direction:column}
-  .wa-composer{flex-wrap:wrap}
-  .wa-composer-campo{order:3;flex-basis:100%}
   .pd-estagiario-botoes{flex-direction:column}
 }

@@ -713,12 +713,20 @@ export async function removerHonorariosDoCaso(advogadoId: string, casoId: string
 
 // ---- Mensagens (WhatsApp) ------------------------------------------------
 
-export type FiltroDeMensagens = { contato?: string; casoId?: string; naoLidas?: boolean };
+// `somenteAssistidos`: só conversas de quem está cadastrado como cliente do
+// advogado. O número do escritório também recebe contato pessoal, e isso não
+// é atendimento: a tela mostra só o assistido; o resto fica guardado e passa a
+// aparecer quando a pessoa for cadastrada com aquele telefone.
+export type FiltroDeMensagens = { contato?: string; casoId?: string; naoLidas?: boolean; somenteAssistidos?: boolean };
 
 export function mensagensDo(advogadoId: string, filtro: FiltroDeMensagens = {}): Mensagem[] {
   const contato = filtro.contato ? filtro.contato.replace(/\D/g, "") : null;
+  const telefonesDeAssistidos = filtro.somenteAssistidos
+    ? new Set(listar<Cliente>(CLIENTES).filter((cliente) => cliente.advogadoId === advogadoId).map((cliente) => cliente.telefone))
+    : null;
   return listar<Mensagem>(MENSAGENS)
     .filter((mensagem) => mensagem.advogadoId === advogadoId)
+    .filter((mensagem) => !telefonesDeAssistidos || telefonesDeAssistidos.has(mensagem.contato))
     .filter((mensagem) => !contato || mensagem.contato === contato)
     .filter((mensagem) => !filtro.casoId || mensagem.casoId === filtro.casoId)
     .filter((mensagem) => !filtro.naoLidas || (!mensagem.lida && !mensagem.deMim))
@@ -858,7 +866,7 @@ export function resumoDoEscritorio(advogadoId: string): ResumoDoEscritorio {
   return {
     casosAbertos: abertos.length,
     prazosProximos,
-    mensagensNovas: mensagensDo(advogadoId, { naoLidas: true }).length,
+    mensagensNovas: mensagensDo(advogadoId, { naoLidas: true, somenteAssistidos: true }).length,
     documentosPendentes: listar<Documento>(DOCUMENTOS).filter((documento) => idsAbertos.has(documento.casoId) && !documento.recebido).length,
   };
 }

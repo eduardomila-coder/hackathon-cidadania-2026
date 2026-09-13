@@ -67,12 +67,15 @@ function AvatarDoContato({ contato, nome, grande = false }: { contato: string; n
   const [temFoto, setTemFoto] = useState(true);
   const classe = `pd-avatar${grande ? " pd-avatar-grande" : ""}`;
   if (!temFoto) return <span className={classe} aria-label={`Sem foto de perfil de ${nome}`}>{iniciais(nome)}</span>;
-  return <span className={`${classe} pd-avatar-com-foto`}>
+  // As iniciais ficam por baixo da foto: enquanto ela carrega, ou se não
+  // vier, o círculo nunca mostra o ícone de imagem quebrada nem o `alt`.
+  return <span className={`${classe} pd-avatar-com-foto`} role="img" aria-label={`Foto de perfil de ${nome}`}>
+    {iniciais(nome)}
     {/* `<img>` de propósito: o otimizador do next/image busca sem o cookie da sessão e a rota autenticada devolve 401. */}
     {/* eslint-disable-next-line @next/next/no-img-element */}
     <img
       src={`/api/escritorio/mensagens/foto?contato=${encodeURIComponent(contato)}`}
-      alt={`Foto de perfil de ${nome}`}
+      alt=""
       onError={() => setTemFoto(false)}
     />
   </span>;
