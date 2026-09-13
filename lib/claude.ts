@@ -33,8 +33,11 @@ function extrairJson(texto: string): string {
 }
 
 // Toda etapa do sistema é uma pergunta com resposta em JSON validado por
-// schema. Se o modelo devolver algo fora do formato, o erro sobe: melhor
-// falhar do que mostrar uma análise inventada.
+// schema. O schema não é afrouxado: análise inventada não passa. O que existe
+// é uma segunda tentativa, porque o plano B (DeepSeek pelo endpoint compatível)
+// às vezes omite uma lista ou manda null onde o contrato pede string, e o
+// próprio erro, devolvido ao modelo, conserta a maior parte disso. Se as duas
+// tentativas falharem, o erro sobe.
 export async function perguntarJson<T>(opts: {
   system: string;
   usuario: string;
@@ -48,37 +51,89 @@ export async function perguntarJson<T>(opts: {
         { type: "text" as const, text: opts.usuario },
       ]
     : opts.usuario;
-  const resposta = await client.messages
-    .stream({
-      model: MODEL,
-      // O limite inclui o pensamento; por isso é folgado.
-      max_tokens: opts.maxTokens ?? 16000,
-      ...(RACIOCINIO_OFF ? { thinking: { type: "disabled" as const } } : {}),
-      system: opts.system,
-      messages: [{ role: "user", content: conteudo }],
-    })
-    .finalMessage();
 
-  const texto = resposta.content
-    .filter((b) => b.type === "text")
-    .map((b) => b.text)
-    .join("");
+  type Mensagens = Parameters<typeof client.messages.stream>[0]["messages"];
 
-  const uso: Uso = {
-    modelo: resposta.model,
-    entrada: resposta.usage.input_tokens,
-    saida: resposta.usage.output_tokens,
-    cache_leitura: resposta.usage.cache_read_input_tokens ?? 0,
-  };
+  async function chamar(mensagens: Mensagens) {
+    const resposta = await client.messages
+      .stream({
+        model: MODEL,
+        // O limite inclui o pensamento; por isso é folgado.
+        max_tokens: opts.maxTokens ?? 16000,
+        ...(RACIOCINIO_OFF ? { thinking: { type: "disabled" as const } } : {}),
+        system: opts.system,
+        messages: mensagens,
+      })
+      .finalMessage();
 
-  try {
-    return { dados: opts.schema.parse(JSON.parse(extrairJson(texto))), uso };
-  } catch (e) {
+    const texto = resposta.content
+      .filter((b) => b.type === "text")
+      .map((b) => b.text)
+      .join("");
+
+    const uso: Uso = {
+      modelo: resposta.model,
+      entrada: resposta.usage.input_tokens,
+      saida: resposta.usage.output_tokens,
+      cache_leitura: resposta.usage.cache_read_input_tokens ?? 0,
+    };
     // Diagnóstico útil: truncou (max_tokens), veio vazio, ou veio fora do formato.
     const tipos = resposta.content.map((b) => b.type).join(",");
+    const diagnostico = `stop=${resposta.stop_reason}, blocos=${tipos}, ${texto.length} chars`;
+
+    return { texto, uso, diagnostico };
+  }
+
+  // O que a segunda tentativa recebe: o motivo exato da recusa, sem o texto
+  // inteiro do modelo (ele já está na conversa).
+  function motivo(e: unknown): string {
+    if (e && typeof e === "object" && "issues" in e) {
+      const issues = (e as { issues: Array<{ path: Array<string | number>; message: string }> }).issues;
+      return issues.slice(0, 8).map((i) => `${i.path.join(".") || "(raiz)"}: ${i.message}`).join("; ");
+    }
+    return String(e).slice(0, 200);
+  }
+
+  let usoDaChamada: Uso | null = null;
+  function acumular(uso: Uso) {
+    usoDaChamada = usoDaChamada
+      ? {
+          modelo: uso.modelo,
+          entrada: usoDaChamada.entrada + uso.entrada,
+          saida: usoDaChamada.saida + uso.saida,
+          cache_leitura: usoDaChamada.cache_leitura + uso.cache_leitura,
+        }
+      : uso;
+  }
+
+  const primeira = await chamar([{ role: "user", content: conteudo }]);
+  acumular(primeira.uso);
+  let motivoDaRecusa = "";
+  try {
+    return { dados: opts.schema.parse(JSON.parse(extrairJson(primeira.texto))), uso: usoDaChamada! };
+  } catch (e) {
+    motivoDaRecusa = motivo(e);
+    console.warn(`perguntarJson: ${primeira.diagnostico} · ${motivoDaRecusa} · repetindo uma vez`);
+  }
+
+  const segunda = await chamar([
+    { role: "user", content: conteudo },
+    { role: "assistant", content: primeira.texto || "(resposta vazia)" },
+    {
+      role: "user",
+      content:
+        "Sua resposta anterior não respeitou o formato exigido. Responda de novo, somente com o JSON, " +
+        "sem texto antes ou depois, com todos os campos do formato preenchidos. Se o texto foi cortado, " +
+        `seja mais curto, mas complete o JSON. O validador recusou assim: ${motivoDaRecusa}`,
+    },
+  ]);
+  acumular(segunda.uso);
+  try {
+    return { dados: opts.schema.parse(JSON.parse(extrairJson(segunda.texto))), uso: usoDaChamada! };
+  } catch (e) {
     throw new Error(
-      `resposta fora do formato (stop=${resposta.stop_reason}, blocos=${tipos}, ${texto.length} chars): ` +
-        `${texto.slice(0, 300)} … ${String(e).slice(0, 200)}`,
+      `resposta fora do formato depois de duas tentativas (${segunda.diagnostico}): ` +
+        `${segunda.texto.slice(0, 300)} … ${motivo(e)}`,
     );
   }
 }
