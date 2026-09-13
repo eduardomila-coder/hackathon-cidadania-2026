@@ -9,6 +9,7 @@ import { listarAdvogados } from "@/lib/contas";
 import { Advogados } from "./Advogados";
 import { Relogio } from "./Relogio";
 import { Tarefas } from "./Tarefas";
+import "./painel.css";
 import "./advogados.css";
 
 export const metadata: Metadata = { title: "Painel — Habeas Titas · Hackathon da Cidadania 2026" };

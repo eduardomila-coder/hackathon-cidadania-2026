@@ -20,12 +20,14 @@ export default async function PaginaDeProcessos() {
   const casos = listarCasos(advogado.id).map((caso) => ({ id: caso.id, titulo: caso.titulo, processo: caso.processo }));
 
   return <div className="pd-processos">
-    <section className="pd-cartao pd-processos-cabeca">
-      <p className="md-eyebrow">Processos</p>
-      <h1>Andamento público dos seus processos</h1>
-      <p>Consulta pontual ao DataJud público do CNJ, base do TJPR, pelo número do processo. Mostra classe, órgão julgador e o último andamento disponível, e guarda o resultado aqui para você.</p>
-      <p>Não é intimação nem fonte de prazo: o prazo se confere no processo oficial. Processos em segredo de justiça não aparecem.</p>
-    </section>
+    <div className="pd-pagina-cabeca">
+      <div>
+        <p className="pd-eyebrow">Processos</p>
+        <h1>Andamento público dos seus processos</h1>
+        <p className="pd-auxiliar">Consulta pontual ao DataJud público do CNJ, base do TJPR, pelo número do processo. Mostra classe, órgão julgador e o último andamento publicado, e guarda o resultado aqui para você.</p>
+      </div>
+    </div>
+    <p className="pd-aviso pd-aviso-atencao">Não é intimação nem fonte de prazo: o prazo se confere no processo oficial. Processos em segredo de justiça não aparecem.</p>
     <Processos processos={processos} casos={casos} configurado={dataJudConfigurado()} />
   </div>;
 }

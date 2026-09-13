@@ -23,11 +23,11 @@ export default async function Entrar({ searchParams }: { searchParams: Promise<{
 
   return <main className="pd-entrar">
     <section className="pd-entrar-caixa" aria-labelledby="entrar-titulo">
-      <p className="md-eyebrow">Ponto Dativo · escritório do advogado</p>
-      <h1 id="entrar-titulo">Entrar</h1>
+      <p className="pd-eyebrow">Ponto Dativo</p>
+      <h1 id="entrar-titulo">Entrar no escritório</h1>
       <p className="pd-entrar-intro">Use o usuário e a senha que a equipe do Hackathon passou para você.</p>
       <Formulario destino={destino} />
-      <p className="pd-entrar-aviso">Ambiente de demonstração do Hackathon. Use dados fictícios ou de casos que você pode tratar; nada aqui é sistema oficial da OAB.</p>
+      <p className="pd-entrar-aviso">Ambiente de demonstração do Hackathon. Use dados fictícios ou casos que você pode tratar. Não é um sistema oficial.</p>
       <Link href="/" className="pd-entrar-voltar">← Voltar ao site</Link>
     </section>
   </main>;

@@ -76,76 +76,89 @@ export function Processos({ processos, casos, configurado }: Props) {
 
   return <>
     <section className="pd-cartao pd-processos-consulta" aria-labelledby="consultar-titulo">
-      <h2 id="consultar-titulo">Consultar um processo</h2>
-      {!configurado && <p className="md-status" role="status">A consulta ao DataJud ainda não está ligada neste servidor. Peça à equipe do Hackathon para configurar a chave; até lá a lista abaixo continua disponível.</p>}
-      <form className="pd-processos-form" onSubmit={enviar}>
-        <div className="pd-processos-campo">
-          <label htmlFor="numero-processo">Número do processo</label>
-          <input
-            id="numero-processo"
-            name="numero"
-            value={numero}
-            onChange={(evento) => setNumero(evento.target.value)}
-            placeholder="0000000-00.0000.8.16.0000"
-            inputMode="numeric"
-            autoComplete="off"
-            spellCheck={false}
-            required
-          />
-          <small>Os 20 dígitos do padrão CNJ, com ou sem pontos e traços.{digitos.length > 0 && digitos.length < 20 ? ` Faltam ${20 - digitos.length}.` : ""}{digitos.length > 20 ? " Há dígitos a mais." : ""}</small>
-        </div>
-        <div className="pd-processos-campo">
-          <label htmlFor="caso-processo">Vincular a um caso</label>
-          <select id="caso-processo" name="casoId" value={casoId} onChange={(evento) => setCasoId(evento.target.value)}>
-            <option value="">Sem caso vinculado</option>
-            {casos.map((caso) => <option key={caso.id} value={caso.id}>{caso.titulo}{caso.processo ? ` · ${formatarNumeroCnj(caso.processo)}` : ""}</option>)}
-          </select>
-          <small>Opcional. Se o caso ainda não tem número, este passa a ser o dele.</small>
-        </div>
-        <button type="submit" className="md-botao-primario" disabled={ocupado !== null || digitos.length !== 20}>
-          {ocupado === "novo" ? "Consultando…" : "Consultar no DataJud"}
-        </button>
-      </form>
-      {erro && <p className="pd-processos-erro" role="alert">{erro}</p>}
-      {ultimo && <div className="md-retorno-processo" role="status">
-        <strong>{formatarNumeroCnj(ultimo.numero)}</strong>
-        <span>{ultimo.classe ?? "Classe não informada"} · {ultimo.orgao ?? "Órgão não informado"}</span>
-        <b>Último andamento</b>
-        <p>{ultimo.ultimoMovimento ?? "Movimentação não informada"}</p>
-        <small>{dataCurta(ultimo.dataMovimento) ? `Em ${dataCurta(ultimo.dataMovimento)}. ` : ""}Consulta pública, sem valor de intimação.</small>
-      </div>}
+      <header className="pd-cartao-cabeca">
+        <h2 id="consultar-titulo">Consultar um processo</h2>
+        <span className="pd-processos-fonte">DataJud público · TJPR</span>
+      </header>
+      <div className="pd-cartao-corpo">
+        {!configurado && <p className="pd-aviso pd-aviso-atencao" role="status">A consulta ao DataJud ainda não está ligada neste servidor. Peça à equipe do Hackathon para configurar a chave; até lá a lista abaixo continua disponível.</p>}
+        <form className="pd-processos-form" onSubmit={enviar}>
+          <div className="pd-campo">
+            <label htmlFor="numero-processo">Número do processo</label>
+            <input
+              id="numero-processo"
+              className="pd-entrada pd-processos-numero-campo"
+              name="numero"
+              value={numero}
+              onChange={(evento) => setNumero(evento.target.value)}
+              placeholder="0000000-00.0000.8.16.0000"
+              inputMode="numeric"
+              autoComplete="off"
+              spellCheck={false}
+              required
+            />
+            <small className="pd-auxiliar">Os 20 dígitos do padrão CNJ, com ou sem pontos e traços.{digitos.length > 0 && digitos.length < 20 ? ` Faltam ${20 - digitos.length}.` : ""}{digitos.length > 20 ? " Há dígitos a mais." : ""}</small>
+          </div>
+          <div className="pd-campo">
+            <label htmlFor="caso-processo">Vincular a um caso</label>
+            <select id="caso-processo" className="pd-selecao" name="casoId" value={casoId} onChange={(evento) => setCasoId(evento.target.value)}>
+              <option value="">Sem caso vinculado</option>
+              {casos.map((caso) => <option key={caso.id} value={caso.id}>{caso.titulo}{caso.processo ? ` · ${formatarNumeroCnj(caso.processo)}` : ""}</option>)}
+            </select>
+            <small className="pd-auxiliar">Opcional. Se o caso ainda não tem número, este passa a ser o dele.</small>
+          </div>
+          <button type="submit" className="pd-botao pd-botao-primario pd-processos-consultar" disabled={ocupado !== null || digitos.length !== 20}>
+            {ocupado === "novo" ? "Consultando…" : "Consultar no DataJud"}
+          </button>
+        </form>
+        {erro && <p className="pd-aviso pd-aviso-risco pd-processos-erro" role="alert">{erro}</p>}
+        {ultimo && <div className="pd-processos-resultado" role="status">
+          <div>
+            <p className="pd-eyebrow">Resultado da consulta</p>
+            <p className="pd-numero pd-processos-resultado-numero">{formatarNumeroCnj(ultimo.numero)}</p>
+            <p className="pd-processos-resultado-classe">{ultimo.classe ?? "Classe não informada"} · {ultimo.orgao ?? "Órgão não informado"}</p>
+          </div>
+          <div>
+            <p className="pd-eyebrow">Último andamento publicado</p>
+            <p className="pd-processos-resultado-movimento">{ultimo.ultimoMovimento ?? "Movimentação não informada"}</p>
+            <p className="pd-auxiliar">{dataCurta(ultimo.dataMovimento) ? `Em ${dataCurta(ultimo.dataMovimento)}. ` : ""}Consulta pública. Não é intimação nem fonte de prazo.</p>
+          </div>
+        </div>}
+      </div>
     </section>
 
     <section className="pd-cartao pd-processos-lista" aria-labelledby="lista-titulo">
-      <div className="pd-processos-lista-cabeca">
+      <header className="pd-cartao-cabeca">
         <h2 id="lista-titulo">Seus processos</h2>
-        <span className="pd-processos-contagem">{processos.length === 1 ? "1 processo" : `${processos.length} processos`}{recarregando ? " · atualizando…" : ""}</span>
-      </div>
+        <span className="pd-auxiliar">{processos.length === 1 ? "1 processo" : `${processos.length} processos`}{recarregando ? " · atualizando" : ""}</span>
+      </header>
       {processos.length === 0
-        ? <p className="pd-processos-vazio">Nenhum processo consultado ainda. Digite o número acima para ver o último andamento público e guardá-lo aqui.</p>
-        : <ul className="pd-processos-itens">
+        ? <div className="pd-cartao-corpo">
+          <p className="pd-vazio"><strong>Nenhum processo consultado ainda</strong>Digite o número acima para ver o último andamento publicado e guardá-lo aqui.</p>
+        </div>
+        : <ul className="pd-lista pd-processos-itens">
           {processos.map((processo) => {
             const caso = processo.casoId ? casosPorId.get(processo.casoId) : undefined;
             const consultando = ocupado === processo.id;
-            return <li key={processo.id} className="pd-processo">
+            return <li key={processo.id} className="pd-linha pd-processo">
               <div className="pd-processo-numero">
-                <strong>{formatarNumeroCnj(processo.numero)}</strong>
-                <span>{processo.classe ?? "Classe não informada"} · {processo.orgao ?? "Órgão não informado"}</span>
+                <span className="pd-linha-titulo pd-numero">{formatarNumeroCnj(processo.numero)}</span>
+                <span className="pd-linha-meta">{processo.classe ?? "Classe não informada"} · {processo.orgao ?? "Órgão não informado"}</span>
               </div>
               <div className="pd-processo-andamento">
-                <b>Último andamento</b>
+                <span className="pd-processo-rotulo">Último andamento publicado</span>
                 <p>{processo.ultimoMovimento ?? "Movimentação não informada"}</p>
-                {dataCurta(processo.dataMovimento) && <small>Em {dataCurta(processo.dataMovimento)}</small>}
+                {dataCurta(processo.dataMovimento) && <span className="pd-linha-meta">Em {dataCurta(processo.dataMovimento)}</span>}
               </div>
               <div className="pd-processo-caso">
-                <b>Caso</b>
+                <span className="pd-processo-rotulo">Caso</span>
                 {caso
                   ? <Link href={`/escritorio/casos/${caso.id}`}>{caso.titulo}</Link>
-                  : <span>Sem caso vinculado</span>}
-                <small>Consultado em {dataEHora(processo.consultadoEm)}</small>
+                  : <span className="pd-processo-sem-caso">Sem caso vinculado</span>}
+                <span className="pd-linha-meta">Consultado em {dataEHora(processo.consultadoEm)}</span>
               </div>
               <div className="pd-processo-acoes">
-                <button type="button" className="md-botao-secundario" disabled={ocupado !== null} onClick={() => void consultar(processo.numero, processo.casoId, processo.id)}>
+                <button type="button" className="pd-botao pd-botao-secundario pd-botao-pequeno" disabled={ocupado !== null} onClick={() => void consultar(processo.numero, processo.casoId, processo.id)}>
                   {consultando ? "Consultando…" : "Consultar de novo"}
                 </button>
               </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listarRevisoes, type Revisao } from "@/lib/revisoes";
+import "../painel/painel.css";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Habeas Release" };

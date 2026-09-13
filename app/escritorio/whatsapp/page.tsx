@@ -16,11 +16,19 @@ const ESTADOS_WHATSAPP: Record<string, string> = {
   connecting: "aguardando leitura do QR",
   close: "desconectado",
   sem_numero: "cadastre seu número",
-  sem_instancia: "instância perdida",
-  nao_configurado: "servidor sem Evolution",
-  indisponivel: "indisponível",
-  carregando: "…",
+  sem_instancia: "conexão perdida no servidor",
+  nao_configurado: "integração desligada",
+  indisponivel: "indisponível agora",
+  carregando: "consultando",
 };
+
+// Estado sempre com cor mais texto: o selo do cabeçalho traz as duas coisas.
+function classeDoEstado(estado: string) {
+  if (estado === "open") return "pd-estado-ok";
+  if (estado === "connecting") return "pd-estado-info";
+  if (estado === "indisponivel" || estado === "sem_instancia") return "pd-estado-risco";
+  return "pd-estado-atencao";
+}
 
 export default function WhatsApp() {
   const [whatsApp, setWhatsApp] = useState<ConexaoWhatsApp>(WHATSAPP_INICIAL);
@@ -53,7 +61,7 @@ export default function WhatsApp() {
   }, [imagemConexao]);
 
   async function acionarWhatsApp(acao: "cadastrar" | "conectar" | "desconectar" | "remover") {
-    if (acao === "remover" && !window.confirm("Remover o número apaga a sessão do seu WhatsApp neste servidor. As mensagens já guardadas continuam na sua conta. Continuar?")) return;
+    if (acao === "remover" && !window.confirm("Remover o número apaga a conexão do seu WhatsApp neste servidor. As mensagens já guardadas continuam na sua conta. Continuar?")) return;
     setCarregandoWhatsApp(true);
     if (acao !== "conectar") { setCodigoConexao(null); setImagemConexao(null); }
     try {
@@ -64,11 +72,11 @@ export default function WhatsApp() {
       if (acao === "cadastrar" || acao === "conectar") {
         setCodigoConexao(dados.codigo ?? null);
         setImagemConexao(dados.imagem ?? null);
-        setAviso(dados.conectado ? "O WhatsApp já está conectado." : dados.imagem ? "Leia o QR no WhatsApp do celular: Configurações → Aparelhos conectados → Conectar aparelho." : "A Evolution não devolveu um QR agora. Tente de novo em alguns segundos.");
-        if (acao === "cadastrar" && dados.webhookRegistrado === false) setAviso("Número cadastrado, mas o webhook não foi registrado: falta APP_URL ou EVOLUTION_WEBHOOK_SECRET no servidor. Sem ele, as mensagens não chegam à tela.");
+        setAviso(dados.conectado ? "O WhatsApp já está conectado." : dados.imagem ? "Leia o QR no WhatsApp do celular: Aparelhos conectados, Conectar aparelho." : "O servidor não devolveu um QR agora. Tente de novo em alguns segundos.");
+        if (acao === "cadastrar" && dados.webhookRegistrado === false) setAviso("Número cadastrado, mas o aviso de mensagem nova não foi ligado no servidor. Sem ele, as mensagens não chegam à tela de Mensagens.");
       }
       if (acao === "desconectar") setAviso("WhatsApp desconectado. O número continua cadastrado; gere um QR para voltar.");
-      if (acao === "remover") { setNumeroWhatsApp(""); setAviso("Número e sessão do WhatsApp removidos do servidor."); }
+      if (acao === "remover") { setNumeroWhatsApp(""); setAviso("Número e conexão do WhatsApp removidos do servidor."); }
       await atualizarWhatsApp();
     } catch (e) {
       setAviso(e instanceof Error && e.message ? e.message : "Não consegui configurar o WhatsApp agora.");
@@ -78,61 +86,82 @@ export default function WhatsApp() {
   const semNumero = whatsApp.estado === "sem_numero" || whatsApp.estado === "sem_instancia";
 
   return <section className="pd-whatsapp">
-    {aviso && <p className="md-status" role="status" aria-live="polite">{aviso}</p>}
-
-    <section className="md-whatsapp md-cartao" aria-labelledby="whatsapp-titulo">
-      <div className="md-titulo-linha">
-        <div><p className="md-eyebrow">Canal profissional</p><h2 id="whatsapp-titulo">WhatsApp conectado ao seu escritório, sem piloto automático.</h2></div>
-        <span className={`md-whatsapp-estado estado-${whatsApp.estado}`}>{ESTADOS_WHATSAPP[whatsApp.estado] ?? whatsApp.estado}</span>
+    <div className="pd-pagina-cabeca">
+      <div>
+        <p className="pd-eyebrow">Canal profissional</p>
+        <h1>WhatsApp do escritório</h1>
+        <p className="pd-auxiliar">Você conecta o seu próprio número. O que o cliente manda aparece em Mensagens e na página do caso. O assistente escreve o rascunho; o envio é sempre seu.</p>
       </div>
-      <div className="md-whatsapp-corpo">
-        <div>
-          <p>Você conecta o seu próprio número. O que os clientes mandam aparece em <Link href="/escritorio/mensagens">Mensagens</Link> e na página do caso; o assistente sugere a resposta e só você envia.</p>
-          <ul>
-            <li>Conexão por QR Code, com uma instância só sua</li>
-            <li>Chegam texto e avisos de mídia; nenhum arquivo é baixado</li>
-            <li>Nenhuma mensagem sai sem o seu clique</li>
-          </ul>
+      <div className="pd-pagina-acoes">
+        <span className={`pd-estado ${classeDoEstado(whatsApp.estado)}`}>{ESTADOS_WHATSAPP[whatsApp.estado] ?? whatsApp.estado}</span>
+      </div>
+    </div>
+
+    {aviso && <p className="pd-aviso" role="status" aria-live="polite">{aviso}</p>}
+
+    <section className="pd-cartao" aria-labelledby="whatsapp-titulo">
+      <header className="pd-cartao-cabeca">
+        <h2 id="whatsapp-titulo">Conexão do número</h2>
+      </header>
+      <div className="pd-cartao-corpo pd-whatsapp-corpo">
+        <div className="pd-whatsapp-bloco">
+          <p>O número fica ligado ao seu login do escritório, com uma conexão só sua. Nenhum arquivo é baixado: chegam o texto e o aviso de que existe mídia.</p>
+          <ol className="pd-whatsapp-passos">
+            <li><b>1</b><span>Cadastre o número com DDD. Use um número seu ou de teste, nunca o de um cliente real.</span></li>
+            <li><b>2</b><span>Gere o QR e leia no celular, em Aparelhos conectados, Conectar aparelho.</span></li>
+            <li><b>3</b><span>As conversas passam a aparecer em <Link href="/escritorio/mensagens">Mensagens</Link>. Nada sai para o cliente sem o seu clique.</span></li>
+          </ol>
         </div>
-        <aside>
+
+        <aside className="pd-whatsapp-lado">
           {!whatsApp.configurado && whatsApp.estado !== "carregando" ? <>
-            <strong>Servidor sem Evolution</strong>
-            <small>Defina EVOLUTION_API_URL e EVOLUTION_API_KEY no ambiente do servidor. As chaves nunca passam pela tela.</small>
+            <strong>Integração desligada neste servidor</strong>
+            <small>A equipe precisa ligar a integração do WhatsApp no ambiente de demonstração. As chaves ficam só no servidor e nunca passam pela tela.</small>
           </> : whatsApp.estado === "carregando" ? <>
-            <strong>Consultando…</strong>
-            <small>Verificando o estado da sua conexão.</small>
+            <strong>Consultando o estado</strong>
+            <small>Verificando a sua conexão com o WhatsApp.</small>
           </> : semNumero ? <>
             <strong>Cadastre o seu WhatsApp</strong>
-            <small>O número fica ligado ao seu login do escritório. Depois do cadastro, o QR aparece aqui para ler no celular.</small>
-            <div className="md-adicionar md-numero-whatsapp">
+            <small>Depois do cadastro, o QR aparece aqui para ler no celular.</small>
+            <div className="pd-campo">
               <label htmlFor="numero-whatsapp">Número com DDD</label>
-              <div>
-                <input id="numero-whatsapp" value={numeroWhatsApp} onChange={(evento) => setNumeroWhatsApp(evento.target.value)} inputMode="tel" autoComplete="tel" maxLength={20} placeholder="(41) 99999-9999" />
-                <button type="button" className="md-botao-primario" onClick={() => acionarWhatsApp("cadastrar")} disabled={carregandoWhatsApp || numeroWhatsApp.replace(/\D/g, "").length < 10}>{carregandoWhatsApp ? "Cadastrando…" : "Cadastrar e gerar QR"}</button>
-              </div>
+              <input
+                id="numero-whatsapp"
+                className="pd-entrada"
+                value={numeroWhatsApp}
+                onChange={(evento) => setNumeroWhatsApp(evento.target.value)}
+                inputMode="tel"
+                autoComplete="tel"
+                maxLength={20}
+                placeholder="(41) 99999-9999"
+              />
             </div>
-            {whatsApp.estado === "sem_instancia" && <small>O cadastro anterior ({whatsApp.numero}) perdeu a instância no servidor. Cadastre de novo para recriá-la.</small>}
+            <button type="button" className="pd-botao pd-botao-primario pd-botao-bloco" onClick={() => acionarWhatsApp("cadastrar")} disabled={carregandoWhatsApp || numeroWhatsApp.replace(/\D/g, "").length < 10}>{carregandoWhatsApp ? "Cadastrando…" : "Cadastrar e gerar QR"}</button>
+            {whatsApp.estado === "sem_instancia" && <small>O cadastro anterior ({whatsApp.numero}) não foi encontrado no servidor. Cadastre de novo para recriar a conexão.</small>}
           </> : <>
             <strong>{whatsApp.estado === "open" ? "Conectado" : "Número cadastrado"}</strong>
-            <small>{whatsApp.numero} · instância {whatsApp.instancia}</small>
-            <div className="md-acoes">
-              {whatsApp.estado !== "open" && <button type="button" className="md-botao-primario" onClick={() => acionarWhatsApp("conectar")} disabled={carregandoWhatsApp}>{carregandoWhatsApp ? "Gerando…" : imagemConexao ? "Gerar novo QR" : "Gerar QR de conexão"}</button>}
-              {whatsApp.estado === "open" && <button type="button" className="md-botao-secundario" onClick={() => acionarWhatsApp("desconectar")} disabled={carregandoWhatsApp}>Desconectar</button>}
-              <button type="button" className="md-botao-secundario" onClick={() => acionarWhatsApp("remover")} disabled={carregandoWhatsApp}>Remover número</button>
+            <dl className="pd-dados">
+              <div className="pd-dado"><dt>Número</dt><dd>{whatsApp.numero}</dd></div>
+              <div className="pd-dado"><dt>Situação</dt><dd>{ESTADOS_WHATSAPP[whatsApp.estado] ?? whatsApp.estado}</dd></div>
+            </dl>
+            <div className="pd-linha-campos">
+              {whatsApp.estado !== "open" && <button type="button" className="pd-botao pd-botao-primario" onClick={() => acionarWhatsApp("conectar")} disabled={carregandoWhatsApp}>{carregandoWhatsApp ? "Gerando…" : imagemConexao ? "Gerar novo QR" : "Gerar QR de conexão"}</button>}
+              {whatsApp.estado === "open" && <button type="button" className="pd-botao pd-botao-secundario" onClick={() => acionarWhatsApp("desconectar")} disabled={carregandoWhatsApp}>Desconectar</button>}
+              <button type="button" className="pd-botao pd-botao-perigo" onClick={() => acionarWhatsApp("remover")} disabled={carregandoWhatsApp}>Remover número</button>
             </div>
             {imagemConexao && whatsApp.estado !== "open" && <>
-              <Image className="md-qr-conexao" src={imagemConexao} alt="QR Code para conectar o seu WhatsApp" width={240} height={240} unoptimized />
-              <small>Abra o WhatsApp no celular → Aparelhos conectados → Conectar aparelho. O QR expira sozinho; se passar, gere outro.</small>
+              <Image className="pd-qr" src={imagemConexao} alt="QR Code para conectar o seu WhatsApp" width={240} height={240} unoptimized />
+              <small>O QR expira sozinho. Se passar da tela, gere outro.</small>
             </>}
-            {codigoConexao && whatsApp.estado !== "open" && <code className="md-codigo-conexao">Código de pareamento: {codigoConexao}</code>}
-            {whatsApp.estado === "open" && <small className="pd-whatsapp-dica">Tudo pronto. As conversas aparecem em <Link href="/escritorio/mensagens">Mensagens</Link>.</small>}
+            {codigoConexao && whatsApp.estado !== "open" && <code className="pd-codigo-conexao">Código de pareamento: {codigoConexao}</code>}
+            {whatsApp.estado === "open" && <small>Está tudo pronto. As conversas aparecem em <Link href="/escritorio/mensagens">Mensagens</Link>.</small>}
           </>}
         </aside>
       </div>
     </section>
 
     <p className="pd-whatsapp-limite">
-      Ambiente de demonstração: use um número seu ou de teste. A URL da Evolution e as chaves ficam só no servidor; a tela nunca as mostra.
+      Ambiente de demonstração: use um número seu ou de teste. A integração roda no servidor da equipe; as chaves nunca aparecem nesta tela.
     </p>
   </section>;
 }

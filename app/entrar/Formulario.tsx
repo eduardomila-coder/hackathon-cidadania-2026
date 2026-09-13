@@ -30,11 +30,15 @@ export function Formulario({ destino }: { destino: string }) {
   }
 
   return <form className="pd-entrar-form" onSubmit={entrar}>
-    <label htmlFor="usuario">Usuário</label>
-    <input id="usuario" name="usuario" value={usuario} onChange={(evento) => setUsuario(evento.target.value)} autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} required autoFocus />
-    <label htmlFor="senha">Senha</label>
-    <input id="senha" name="senha" type="password" value={senha} onChange={(evento) => setSenha(evento.target.value)} autoComplete="current-password" required />
+    <div className="pd-campo">
+      <label htmlFor="usuario">Usuário</label>
+      <input className="pd-entrada" id="usuario" name="usuario" value={usuario} onChange={(evento) => setUsuario(evento.target.value)} autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} required autoFocus />
+    </div>
+    <div className="pd-campo">
+      <label htmlFor="senha">Senha</label>
+      <input className="pd-entrada" id="senha" name="senha" type="password" value={senha} onChange={(evento) => setSenha(evento.target.value)} autoComplete="current-password" required />
+    </div>
     {erro && <p className="pd-entrar-erro" role="alert">{erro}</p>}
-    <button type="submit" className="md-botao-primario" disabled={enviando || !usuario.trim() || !senha}>{enviando ? "Entrando…" : "Entrar"}</button>
+    <button type="submit" className="pd-botao pd-botao-primario pd-botao-bloco" disabled={enviando || !usuario.trim() || !senha}>{enviando ? "Entrando…" : "Entrar"}</button>
   </form>;
 }

@@ -228,13 +228,16 @@ function ConversaDoContato({ contato, casoId, aoAtualizar, sugestao, aoEnviarSug
 
     <form className="pd-resposta" onSubmit={(evento) => { evento.preventDefault(); void enviar(); }}>
       {sugestao && <div className="pd-estagiario-sugestao">
-        <p className="pd-estagiario-etiqueta">Estagiário virtual preparou esta resposta</p>
+        <div className="pd-estagiario-cabeca">
+          <p className="pd-estagiario-etiqueta">Rascunho do assistente</p>
+          <span className="pd-estagiario-nao-enviado">não enviado</span>
+        </div>
         <p className="pd-estagiario-texto">{sugestao.texto}</p>
         <p className="pd-estagiario-motivo">{sugestao.motivo}</p>
         <div className="pd-estagiario-acoes">
-          <button type="button" className="wa-botao-sugerir" disabled={enviando} onClick={() => aoEnviarSugestao?.(sugestao.id, sugestao.texto)}>Enviar como está</button>
-          <button type="button" className="md-botao-secundario" disabled={enviando} onClick={() => { setTexto(sugestao.texto); setMotivo(sugestao.motivo); aoDescartarSugestao?.(sugestao.id); }}>Editar na caixa</button>
-          <button type="button" className="pd-estagiario-descartar" disabled={enviando} onClick={() => aoDescartarSugestao?.(sugestao.id)}>Descartar</button>
+          <button type="button" className="pd-botao pd-botao-primario wa-botao-sugerir" disabled={enviando} onClick={() => aoEnviarSugestao?.(sugestao.id, sugestao.texto)}>Enviar pelo WhatsApp</button>
+          <button type="button" className="pd-botao pd-botao-secundario pd-botao-pequeno" disabled={enviando} onClick={() => { setTexto(sugestao.texto); setMotivo(sugestao.motivo); aoDescartarSugestao?.(sugestao.id); }}>Editar na caixa</button>
+          <button type="button" className="pd-botao pd-botao-quieto pd-botao-pequeno pd-estagiario-descartar" disabled={enviando} onClick={() => aoDescartarSugestao?.(sugestao.id)}>Descartar</button>
         </div>
       </div>}
       {motivo && <p className="pd-motivo"><b>O que o assistente fez</b>{motivo}</p>}
@@ -265,15 +268,16 @@ function ConversaDoContato({ contato, casoId, aoAtualizar, sugestao, aoEnviarSug
           disabled={enviando}
           aria-label={`Resposta para ${formatarTelefone(contato)}`}
         />
-        <button type="button" className="wa-botao-sugerir" onClick={sugerir} disabled={sugerindo || enviando}>{sugerindo ? "Trabalhando…" : "Sugerir resposta"}</button>
-        <button type="submit" className="wa-botao-enviar" disabled={enviando || sugerindo || !texto.trim()} title="Enviar pelo WhatsApp" aria-label="Enviar pelo WhatsApp">
+        <button type="button" className="pd-botao pd-botao-secundario wa-botao-sugerir" onClick={sugerir} disabled={sugerindo || enviando}>{sugerindo ? "Trabalhando…" : "Sugerir resposta"}</button>
+        <button type="submit" className="pd-botao pd-botao-primario wa-botao-enviar" disabled={enviando || sugerindo || !texto.trim()} title="Enviar pelo WhatsApp" aria-label="Enviar pelo WhatsApp">
           {enviando
-            ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="9" strokeDasharray="40 20" /></svg>
-            : <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12 2-12 2z" /></svg>}
+            ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="9" strokeDasharray="40 20" /></svg>
+            : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12 2-12 2z" /></svg>}
+          <span>{enviando ? "Enviando…" : "Enviar pelo WhatsApp"}</span>
         </button>
       </div>
-      <p className="pd-resposta-dica">A sugestão é um rascunho. Só vai ao cliente quando você clicar em enviar.</p>
-      {aviso && <p className={`pd-resposta-aviso pd-aviso-${aviso.tipo}`} role={aviso.tipo === "erro" ? "alert" : "status"}>{aviso.texto}</p>}
+      <p className="pd-resposta-dica"><b>O envio é seu.</b> A sugestão é um rascunho: só vai ao cliente quando você clicar em Enviar pelo WhatsApp.</p>
+      {aviso && <p className={`pd-resposta-aviso ${aviso.tipo}`} role={aviso.tipo === "erro" ? "alert" : "status"}>{aviso.texto}</p>}
     </form>
   </div>;
 }

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { listarCasosComDetalhes, listarClientes, resumoDoEscritorio } from "@/lib/escritorio";
 import { advogadoAtual } from "@/lib/sessao";
 import { Painel } from "./casos/Painel";
-import "./casos.css";
+import "./lista.css";
 
 export const dynamic = "force-dynamic";
 
