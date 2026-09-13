@@ -214,3 +214,38 @@ isolado depois da troca da tela: 39 de 39. No caminho apareceu uma corrida no
 próprio teste, que lia a página antes de o aviso de conexão chegar (é um pedido
 separado do da lista); o teste passou a esperar o aviso. `lint` sem erro, `tsc`
 limpo e `npm run build` verde.
+
+
+### Estagiário virtual (13/09, 1h30)
+
+A pedido do Eduardo, o Ponto Dativo ganhou o estagiário virtual, com o desenho do
+robô da Estagiária da Mila (`backend/whatsapp/services/ai_robot.py`): ligado por
+conversa pelo advogado, ele responde o cliente pelo WhatsApp seguindo as regras de
+lá (não inventar fato, não revelar nota interna, não prometer resultado, não falar
+de prazo, não repetir o que já foi dito, não responder agradecimento, mensagem
+curta = resposta curta) e decide no próprio contrato se responde, com `enviar`,
+`confianca` e `motivoDeSilencio`.
+
+Três travas iguais às de lá: confiança mínima (cuidadoso 0,85, padrão 0,72,
+confiante 0,5), envio automático ou só sugestão, e o atendimento por conversa, não
+por escritório. Quando ele não envia, o texto vira sugestão na tela com o motivo,
+e o advogado manda como está, edita ou descarta; toda decisão, inclusive a de
+ficar quieto, fica registrada no caso. A mensagem que saiu por ele leva o selo
+"estagiário" no balão, para ninguém confundir quem falou. O webhook da Evolution
+aciona o estagiário depois de responder, e mensagens seguidas do cliente viram um
+atendimento só.
+
+**Conferido em ambiente isolado com `scripts/testar-estagiario.mjs`, 21 de 21
+verificações:** com ele desligado o webhook só guarda a mensagem e ninguém
+responde; ligado em modo sugestão ele prepara a resposta e nada sai para o
+cliente; o caso ganha o registro da decisão; o agradecimento não vira conversa
+fiada; a simulação da tela mostra o que ele faria sem enviar; e desligar devolve a
+conversa ao advogado. **No endereço público, 8 de 8** com a conta `ana.souza`: o
+painel liga, simula, mostra a sugestão com o motivo, descarta e desliga.
+
+**Na demonstração ele fica desligado**, para o auditor ligar como o advogado
+faria. O painel está na coluna da direita da tela de Mensagens, e o botão "Testar
+agora" mostra a resposta que ele daria sem enviar nada.
+
+Prints: `15-mensagens-estagiario-desligado.png`,
+`16-mensagens-estagiario-ligado.png` e `17-mensagens-estagiario-sugestao.png`.
