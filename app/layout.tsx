@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./prototipo.css";
 
 export const metadata: Metadata = {
   title: "Escritório Dativo | Ambiente profissional",

@@ -12,6 +12,7 @@ export function PaginaDaNomeacao({ inicial }: { inicial: Nomeacao }) {
   const [nomeacao, setNomeacao] = useState(inicial);
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [verTexto, setVerTexto] = useState(false);
   const ficha = nomeacao.camposExtraidos;
   const todasConferidas = nomeacao.checklist.length > 0 && nomeacao.checklist.every((item) => item.conferido);
   const url = `/api/escritorio/nomeacoes/${nomeacao.id}`;
@@ -60,88 +61,72 @@ export function PaginaDaNomeacao({ inicial }: { inicial: Nomeacao }) {
     }
   }
 
-  return <div className="pd-nomeacao-detalhe">
-    <div className="pd-pagina-cabeca">
-      <div>
-        <p className="pd-eyebrow">Nomeação</p>
-        <h1>{ficha.ato ?? "Nomeação a conferir"}</h1>
-        <p className="pd-auxiliar">Registrada em {formatarMomento(nomeacao.criadoEm)} · atualizada em {formatarMomento(nomeacao.atualizadoEm)}</p>
+  const conferidos = nomeacao.checklist.filter((item) => item.conferido).length;
+  const estado = nomeacao.casoId ? { texto: "Caso aberto", tom: "ok" }
+    : nomeacao.estado === "arquivada" ? { texto: "Arquivada", tom: "neutral" }
+    : todasConferidas ? { texto: "Pronta para abrir o caso", tom: "ok" }
+    : { texto: "Precisa conferência", tom: "warn" };
+
+  return <>
+    <div className="hero-case">
+      <div className="hero-case-grid">
+        <div><div className="eyebrow">Nomeação registrada</div><h1>{ficha.ato ?? "Nomeação a conferir"}</h1><p className="mono">{ficha.processo ? formatarCnj(ficha.processo) : "Processo não identificado no texto"}{ficha.orgao ? ` · ${ficha.orgao}` : ""}</p></div>
+        <div className="inline"><span className={`status st-${estado.tom}`}>{estado.texto}</span><Link href="/escritorio/nomeacoes" className="btn btn-secondary">Voltar</Link></div>
       </div>
-      <div className="pd-nomeacao-detalhe-acoes">
-        <Link href="/escritorio/nomeacoes" className="pd-botao pd-botao-quieto">Todas as nomeações</Link>
-        <button type="button" className="pd-botao pd-botao-secundario" onClick={mudarEstado} disabled={ocupado !== null}>
-          {ocupado === "estado" ? "Salvando…" : nomeacao.estado === "aberta" ? "Arquivar" : "Reabrir nomeação"}
-        </button>
+      <div className="case-meta-grid">
+        <div className="meta-box"><label>Origem</label><strong>Intimação colada pelo advogado</strong></div>
+        <div className="meta-box"><label>Ato indicado</label><strong>{ficha.ato ?? "Não consta no texto"}</strong></div>
+        <div className="meta-box"><label>Prazo</label><strong style={{ color: "var(--risk)" }}>{prazo ? `${prazo} · conferir` : "Não determinado · conferir"}</strong></div>
+        <div className="meta-box"><label>Ciência</label><strong>{ficha.dataCiencia ? formatarData(ficha.dataCiencia) : "Não consta no texto"}</strong></div>
       </div>
     </div>
 
-    <section className="pd-nomeacao-resumo" aria-label="Resumo da nomeação">
-      <div>
-        <p className="pd-eyebrow">{nomeacao.estado === "aberta" ? "Aberta para conferência" : "Arquivada"}</p>
-        <h2>{ficha.processo ? formatarCnj(ficha.processo) : "Processo não identificado no texto"}</h2>
-        <p className="pd-auxiliar">{ficha.orgao ?? "Órgão não consta no texto"}{ficha.ato ? ` · ${ficha.ato}` : ""}</p>
+    {erro && <div role="alert" className="notice risk" style={{ marginBottom: 13 }}>{erro}</div>}
+
+    <div className="detail-grid">
+      <div className="stack">
+        <section className="card">
+          <div className="card-head"><h2>Leitura assistida da nomeação</h2><button type="button" className="btn btn-secondary btn-sm" onClick={() => setVerTexto((valor) => !valor)}>{verTexto ? "Ocultar texto original" : "Ver texto original"}</button></div>
+          <div className="card-body">
+            <div className="assist-note"><div className="assist-icon">i</div><div><strong>O assistente estruturou a intimação. Ele não contou prazo nem tomou decisão processual.</strong><p>Revise cada campo antes de abrir o caso.</p></div></div>
+            {verTexto && <pre className="texto-original">{nomeacao.textoOriginal}</pre>}
+            <div className="extracted"><label>Processo</label><div className="mono">{ficha.processo ? formatarCnj(ficha.processo) : "Não consta no texto"}</div></div>
+            <div className="extracted"><label>Órgão</label><div>{ficha.orgao ?? "Não consta no texto"}</div></div>
+            <div className="extracted"><label>Ato sugerido</label><div>{ficha.ato ?? "Não consta no texto"}</div></div>
+            <div className="extracted"><label>Resumo</label><div>{ficha.resumo}</div></div>
+            <div className="extracted"><label>Prazo</label><div>{prazo
+              ? <><span className="status st-warn">Informado no texto</span> <span className="small">{prazo}. Data escrita na intimação, a conferir no processo oficial.</span></>
+              : <><span className="status st-risk">Não inferido</span> <span className="small">A intimação não contém data final inequívoca.</span></>}</div></div>
+            <div className="extracted"><label>Pontos a verificar</label><div>{ficha.alertas.length ? <ul className="lista-simples">{ficha.alertas.map((item) => <li key={item}>{item}</li>)}</ul> : "Inteiro teor do processo, documentação existente, contato da parte, providência imediata e eventual audiência designada."}</div></div>
+            <div className="extracted"><label>Fundamentos a avaliar</label><div>{ficha.fundamentosAAvaliar.length ? <ul className="lista-simples">{ficha.fundamentosAAvaliar.map((item) => <li key={item}>{item}</li>)}</ul> : "Nada sugerido pelo texto."}</div></div>
+            <div className="extracted"><label>Documentos a pedir</label><div>{ficha.documentosAPedir.length ? <ul className="lista-simples">{ficha.documentosAPedir.map((item) => <li key={item}>{item}</li>)}</ul> : "Nenhum além do checklist padrão."}</div></div>
+            <div className="extracted"><label>Perguntas ao cliente</label><div>{ficha.perguntasAoCliente.length ? <ul className="lista-simples">{ficha.perguntasAoCliente.map((item) => <li key={item}>{item}</li>)}</ul> : "Nenhuma por enquanto."}</div></div>
+          </div>
+        </section>
       </div>
-      <div className="pd-nomeacao-prazo">
-        <small>Prazo informado no texto</small>
-        <strong>{prazo ?? "Não determinado"}</strong>
-        <span>a conferir no processo oficial</span>
-      </div>
-    </section>
-
-    {erro && <p role="alert" className="pd-aviso pd-aviso-risco">{erro}</p>}
-
-    <section className="pd-cartao" aria-label="Ficha extraída">
-      <div className="pd-cartao-cabeca"><h2>Ficha extraída</h2><span className="pd-auxiliar">leitura assistida, a conferir</span></div>
-      <div className="pd-cartao-corpo">
-        <dl className="pd-dados pd-nomeacao-grade">
-          <div className="pd-dado"><dt>Processo</dt><dd>{ficha.processo ? <span className="pd-numero">{formatarCnj(ficha.processo)}</span> : <em>não consta no texto</em>}</dd></div>
-          <div className="pd-dado"><dt>Órgão</dt><dd>{ficha.orgao ?? <em>não consta no texto</em>}</dd></div>
-          <div className="pd-dado"><dt>Ato indicado</dt><dd>{ficha.ato ?? <em>não consta no texto</em>}</dd></div>
-          <div className="pd-dado"><dt>Ciência</dt><dd>{ficha.dataCiencia ? formatarData(ficha.dataCiencia) : <em>não consta no texto</em>}</dd></div>
-        </dl>
-        <div className="pd-nomeacao-ficha">
-          <Bloco titulo="Resumo"><p>{ficha.resumo}</p></Bloco>
-          <Bloco titulo="Fundamentos a avaliar" itens={ficha.fundamentosAAvaliar} vazio="Nada sugerido pelo texto." />
-          <Bloco titulo="Documentos a pedir" itens={ficha.documentosAPedir} vazio="Nenhum além do checklist padrão." />
-          <Bloco titulo="Perguntas ao cliente" itens={ficha.perguntasAoCliente} vazio="Nenhuma por enquanto." />
-          <Bloco titulo="Confira antes de confiar" itens={ficha.alertas} vazio="Sem alertas." classe="pd-nomeacao-alertas" />
-        </div>
-      </div>
-    </section>
-
-    <section className="pd-cartao" aria-label="Texto original da nomeação">
-      <div className="pd-cartao-cabeca"><h2>Texto original</h2><span className="pd-auxiliar">como foi colado</span></div>
-      <div className="pd-cartao-corpo"><pre className="pd-nomeacao-texto">{nomeacao.textoOriginal}</pre></div>
-    </section>
-
-    <section className="pd-cartao" aria-label="Conferências humanas">
-      <div className="pd-cartao-cabeca"><h2>Conferências humanas</h2><span className="pd-auxiliar">{nomeacao.checklist.filter((item) => item.conferido).length} de {nomeacao.checklist.length} marcadas</span></div>
-      <div className="pd-cartao-corpo">
-        <p className="pd-aviso pd-aviso-atencao">Marque apenas o que você conferiu. O caso só pode ser aberto depois de todas as confirmações.</p>
-        <ul className="pd-nomeacao-checklist">
-          {nomeacao.checklist.map((item) => <li key={item.id}>
-            <label className="pd-nomeacao-check">
-              <input type="checkbox" checked={item.conferido} onChange={() => alternarChecklist(item)} disabled={ocupado !== null} />
-              <span><strong>{item.descricao}</strong>{item.conferidoEm ? `Conferido em ${formatarMomento(item.conferidoEm)}` : "Pendente de conferência humana"}</span>
-            </label>
-          </li>)}
-        </ul>
-        <div className="pd-nomeacao-acoes">
+      <aside className="stack">
+        <section className="decision">
+          <div className="eyebrow">Antes de abrir o caso</div><h3 style={{ fontSize: 14, marginTop: 5 }}>Checklist mínimo</h3><p>Marque apenas o que você conferiu. O caso só abre depois de todas as confirmações ({conferidos} de {nomeacao.checklist.length}).</p>
+          {nomeacao.checklist.map((item) => <label className="task" key={item.id} style={{ cursor: ocupado ? "wait" : "pointer" }}>
+            <input type="checkbox" className="sr-only" checked={item.conferido} onChange={() => alternarChecklist(item)} disabled={ocupado !== null} />
+            <span className="check" aria-hidden="true">{item.conferido ? "✓" : ""}</span>
+            <div><strong>{item.descricao}</strong><span>{item.conferidoEm ? `conferido em ${formatarMomento(item.conferidoEm)}` : "confirmação humana"}</span></div>
+          </label>)}
+        </section>
+        <section className="card"><div className="card-head"><h2>Próximo passo</h2></div><div className="card-body stack">
           {nomeacao.casoId
-            ? <Link href={`/escritorio/casos/${nomeacao.casoId}`} className="pd-botao pd-botao-primario">Ver caso aberto</Link>
-            : <button type="button" className="pd-botao pd-botao-primario" onClick={abrirCaso} disabled={ocupado !== null || !todasConferidas || nomeacao.estado !== "aberta"}>
-              {ocupado === "abrir" ? "Abrindo…" : "Abrir caso a partir da ficha"}
+            ? <Link href={`/escritorio/casos/${nomeacao.casoId}`} className="btn btn-primary btn-block">Abrir workspace do caso</Link>
+            : <button type="button" className="btn btn-primary btn-block" onClick={abrirCaso} disabled={ocupado !== null || !todasConferidas || nomeacao.estado !== "aberta"}>
+              {ocupado === "abrir" ? "Abrindo…" : "Criar workspace do caso"}
             </button>}
-          <span className="pd-auxiliar">{nomeacao.estado === "arquivada" ? "Reabra a nomeação para abrir um caso." : todasConferidas ? "Todas as conferências foram registradas." : "Conclua todas as conferências para liberar a abertura do caso."}</span>
-        </div>
-      </div>
-    </section>
-  </div>;
-}
-
-function Bloco({ titulo, itens, vazio, classe = "", children }: { titulo: string; itens?: string[]; vazio?: string; classe?: string; children?: React.ReactNode }) {
-  return <div className={classe}>
-    <h3>{titulo}</h3>
-    {children ?? (itens && itens.length > 0 ? <ul>{itens.map((item) => <li key={item}>{item}</li>)}</ul> : <p>{vazio}</p>)}
-  </div>;
+          <Link href="/escritorio/nomeacoes" className="btn btn-secondary btn-block">Salvar para revisar depois</Link>
+          <button type="button" className="btn btn-quiet btn-block" onClick={mudarEstado} disabled={ocupado !== null}>
+            {ocupado === "estado" ? "Salvando…" : nomeacao.estado === "aberta" ? "Arquivar registro" : "Reabrir registro"}
+          </button>
+          <p className="tiny muted" style={{ margin: 0 }}>{nomeacao.estado === "arquivada" ? "Reabra a nomeação para abrir um caso." : todasConferidas ? "Todas as conferências foram registradas." : "Conclua todas as conferências para liberar a abertura do caso."}</p>
+        </div></section>
+        <div className="notice warn">Qualquer aceite, recusa ou manifestação que produza efeito processual deve ser praticado no canal oficial adequado.</div>
+      </aside>
+    </div>
+  </>;
 }

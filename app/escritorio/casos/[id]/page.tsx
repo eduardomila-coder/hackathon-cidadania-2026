@@ -7,7 +7,7 @@ import "../../casos.css";
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ aba?: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
@@ -19,11 +19,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // A página do caso lê o dossiê inteiro no servidor; o componente cliente
 // cuida das edições e recarrega pela API quando precisa. Caso de outro
 // advogado (ou inexistente) é 404: para quem não é dono, não existe.
-export default async function Pagina({ params }: Props) {
+export default async function Pagina({ params, searchParams }: Props) {
   const { id } = await params;
+  const { aba } = await searchParams;
   const advogado = await advogadoAtual();
   if (!advogado) redirect("/entrar");
   const dossie = dossieDoCaso(advogado.id, id);
   if (!dossie) notFound();
-  return <PaginaDoCaso inicial={dossie} />;
+  return <PaginaDoCaso inicial={dossie} abaInicial={aba} />;
 }

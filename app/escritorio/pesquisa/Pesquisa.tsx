@@ -29,167 +29,86 @@ export type CasoPesquisado = { id: string; titulo: string; cliente: string | nul
 
 type Props = { casos: CasoPesquisado[]; fontes: Record<string, FonteDaBase>; base: FonteDaBase[]; totalDeTriagens: number };
 
-const ESTADO_DO_REQUISITO: Record<string, { nome: string; classe: string }> = {
-  comprovado: { nome: "comprovado", classe: "pd-estado pd-estado-ok" },
-  falta_documento: { nome: "falta documento", classe: "pd-estado pd-estado-atencao" },
-  nao_se_aplica: { nome: "não se aplica", classe: "pd-estado" },
+const ESTADO_DO_REQUISITO: Record<string, { nome: string; tom: string }> = {
+  comprovado: { nome: "comprovado", tom: "st-ok" },
+  falta_documento: { nome: "falta documento", tom: "st-warn" },
+  nao_se_aplica: { nome: "não se aplica", tom: "st-neutral" },
 };
 
-// Leitura das triagens salvas. Cada requisito mostra o id do trecho que o
-// exige e a lei a que esse id pertence; quem confere a leitura e decide é o
-// advogado. Nada aqui é parecer, e o rodapé de cada triagem diz isso.
+// Leitura das triagens salvas, no desenho do protótipo: à esquerda o contexto
+// que a análise usou; à direita a resposta, numerada, com a fonte de cada
+// afirmação. Nada é analisado de novo aqui; quem confere e decide é o
+// advogado, e o rodapé diz isso.
 export function Pesquisa({ casos, fontes, base, totalDeTriagens }: Props) {
-  const [escolhido, setEscolhido] = useState<string | null>(null);
-  const visiveis = escolhido ? casos.filter((caso) => caso.id === escolhido) : casos;
+  const [casoId, setCasoId] = useState<string>(casos[0]?.id ?? "");
+  const caso = casos.find((item) => item.id === casoId) ?? casos[0] ?? null;
+  const [triagemId, setTriagemId] = useState<string | null>(null);
+  const triagem = caso ? caso.triagens.find((item) => item.id === triagemId) ?? caso.triagens[0] ?? null : null;
 
-  return <div className="pd-pesquisa">
-    <div className="pd-pagina-cabeca">
-      <div>
-        <p className="pd-eyebrow">Pesquisa jurídica</p>
-        <h1>Pesquisa jurídica</h1>
-        <p className="pd-auxiliar">As triagens já feitas nos seus casos, guardadas com os requisitos e a fonte de cada afirmação. É a memória de pesquisa do escritório: nada é analisado de novo aqui, só o que ficou salvo no caso.</p>
-      </div>
-    </div>
+  if (!caso || !triagem) return <div className="card"><div className="vazio"><strong>Nenhuma pesquisa guardada ainda.</strong>Abra um caso, salve o relato e use <b>Triar com fontes</b>: a triagem fica aqui, com os requisitos e a fonte de cada ponto.</div></div>;
 
-    <p className="pd-aviso">
-      <strong>Resposta de apoio, sujeita à conferência profissional.</strong> A triagem organiza o relato e cita o trecho da lei que sustenta cada ponto, mas não é parecer, não decide tese e não diz se o caso deve ser aceito. A redação final e a estratégia são do advogado.
-    </p>
+  const leis = Array.from(new Set(base.map((fonte) => fonte.lei))).slice(0, 6);
+  const pergunta = `O que a lei exige para o caso ${caso.cliente ? `de ${caso.cliente}` : `"${caso.titulo}"`} e o que já está comprovado?`;
 
-    {totalDeTriagens === 0
-      ? <div className="pd-vazio">
-        <strong>Nenhuma triagem salva ainda.</strong>
-        A triagem nasce dentro do caso: abra <Link href="/escritorio">um caso</Link>, cole o relato na parte de triagem e rode a análise. O que ficar salvo aparece aqui, com as fontes, como memória de pesquisa do escritório.
-      </div>
-      : <div className="pd-pesquisa-layout">
-        <aside className="pd-pesquisa-contexto" aria-label="Casos com triagem">
-          <div className="pd-cartao-cabeca">
-            <h2>Casos com pesquisa</h2>
-            <span className="pd-auxiliar">{totalDeTriagens} {totalDeTriagens === 1 ? "triagem" : "triagens"}</span>
-          </div>
-          <button
-            type="button"
-            className={`pd-pesquisa-caso${escolhido === null ? " pd-pesquisa-caso-ativo" : ""}`}
-            aria-pressed={escolhido === null}
-            onClick={() => setEscolhido(null)}
-          >
-            <span className="pd-pesquisa-caso-nome">Todos os casos</span>
-            <span className="pd-pesquisa-caso-contagem">{totalDeTriagens}</span>
-          </button>
-          {casos.map((caso) => <button
-            key={caso.id}
-            type="button"
-            className={`pd-pesquisa-caso${escolhido === caso.id ? " pd-pesquisa-caso-ativo" : ""}`}
-            aria-pressed={escolhido === caso.id}
-            onClick={() => setEscolhido(caso.id)}
-          >
-            <span className="pd-pesquisa-caso-nome">{caso.titulo}</span>
-            <span className="pd-pesquisa-caso-contagem">{caso.triagens.length}</span>
-          </button>)}
-        </aside>
-
-        <div className="pd-pesquisa-tudo">
-          {visiveis.map((caso) => <section className="pd-pesquisa-grupo" key={caso.id}>
-            <div className="pd-pesquisa-grupo-cabeca">
-              <div>
-                <h2>{caso.titulo}</h2>
-                <p className="pd-linha-meta">{caso.cliente ?? "sem cliente vinculado"}</p>
-              </div>
-              <Link className="pd-botao pd-botao-pequeno pd-botao-secundario" href={`/escritorio/casos/${caso.id}`}>Abrir caso</Link>
-            </div>
-
-            {caso.triagens.map((triagem) => <article className="pd-pesquisa-triagem" key={triagem.id}>
-              <div className="pd-pesquisa-triagem-cabeca">
-                <div>
-                  <p className="pd-eyebrow">Triagem de {triagem.quando}</p>
-                  <p className="pd-linha-meta">{triagem.area} · {triagem.tipo}</p>
-                </div>
-                <span className={`pd-estado ${triagem.cabeJec ? "pd-estado-ok" : "pd-estado-atencao"}`}>
-                  {triagem.cabeJec ? "Cabe no Juizado Especial" : "Não cabe no Juizado Especial"}
-                </span>
-              </div>
-
-              {triagem.forca.aplicaveis > 0 && <div className="pd-pesquisa-forca">
-                <div>
-                  <strong>{triagem.forca.comprovados} de {triagem.forca.aplicaveis} requisitos comprovados</strong>
-                  <small>Contagem do que já está provado por documento ou fato do relato. Não é probabilidade de êxito.</small>
-                </div>
-                <div className="pd-progresso" role="img" aria-label={`${triagem.forca.comprovados} de ${triagem.forca.aplicaveis} requisitos comprovados`}>
-                  <span style={{ width: `${Math.round((triagem.forca.comprovados / triagem.forca.aplicaveis) * 100)}%` }} />
-                </div>
-              </div>}
-
-              <p className="pd-pesquisa-texto">{triagem.resumo}</p>
-              <p className="pd-pesquisa-texto"><strong>No Juizado:</strong> {triagem.cabeJec ? "Sim. " : "Não. "}{triagem.motivoJec}</p>
-              {triagem.encaminhamento && <p className="pd-pesquisa-texto"><strong>Via adequada:</strong> {triagem.encaminhamento}</p>}
-
-              {triagem.requisitos.length > 0 && <div className="pd-pesquisa-bloco">
-                <h3>Requisitos e a fonte de cada um</h3>
-                <ul className="pd-pesquisa-requisitos">
-                  {triagem.requisitos.map((requisito) => {
-                    const estado = ESTADO_DO_REQUISITO[requisito.situacao] ?? { nome: requisito.situacao, classe: "pd-estado" };
-                    const fonte = fontes[requisito.fonte];
-                    return <li key={`${triagem.id}-${requisito.fonte}-${requisito.requisito}`}>
-                      <div className="pd-pesquisa-requisito-topo">
-                        <strong>{requisito.requisito}</strong>
-                        <span className={estado.classe}>{estado.nome}</span>
-                      </div>
-                      <p className="pd-pesquisa-texto">{requisito.oQueComprova}</p>
-                      <p className="pd-pesquisa-fonte">
-                        <code>{requisito.fonte}</code>
-                        {fonte ? ` ${fonte.lei}, art. ${fonte.artigo}` : " trecho não encontrado no acervo"}
-                      </p>
-                    </li>;
-                  })}
-                </ul>
-              </div>}
-
-              {triagem.fundamentos.length > 0 && <details className="pd-pesquisa-detalhe">
-                <summary>Fundamentos citados <b>{triagem.fundamentos.length}</b></summary>
-                <ul className="pd-pesquisa-marcadores">
-                  {triagem.fundamentos.map((fundamento) => {
-                    const fonte = fontes[fundamento.fonte];
-                    return <li key={`${triagem.id}-${fundamento.fonte}-${fundamento.afirmacao}`}>
-                      {fundamento.afirmacao} <code>{fundamento.fonte}</code>{fonte ? ` (${fonte.lei}, art. ${fonte.artigo})` : ""}
-                    </li>;
-                  })}
-                </ul>
-              </details>}
-
-              {(triagem.documentosAPedir.length > 0 || triagem.perguntasPendentes.length > 0) && <div className="pd-pesquisa-colunas">
-                {triagem.documentosAPedir.length > 0 && <div>
-                  <h3>Pedir ao cliente</h3>
-                  <ul className="pd-pesquisa-marcadores">{triagem.documentosAPedir.map((item) => <li key={item}>{item}</li>)}</ul>
-                </div>}
-                {triagem.perguntasPendentes.length > 0 && <div>
-                  <h3>Perguntar ao cliente</h3>
-                  <ul className="pd-pesquisa-marcadores">{triagem.perguntasPendentes.map((item) => <li key={item}>{item}</li>)}</ul>
-                </div>}
-              </div>}
-
-              {triagem.alertas.length > 0 && <details className="pd-pesquisa-detalhe pd-pesquisa-detalhe-alerta">
-                <summary>A conferir antes de confiar <b>{triagem.alertas.length}</b></summary>
-                <ul className="pd-pesquisa-marcadores">{triagem.alertas.map((item) => <li key={item}>{item}</li>)}</ul>
-              </details>}
-
-              <div className="pd-pesquisa-bloco">
-                <h3>Próximo passo</h3>
-                <p className="pd-pesquisa-texto">{triagem.orientacao}</p>
-              </div>
-
-              <p className="pd-pesquisa-rodape">
-                Resposta de apoio, sujeita à conferência profissional. · custo {triagem.custo} · {triagem.modelo}
-              </p>
-            </article>)}
-          </section>)}
-        </div>
+  return <div className="assistant-layout">
+    <aside className="context-panel">
+      <div className="card-head"><h2>Contexto usado</h2><span className="status st-info">{casos.length === 1 ? "Caso atual" : `${totalDeTriagens} triagens`}</span></div>
+      {casos.length > 1 && <div className="context-item"><label>Caso</label>
+        <select className="select" value={caso.id} onChange={(evento) => { setCasoId(evento.target.value); setTriagemId(null); }} aria-label="Caso pesquisado">
+          {casos.map((item) => <option key={item.id} value={item.id}>{item.cliente ? `${item.cliente} · ${item.titulo}` : item.titulo}</option>)}
+        </select>
       </div>}
+      {caso.triagens.length > 1 && <div className="context-item"><label>Triagem</label>
+        <select className="select" value={triagem.id} onChange={(evento) => setTriagemId(evento.target.value)} aria-label="Data da triagem">
+          {caso.triagens.map((item) => <option key={item.id} value={item.id}>{item.quando}</option>)}
+        </select>
+      </div>}
+      <div className="context-item"><label>Assistida</label><strong>{caso.cliente ?? "Sem cliente vinculado"}</strong></div>
+      <div className="context-item"><label>Matéria</label><strong>{triagem.area} · {triagem.tipo}</strong></div>
+      <div className="context-item"><label>Fatos relevantes</label><strong>{triagem.resumo}</strong></div>
+      <div className="context-item"><label>Documentos</label><strong>{triagem.documentosAPedir.length ? `${triagem.documentosAPedir.length} a pedir` : "Nenhum pendente na triagem"}</strong></div>
+      <div className="context-item"><label>Fontes permitidas</label><strong>Acervo local: {leis.join(", ")}</strong></div>
+      <div className="context-item"><label>Não autorizado</label><strong>Contar prazo, protocolar ou enviar comunicação sozinho</strong></div>
+    </aside>
+    <section className="research">
+      <div className="research-head"><div className="eyebrow">Pergunta do advogado</div><h2>{pergunta}</h2><p className="small muted">Resposta construída para pesquisa e conferência, não para uso automático em peça. Triagem de {triagem.quando}.</p></div>
+      <div className="answer">
+        <h3>1. Cabimento no Juizado Especial</h3>
+        <p>{triagem.cabeJec ? "Sim. " : "Não. "}{triagem.motivoJec}{triagem.encaminhamento ? ` Via adequada: ${triagem.encaminhamento}.` : ""}</p>
+        {triagem.forca.aplicaveis > 0 && <div className="source">Força do caso · {triagem.forca.comprovados} de {triagem.forca.aplicaveis} requisitos comprovados · contagem do que está provado, não probabilidade de êxito</div>}
 
-    {base.length > 0 && <details className="pd-pesquisa-base">
-      <summary>Trechos que toda busca leva em conta <b>{base.length}</b></summary>
-      <p className="pd-pesquisa-texto">Além destes, a busca por tema recupera os outros trechos do acervo, que fica em <code>docs/juridico/</code>, um artigo por trecho. Cada id citado acima é um desses artigos.</p>
-      <ul className="pd-pesquisa-marcadores">
-        {base.map((trecho) => <li key={trecho.id}><code>{trecho.id}</code> {trecho.lei}, art. {trecho.artigo}</li>)}
-      </ul>
-    </details>}
+        <h3>2. Requisitos e a fonte de cada um</h3>
+        {triagem.requisitos.length === 0 && <p>A triagem não listou requisitos para este caso.</p>}
+        {triagem.requisitos.map((requisito) => {
+          const estado = ESTADO_DO_REQUISITO[requisito.situacao] ?? { nome: requisito.situacao, tom: "st-neutral" };
+          const fonte = fontes[requisito.fonte];
+          return <div key={`${requisito.fonte}-${requisito.requisito}`} style={{ marginBottom: 10 }}>
+            <p style={{ marginBottom: 4 }}><strong>{requisito.requisito}</strong> <span className={`status ${estado.tom}`}>{estado.nome}</span></p>
+            <p style={{ marginBottom: 6 }}>{requisito.oQueComprova}</p>
+            <div className="source">Fonte jurídica recuperada · <code>{requisito.fonte}</code>{fonte ? ` · ${fonte.lei}, art. ${fonte.artigo}` : " · trecho não encontrado no acervo"}</div>
+          </div>;
+        })}
+
+        {triagem.fundamentos.length > 0 && <>
+          <h3>3. Fundamentos citados</h3>
+          {triagem.fundamentos.map((fundamento) => {
+            const fonte = fontes[fundamento.fonte];
+            return <div key={`${fundamento.fonte}-${fundamento.afirmacao}`} style={{ marginBottom: 8 }}><p style={{ marginBottom: 4 }}>{fundamento.afirmacao}</p><div className="source"><code>{fundamento.fonte}</code>{fonte ? ` · ${fonte.lei}, art. ${fonte.artigo}` : ""}</div></div>;
+          })}
+        </>}
+
+        {(triagem.documentosAPedir.length > 0 || triagem.perguntasPendentes.length > 0) && <>
+          <h3>{triagem.fundamentos.length > 0 ? "4" : "3"}. Documentos e perguntas ao cliente</h3>
+          {triagem.documentosAPedir.length > 0 && <p><strong>Pedir:</strong> {triagem.documentosAPedir.join("; ")}.</p>}
+          {triagem.perguntasPendentes.length > 0 && <p><strong>Perguntar:</strong> {triagem.perguntasPendentes.join(" ")}</p>}
+        </>}
+
+        <h3>Próximo passo</h3>
+        <p>{triagem.orientacao}</p>
+        {triagem.alertas.length > 0 && <div className="notice risk" style={{ marginBottom: 12 }}><strong>A conferir antes de confiar:</strong> {triagem.alertas.join(" ")}</div>}
+        <div className="notice warn"><strong>Conferência obrigatória:</strong> a redação final, a seleção de precedentes e a estratégia pertencem ao advogado dativo. Resposta de apoio · custo {triagem.custo} · {triagem.modelo}.</div>
+        <div className="inline" style={{ marginTop: 12 }}><Link href={`/escritorio/casos/${caso.id}?aba=relato`} className="btn btn-primary">Abrir no caso</Link><Link href={`/escritorio/casos/${caso.id}?aba=documentos`} className="btn btn-secondary">Ver documentos do caso</Link></div>
+      </div>
+    </section>
   </div>;
 }

@@ -1,133 +1,9 @@
-/* Casca do escritório e a tela de entrada, no desenho do protótipo
-   escritorio-dativo-oabpr-v6. O sistema (cor, tipo, forma, componentes) está em
-   globals.css; aqui fica só o que é da casca: menu lateral, topbar, faixa de
-   demonstração, cabeçalho de página e o login em tela dividida. Cada módulo tem
-   o seu CSS e não redefine nada disto. */
+/* Complementos do escritório por cima do sistema do protótipo (app/prototipo.css).
+   A casca (menu, topbar, faixa) e o login usam só as classes do protótipo. O
+   que fica aqui é o que as telas ainda em `pd-*` precisam e o que o app tem e o
+   protótipo não tinha. */
 
-.pd-escritorio { display: flex; min-height: 100vh; background: var(--fundo); }
-
-/* Menu lateral: fica parado, o conteúdo rola por baixo. */
-.pd-menu {
-  position: fixed; inset: 0 auto 0 0; z-index: 20;
-  display: flex; flex-direction: column; width: var(--menu-largura);
-  padding: 14px 11px 11px; border-right: 1px solid var(--linha);
-  background: #FBFBFA; overflow-y: auto;
-}
-
-.pd-menu-marca {
-  display: flex; align-items: center; gap: 10px;
-  padding: 4px 7px 15px; border-bottom: 1px solid var(--linha);
-}
-.pd-menu-marca-texto { min-width: 0; }
-.pd-menu-marca-texto strong {
-  display: block; color: var(--marinho);
-  font-size: 13px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15;
-}
-.pd-menu-marca-texto small {
-  display: block; margin-top: 1px; color: var(--tinta-3);
-  font-size: 8px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
-}
-
-/* Símbolo do produto: quadrado azul com o sinal de "positivo", como no
-   protótipo, feito só com CSS. */
-.pd-simbolo {
-  position: relative; flex: 0 0 auto; width: 30px; height: 30px; border-radius: 7px;
-  background: linear-gradient(145deg, var(--azul), #0B5E93);
-  box-shadow: 0 5px 14px rgba(8, 115, 185, .17);
-}
-.pd-simbolo::before,
-.pd-simbolo::after { content: ""; position: absolute; background: #fff; border-radius: 2px; }
-.pd-simbolo::before { left: 8px; right: 8px; top: 14px; height: 2px; }
-.pd-simbolo::after { top: 8px; bottom: 8px; left: 14px; width: 2px; }
-
-.pd-menu-nav { display: grid; gap: 1px; padding-top: 4px; }
-
-.pd-menu-grupo {
-  margin: 14px 0 5px; padding: 0 8px; color: var(--tinta-3);
-  font-size: 9px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
-}
-.pd-menu-grupo:first-child { margin-top: 8px; }
-
-.pd-menu-item {
-  display: flex; align-items: center; gap: 9px;
-  min-height: 34px; padding: 8px 9px; border-radius: var(--raio-pequeno);
-  color: var(--tinta-2); font-size: 12.5px; font-weight: 600; line-height: 1.2;
-}
-.pd-menu-item svg { flex: 0 0 auto; color: #8B979D; }
-.pd-menu-item:hover { background: var(--papel-3); color: var(--tinta); }
-.pd-menu-item:hover svg { color: var(--tinta-2); }
-.pd-menu-item[aria-current="page"] {
-  background: var(--azul-claro); color: var(--azul-escuro); font-weight: 800;
-}
-.pd-menu-item[aria-current="page"] svg { color: var(--azul); }
-
-/* Contagem: número, não enfeite. Só aparece quando há o que contar. */
-.pd-menu-contagem {
-  margin-left: auto; padding: 2px 6px; border-radius: 99px;
-  background: var(--papel-3); color: var(--tinta-2);
-  font-family: var(--fonte-numeros); font-size: 10px; font-weight: 700;
-}
-.pd-menu-item[aria-current="page"] .pd-menu-contagem { background: #fff; color: var(--azul-escuro); }
-.pd-menu-contagem-alerta { background: var(--marca-acento); color: #fff; }
-
-.pd-menu-conta {
-  display: flex; flex-direction: column; gap: 8px;
-  margin-top: auto; padding: 12px 4px 2px; border-top: 1px solid var(--linha);
-}
-.pd-menu-quem { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.pd-avatar {
-  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%;
-  display: grid; place-items: center;
-  background: linear-gradient(145deg, #E3F1F9, #D6E9F4); border: 1px solid #C9DFEB;
-  color: var(--azul-escuro); font-size: 11px; font-weight: 900;
-}
-.pd-menu-quem-texto { min-width: 0; }
-.pd-menu-quem-texto strong { display: block; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pd-menu-quem-texto small { display: block; margin-top: 1px; color: var(--tinta-3); font-size: 10px; }
-
-.pd-sair {
-  display: flex; align-items: center; gap: 8px; width: 100%;
-  min-height: 34px; padding: 8px 9px;
-  border: 0; border-radius: var(--raio-pequeno);
-  background: transparent; color: var(--tinta-2); font-size: 12.5px; font-weight: 600; text-align: left;
-}
-.pd-sair:hover { background: var(--papel-3); color: var(--marca-acento-escuro); }
-.pd-sair:disabled { opacity: .5; cursor: wait; }
-
-/* Coluna da direita */
-.pd-coluna { display: flex; flex-direction: column; flex: 1; min-width: 0; margin-left: var(--menu-largura); }
-
-/* Topbar com breadcrumb, como no protótipo. */
-.pd-topbar {
-  position: sticky; top: 0; z-index: 15;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  height: 62px; padding: 0 27px;
-  border-bottom: 1px solid var(--linha);
-  background: rgba(255, 255, 255, .92); backdrop-filter: blur(14px);
-}
-.pd-breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--tinta-3); }
-.pd-breadcrumb strong { color: var(--tinta); }
-.pd-top-acoes { display: flex; align-items: center; gap: 10px; }
-.pd-oab-chip {
-  padding-right: 12px; border-right: 1px solid var(--linha);
-  color: var(--tinta-3); font-size: 10px; font-weight: 700;
-}
-
-/* Faixa de demonstração. */
-.pd-faixa {
-  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
-  min-height: 34px; padding: 7px 27px; border-bottom: 1px solid #E9DFC1;
-  background: #FBF7EC; color: #6B5620; font-size: 11px; line-height: 1.4;
-}
-.pd-faixa strong {
-  padding: 3px 7px; border-radius: 4px; background: #72591E; color: #FFF9E8;
-  font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
-}
-.pd-faixa p { margin: 0; }
-
-.pd-conteudo { flex: 1; width: 100%; max-width: 1510px; padding: 25px 27px 90px; }
-
-/* Cabeçalho de página, comum a todas as telas do escritório. */
+/* Cabeçalho de página das telas ainda em pd-*: mesmo ritmo do .page-head. */
 .pd-pagina-cabeca {
   display: flex; align-items: flex-end; justify-content: space-between;
   gap: 18px; flex-wrap: wrap; margin-bottom: 20px;
@@ -136,90 +12,100 @@
 .pd-pagina-cabeca .pd-auxiliar { max-width: 74ch; margin: 5px 0 0; }
 .pd-pagina-acoes { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-/* ── Login em tela dividida (/entrar) ─────────────────────────────────────── */
-.pd-login { display: grid; grid-template-columns: 430px 1fr; min-height: 100vh; background: var(--papel); }
-.pd-login-lateral {
-  position: relative; overflow: hidden; display: flex; flex-direction: column;
-  padding: 42px; background: linear-gradient(150deg, #123A52, #0C2E42); color: #fff;
-}
-.pd-oab-lockup { display: flex; align-items: center; gap: 12px; }
-.pd-oab-marca { color: #fff; font-size: 23px; font-weight: 900; letter-spacing: -.05em; line-height: 1; }
-.pd-oab-marca b { color: #82C9F2; }
-.pd-oab-texto strong { display: block; font-size: 11px; letter-spacing: .03em; }
-.pd-oab-texto small { font-size: 9px; color: rgba(255, 255, 255, .55); }
-.pd-login-produto { margin: auto 0; }
-.pd-login-kicker {
-  margin: 0; color: #8CCEF1; font-size: 10px; font-weight: 850;
-  letter-spacing: .14em; text-transform: uppercase;
-}
-.pd-login-produto h1 { margin: 10px 0 14px; font-size: 44px; font-weight: 680; letter-spacing: -.045em; }
-.pd-login-produto p { margin: 0; max-width: 320px; color: rgba(255, 255, 255, .7); font-size: 14px; line-height: 1.5; }
-.pd-login-rodape { margin: 0; color: rgba(255, 255, 255, .48); font-size: 10px; }
-
-.pd-login-principal { display: grid; place-items: center; padding: 40px; }
-.pd-login-caixa { width: min(430px, 100%); }
-.pd-login-caixa h2 { margin: 6px 0 8px; font-size: 28px; letter-spacing: -.03em; }
-.pd-login-intro { margin: 0; color: var(--tinta-2); font-size: 13px; line-height: 1.55; }
-
-.pd-login-identidade {
-  margin: 22px 0; padding: 18px; border: 1px solid var(--linha);
-  border-radius: var(--raio-pequeno); background: var(--papel-2);
-}
-.pd-login-identidade strong { display: block; font-size: 12px; }
-.pd-login-identidade p { margin: 5px 0 0; color: var(--tinta-3); font-size: 12px; line-height: 1.5; }
-
-.pd-login-form { display: grid; gap: 13px; }
-.pd-login-erro {
-  margin: 0; padding: 10px 12px; border-left: 3px solid var(--risco);
-  border-radius: 0 var(--raio-pequeno) var(--raio-pequeno) 0;
-  background: var(--risco-fundo); color: #79363B; font-size: 12px; line-height: 1.45;
+.pd-avatar {
+  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--oab-050); color: var(--oab-700);
+  font-size: 11px; font-weight: 800; letter-spacing: .02em;
 }
 
-.pd-login-seguranca {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 22px;
-}
-.pd-login-seguranca div { border-top: 1px solid var(--linha); padding-top: 11px; color: var(--tinta-3); font-size: 10px; line-height: 1.45; }
-.pd-login-seguranca strong { display: block; margin-bottom: 3px; color: var(--tinta-2); font-size: 10px; }
+/* Linhas de lista do protótipo viram links no app. */
+a.list-row, a.appointment-row, a.course-row, a.doc-card { color: inherit; text-decoration: none; }
+a.list-row:hover .list-title, a.appointment-row:hover .appt-title { color: var(--oab-700); }
 
-.pd-login-aviso {
-  margin: 22px 0 0; padding-top: 15px; border-top: 1px solid var(--linha);
-  color: var(--tinta-3); font-size: 11px; line-height: 1.55;
-}
-.pd-login-voltar { display: inline-block; margin-top: 14px; color: var(--azul-escuro); font-size: 12px; font-weight: 700; }
+/* Formulários do protótipo com campos do app. */
+.login-form { display: grid; gap: 12px; margin: 18px 0 6px; }
+.login-erro { color: var(--risk); font-size: 12px; font-weight: 700; }
+.login-voltar { display: inline-block; margin-top: 16px; font-size: 12px; color: var(--oab-700); font-weight: 750; }
 
-/* Em telas estreitas o menu deixa de ser coluna e vira faixa rolável. */
-@media (max-width: 900px) {
-  .pd-escritorio { display: block; }
-  .pd-menu {
-    position: static; width: auto; padding: 12px 16px 0;
-    border-right: 0; border-bottom: 1px solid var(--linha); overflow: visible;
-  }
-  .pd-menu-marca { padding: 0 0 10px; }
-  .pd-menu-nav {
-    display: flex; gap: 4px; margin: 0 -16px; padding: 0 16px 10px;
-    overflow-x: auto; scrollbar-width: none;
-  }
-  .pd-menu-nav::-webkit-scrollbar { display: none; }
-  .pd-menu-grupo { display: none; }
-  .pd-menu-item { white-space: nowrap; }
-  .pd-menu-conta { margin-top: 0; flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 0; }
-  .pd-menu-quem { flex: 1; }
-  .pd-sair { width: auto; }
-  .pd-coluna { margin-left: 0; }
-  .pd-topbar { padding: 0 16px; }
-  .pd-oab-chip { display: none; }
-  .pd-faixa { padding: 7px 16px; }
-  .pd-conteudo { padding: 20px 16px 70px; }
+/* Estado vazio dentro de um card. */
+.vazio { padding: 26px 16px; text-align: center; color: var(--ink-3); font-size: 12px; }
+.vazio strong { display: block; color: var(--ink-2); font-size: 13px; margin-bottom: 4px; }
+
+/* Botão que parece link de linha (sem borda) no meio de listas. */
+.linha-botao { border: 0; background: transparent; padding: 0; text-align: left; width: 100%; }
+
+@media (max-width: 850px) {
   .pd-pagina-cabeca { margin-bottom: 16px; }
-
-  .pd-login { grid-template-columns: 1fr; }
-  .pd-login-lateral { min-height: 280px; padding: 28px; }
-  .pd-login-produto { margin: 40px 0 18px; }
-  .pd-login-produto h1 { font-size: 36px; }
-  .pd-login-principal { padding: 28px 20px 40px; }
 }
 
-@media (max-width: 480px) {
-  .pd-menu-quem-texto small { display: none; }
-  .pd-login-seguranca { grid-template-columns: 1fr; }
+/* Formulários de registro (nomeação, caso novo) abrem por cima da tela, como
+   uma folha; o conteúdo por baixo continua onde estava. */
+.painel-flutuante {
+  position: fixed; inset: 0; z-index: 300; display: grid; place-items: start center;
+  padding: 40px 16px; overflow: auto; background: rgba(11, 46, 68, .42);
 }
+.painel-flutuante > * { width: min(780px, 100%); box-shadow: 0 30px 80px rgba(0, 0, 0, .28); }
+
+/* Detalhe da nomeação: texto original e listas dentro do bloco extraído. */
+.texto-original { white-space: pre-wrap; font: 12px/1.6 var(--fonte-numeros); background: var(--paper-2); border: 1px solid var(--line); border-radius: 7px; padding: 12px; margin: 0 0 14px; max-height: 320px; overflow: auto; }
+.lista-simples { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Topo do caso: o que o app tem além do protótipo (vínculo do cliente e a
+   situação editável) entra no mesmo hero escuro. */
+.case-top-cliente { margin-top: 10px; }
+.case-top-vincular { border: 0; background: transparent; padding: 0; color: #8BCDF0; font-size: 11px; font-weight: 750; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.case-top .pdc-vincular { margin-top: 8px; padding: 12px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .16); border-radius: 8px; display: grid; gap: 10px; max-width: 520px; }
+.case-top .pdc-vincular label { color: rgba(255, 255, 255, .8); }
+.case-top .pdc-vincular .pd-entrada, .case-top .pdc-vincular .pd-selecao { background: #fff; color: var(--ink); }
+.case-top .pdc-vincular-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.case-top .pdc-alternar { display: flex; gap: 14px; font-size: 11px; }
+.case-situacao { display: grid; gap: 4px; min-width: 190px; }
+.case-situacao label { font-size: 9px; text-transform: uppercase; letter-spacing: .1em; font-weight: 800; color: rgba(255, 255, 255, .6); }
+.case-situacao .select { padding: 8px 10px; font-size: 12px; font-weight: 700; }
+.case-situacao small { font-size: 9px; color: rgba(255, 255, 255, .55); }
+.case-deadline-plain.tom-vencido strong, .case-deadline-plain.tom-hoje strong { color: #FFB4B4; }
+.case-deadline-plain.tom-urgente strong, .case-deadline-plain.tom-proximo strong { color: #FFD79A; }
+.pdc-aba-contagem { margin-left: 6px; padding: 1px 6px; border-radius: 99px; background: var(--paper-3); color: var(--ink-2); font-size: 10px; font-weight: 800; }
+.case-tab.active .pdc-aba-contagem { background: var(--oab-050); color: var(--oab-700); }
+.pdc-aba-painel { margin-top: 16px; }
+
+/* Agenda: linhas por tipo em vez de horas; o dia de hoje fica marcado. */
+.week-head > .hoje { color: var(--oab-700); }
+.slot.hoje { background: var(--oab-050); }
+.week-grid a.event { display: block; color: inherit; }
+.menu-flutuante { position: absolute; top: calc(100% + 6px); right: 0; z-index: 50; width: 280px; box-shadow: var(--shadow); }
+.lista-menu { display: grid; }
+.lista-menu button { border: 0; border-bottom: 1px solid var(--line); background: #fff; padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 700; }
+.lista-menu button:last-child { border-bottom: 0; }
+.lista-menu button:hover { background: var(--oab-050); color: var(--oab-700); }
+
+/* Mensagens: a lista de conversas usa os itens do protótipo dentro da caixa do app. */
+.pd-conversas .conv-item { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: #fff; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+.pd-conversas .conv-item:hover { background: var(--paper-3); }
+.pd-conversas .conv-item.active { background: var(--oab-050); }
+.pd-conversas .conv-item strong { display: block; font-size: 12px; }
+.pd-conversas .conv-item p { font-size: 11px; }
+.pd-conversas .conv-item time { font-size: 10px; }
+
+/* Cartão de documento: o botão de marcar fica embaixo da descrição. */
+.doc-card .doc-acao { padding: 4px 0 0; height: auto; justify-content: flex-start; color: var(--oab-700); }
+.doc-card .doc-acao:hover { transform: none; text-decoration: underline; }
+
+/* Acompanhamento de honorários dentro de um card do protótipo. */
+.pd-honorarios .pd-honorarios-recado { margin: 0; padding: 8px 16px 0; font-size: 12px; color: var(--ink-3); min-height: 26px; }
+.pd-honorarios .pd-honorarios-erro { color: var(--risk); }
+.pd-honorarios .pd-honorarios-paineis { display: grid; gap: 14px; padding: 14px 16px 16px; }
+.pd-honorarios .pd-honorarios-paineis > .pd-cartao { border: 1px solid var(--line); border-radius: 8px; }
+.pd-honorarios > .pd-cartao, .pd-honorarios > .pd-vazio { margin: 14px 16px 16px; }
+.pd-honorarios-corpo { display: grid; gap: 10px; }
+.pd-honorarios-item, .pd-honorarios-adicionar { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; }
+.pd-honorarios-adicionar { grid-template-columns: 1fr auto; }
+.pd-honorarios-marca { display: inline-flex; gap: 6px; align-items: center; font-size: 11px; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+.pd-honorarios-registro, .pd-honorarios-novo-registro { display: grid; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+
+/* Pesquisa: selects dentro do painel de contexto. */
+.context-panel .select { margin-top: 4px; font-size: 12px; padding: 8px 10px; }
+.answer .status { margin-left: 6px; vertical-align: middle; }
+.answer code { font-family: var(--fonte-numeros); font-size: 10px; }

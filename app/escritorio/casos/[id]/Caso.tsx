@@ -10,7 +10,7 @@ import {
   descreverPrazo, formatarCnj, formatarData, formatarMomento, formatarTelefone,
   NOMES_DA_ORIGEM, NOMES_DA_SITUACAO, ORIGENS, SITUACOES,
 } from "../formatos";
-import { CLASSE_DO_TOM, Documentos, Processo, Registros, Tarefas } from "./Secoes";
+import { Documentos, Processo, Registros, Tarefas } from "./Secoes";
 import { AgendaDoCaso } from "./AgendaDoCaso";
 import { ForcaDoCaso, TriagemDoCaso } from "./Triagem";
 
@@ -20,20 +20,20 @@ export type Atualizar = Dispatch<SetStateAction<DossieDoCaso>>;
 // fica no alto, sempre à vista, e a pessoa troca de aba sem sair da página.
 const ABAS = [
   { id: "visao", rotulo: "Visão geral" },
-  { id: "relato", rotulo: "Relato e triagem" },
   { id: "tarefas", rotulo: "Tarefas" },
-  { id: "documentos", rotulo: "Documentos" },
-  { id: "agenda", rotulo: "Agenda" },
   { id: "processo", rotulo: "Processo" },
-  { id: "conversa", rotulo: "Conversa" },
-  { id: "registros", rotulo: "Registros" },
+  { id: "relato", rotulo: "Relato e triagem" },
+  { id: "documentos", rotulo: "Documentos" },
+  { id: "conversa", rotulo: "Mensagens" },
+  { id: "agenda", rotulo: "Agenda" },
+  { id: "registros", rotulo: "Histórico" },
 ] as const;
 
 type Aba = (typeof ABAS)[number]["id"];
 
-export function PaginaDoCaso({ inicial }: { inicial: DossieDoCaso }) {
+export function PaginaDoCaso({ inicial, abaInicial }: { inicial: DossieDoCaso; abaInicial?: string }) {
   const [dados, setDados] = useState<DossieDoCaso>(inicial);
-  const [aba, setAba] = useState<Aba>("visao");
+  const [aba, setAba] = useState<Aba>(ABAS.some((item) => item.id === abaInicial) ? abaInicial as Aba : "visao");
   const { caso, cliente } = dados;
 
   // Busca o dossiê de novo depois das ações que o servidor complementa
@@ -73,42 +73,24 @@ export function PaginaDoCaso({ inicial }: { inicial: DossieDoCaso }) {
   }
 
   return <div className="pdc-pagina">
-    <div className="pd-pagina-cabeca">
+    <div className="case-top">
       <div>
-        <p className="pd-eyebrow">Caso</p>
-        <h1>{caso.titulo}</h1>
-        <p className="pd-auxiliar">
-          {NOMES_DA_ORIGEM[caso.origem]} · aberto em {formatarData(caso.criadoEm.slice(0, 10))} · atualizado em {formatarMomento(caso.atualizadoEm)}
-        </p>
+        <div className="eyebrow" style={{ color: "#8BCDF0" }}>{caso.situacao === "concluido" ? "Caso concluído" : "Caso ativo"} · {NOMES_DA_ORIGEM[caso.origem]}</div>
+        <h1>{cliente ? cliente.nome : caso.titulo}</h1>
+        <p className="mono">{caso.processo ? formatarCnj(caso.processo) : "sem número de processo"}{caso.orgao ? ` · ${caso.orgao}` : ""}{cliente ? ` · ${caso.titulo}` : ""}</p>
+        <div className="case-top-cliente"><VincularCliente caso={caso} cliente={cliente} atualizar={setDados} /></div>
       </div>
-      <div className="pd-pagina-acoes">
-        <Link href="/escritorio" className="pd-botao pd-botao-quieto">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5" /></svg>
-          Seus casos
-        </Link>
+      <div className="inline">
+        <div className={`case-deadline-plain tom-${prazoDoTopo.tom}`}>
+          <small>Prazo informado</small>
+          <strong>{caso.prazo ? formatarData(caso.prazo) : "Sem data"}</strong>
+          <span>{[prazoDoTopo.texto, prazoDoTopo.aviso].filter(Boolean).join(" · ")}</span>
+        </div>
         <SituacaoDoCaso caso={caso} atualizar={setDados} />
       </div>
     </div>
 
-    <header className="pdc-topo-caso">
-      <div className="pdc-topo-quem">
-        <p className="pdc-topo-rotulo">{NOMES_DA_ORIGEM[caso.origem]}</p>
-        <p className="pdc-topo-nome">{cliente ? cliente.nome : <em>sem cliente cadastrado</em>}</p>
-        <p className="pdc-topo-linha">
-          {caso.processo ? formatarCnj(caso.processo) : "sem número de processo"}
-          {caso.orgao ? ` · ${caso.orgao}` : ""}
-        </p>
-        <VincularCliente caso={caso} cliente={cliente} atualizar={setDados} />
-      </div>
-      <div className={`pdc-prazo-caixa tom-${prazoDoTopo.tom}`}>
-        <small>Prazo informado</small>
-        <strong>{caso.prazo ? formatarData(caso.prazo) : "Sem data"}</strong>
-        {prazoDoTopo.texto && <span className="pdc-prazo-quando">{prazoDoTopo.texto}</span>}
-        {prazoDoTopo.aviso && <span className="pdc-prazo-aviso">{prazoDoTopo.aviso}</span>}
-      </div>
-    </header>
-
-    <nav className="pd-abas pdc-abas-tira" role="tablist" aria-label="Seções do caso" onKeyDown={aoTeclar}>
+    <nav className="case-tabs" role="tablist" aria-label="Seções do caso" onKeyDown={aoTeclar}>
       {ABAS.map((item) => {
         const contagem = pendentes[item.id as "tarefas" | "documentos"];
         return <button
@@ -116,7 +98,7 @@ export function PaginaDoCaso({ inicial }: { inicial: DossieDoCaso }) {
           type="button"
           role="tab"
           id={`aba-${item.id}`}
-          className="pd-aba"
+          className={`case-tab${aba === item.id ? " active" : ""}`}
           aria-selected={aba === item.id}
           aria-controls={`painel-${item.id}`}
           tabIndex={aba === item.id ? 0 : -1}
@@ -194,129 +176,78 @@ function VisaoGeral({ dados, atualizar, irPara }: { dados: DossieDoCaso; atualiz
   const semDocumento = documentos.filter((documento) => !documento.recebido);
   const recentes = registros.slice(0, 4);
 
-  return <div className="pdc-visao">
-    <div className="pdc-visao-principal">
-      <div className="pdc-panorama">
-        <section className="pd-cartao" aria-label="Próxima providência">
-          <div className="pd-cartao-cabeca"><h2>Providência</h2></div>
-          <div className="pd-cartao-corpo">
-            <p className={`pdc-prov-titulo${proxima ? "" : " pdc-prov-vazio"}`}>{proxima ? proxima.titulo : "Nenhuma tarefa aberta"}</p>
-            <dl className="pdc-chaves">
-              <div>
-                <dt>Prazo informado</dt>
-                <dd>{caso.prazo ? <>{formatarData(caso.prazo)}<span className="pdc-chave-nota">{prazo?.texto}, a conferir no processo oficial</span></> : <em>sem prazo definido, a conferir no ato</em>}</dd>
-              </div>
-              <div><dt>Responsável</dt><dd>{advogado.nome}</dd></div>
-              <div><dt>Situação</dt><dd>{NOMES_DA_SITUACAO[caso.situacao]}</dd></div>
-            </dl>
-          </div>
-        </section>
+  const honorarios = dados.honorarios;
+  const etapasFeitas = honorarios ? honorarios.etapas.filter((etapa) => etapa.concluida).length : 0;
 
-        <section className="pd-cartao" aria-label="Processo">
-          <div className="pd-cartao-cabeca">
-            <h2>Processo</h2>
-            <button type="button" className="pd-botao pd-botao-quieto pd-botao-pequeno" onClick={() => irPara("processo")}>Abrir</button>
-          </div>
-          <div className="pd-cartao-corpo">
-            {processo
-              ? <dl className="pdc-chaves">
-                <div><dt>Último andamento</dt><dd>{processo.ultimoMovimento ?? <em>sem movimentação informada</em>}</dd></div>
-                <div><dt>Data</dt><dd>{processo.dataMovimento ? formatarMomento(processo.dataMovimento) : <em>não informada</em>}</dd></div>
-                <div><dt>Fonte</dt><dd>Consulta pública DataJud <small>não vale como intimação</small></dd></div>
-              </dl>
-              : <p className="pd-vazio"><strong>Sem andamento consultado.</strong>Abra a aba Processo para buscar classe, órgão e último andamento na base pública. É consulta pontual: não vale como intimação e não conta prazo.</p>}
-          </div>
+  return <div className="workspace">
+    <div className="stack">
+      <div className="overview-grid">
+        <section className="overview-card"><div className="eyebrow">Providência</div><h3 style={{ fontSize: 13, margin: "5px 0 9px" }}>{proxima ? proxima.titulo : "Nenhuma tarefa aberta"}</h3>
+          <div className="key-value"><label>Prazo informado</label><strong style={{ color: caso.prazo ? "var(--risk)" : undefined }}>{caso.prazo ? `${formatarData(caso.prazo)} · ${prazo?.texto ? `${prazo.texto}, ` : ""}conferir no processo oficial` : "sem prazo definido, a conferir no ato"}</strong></div>
+          <div className="key-value"><label>Responsável</label><strong>{advogado.nome}</strong></div>
+          <div className="key-value"><label>Situação</label><strong>{NOMES_DA_SITUACAO[caso.situacao]}</strong></div>
+        </section>
+        <section className="overview-card"><div className="eyebrow">Processo</div><h3 style={{ fontSize: 13, margin: "5px 0 9px" }}>{processo ? "Último andamento consultado" : "Sem andamento consultado"}</h3>
+          {processo
+            ? <>
+              <div className="key-value"><label>Data</label><strong>{processo.dataMovimento ? formatarMomento(processo.dataMovimento) : "não informada"}</strong></div>
+              <div className="key-value"><label>Andamento</label><strong>{processo.ultimoMovimento ?? "sem movimentação informada"}</strong></div>
+              <div className="key-value"><label>Fonte</label><strong>Consulta pública DataJud · não vale como intimação</strong></div>
+            </>
+            : <p className="small muted" style={{ margin: 0 }}>Abra a aba Processo para buscar classe, órgão e último andamento na base pública. É consulta pontual: não vale como intimação e não conta prazo.</p>}
+          <button type="button" className="btn btn-quiet btn-sm" style={{ marginTop: 8, paddingLeft: 0 }} onClick={() => irPara("processo")}>Abrir processo →</button>
         </section>
       </div>
 
-      <section className="pd-cartao" aria-label="Força do caso">
-        <div className="pd-cartao-cabeca">
-          <h2>Força do caso</h2>
-          <button type="button" className="pd-botao pd-botao-quieto pd-botao-pequeno" onClick={() => irPara("relato")}>
-            {triagem ? "Ver a triagem" : "Triar com fontes"}
-          </button>
-        </div>
-        <div className="pd-cartao-corpo">
-          {triagem
-            ? <ForcaDoCaso triagem={triagem} />
-            : <p className="pd-vazio"><strong>Nenhuma triagem ainda.</strong>Com o relato salvo, <b>Triar com fontes</b> organiza o caso: requisitos comprovados sobre os que se aplicam, se cabe no Juizado Especial, documentos a pedir e perguntas ao cliente, cada ponto com o trecho da lei que o sustenta.</p>}
-        </div>
-      </section>
+      <section className="card"><div className="card-head"><h2>Plano de trabalho</h2><button type="button" className="btn btn-secondary btn-sm" onClick={() => irPara("tarefas")}>{abertas.length > 0 ? `${abertas.length} ${abertas.length === 1 ? "aberta" : "abertas"}` : "Nova tarefa"}</button></div><div className="card-body">
+        {abertas.length === 0
+          ? <div className="vazio"><strong>Nada pendente.</strong>Anote o que precisa ser feito e a data na aba Tarefas.</div>
+          : abertas.slice(0, 5).map((tarefa) => {
+            const quando = tarefa.prazo ? descreverPrazo(tarefa.prazo) : null;
+            const tom = quando ? (quando.tom === "vencido" || quando.tom === "hoje" ? "risk" : quando.tom === "urgente" || quando.tom === "proximo" ? "warn" : "neutral") : "neutral";
+            return <div className="task" key={tarefa.id}><span className="check" aria-hidden="true" /><div><strong>{tarefa.titulo}</strong><span>{tarefa.prazo ? formatarData(tarefa.prazo) : "sem data"}</span></div><span className={`status st-${tom}`}>{quando ? quando.texto : "Sem data"}</span></div>;
+          })}
+      </div></section>
 
-      <section className="pd-cartao" aria-label="Plano de trabalho">
-        <div className="pd-cartao-cabeca">
-          <h2>Plano de trabalho</h2>
-          <button type="button" className="pd-botao pd-botao-quieto pd-botao-pequeno" onClick={() => irPara("tarefas")}>
-            {abertas.length > 0 ? `${abertas.length} ${abertas.length === 1 ? "aberta" : "abertas"}` : "Nova tarefa"}
-          </button>
-        </div>
-        <div className="pd-cartao-corpo">
-          {abertas.length === 0
-            ? <p className="pd-vazio"><strong>Nada pendente.</strong>Anote o que precisa ser feito e a data; o prazo aparece aqui e no painel.</p>
-            : <ul className="pdc-plano">{abertas.slice(0, 5).map((tarefa) => {
-              const quando = tarefa.prazo && !tarefa.concluida ? descreverPrazo(tarefa.prazo) : null;
-              return <li key={tarefa.id}>
-                <span className="pdc-plano-ponto" aria-hidden="true" />
-                <div>
-                  <strong>{tarefa.titulo}</strong>
-                  <span className="pd-auxiliar">{tarefa.prazo ? formatarData(tarefa.prazo) : "sem data"}</span>
-                </div>
-                {quando ? <span className={`pd-estado ${CLASSE_DO_TOM[quando.tom]}`}>{quando.texto}</span> : <span className="pd-estado">sem data</span>}
-              </li>;
-            })}</ul>}
-        </div>
-      </section>
+      <section className="card"><div className="card-head"><h2>Resumo técnico do caso</h2><button type="button" className="btn btn-secondary btn-sm" onClick={() => irPara("relato")}>{triagem ? "Ver a triagem" : "Triar com fontes"}</button></div><div className="card-body">
+        {caso.resumo
+          ? <p className="small" style={{ lineHeight: 1.65 }}>{caso.resumo}</p>
+          : <p className="small muted">Sem resumo ainda. Escreva o relato na aba Relato e triagem, ou edite a ficha abaixo.</p>}
+        {caso.fundamentos.length > 0 && <div className="notice"><strong>Hipóteses para avaliar:</strong> {caso.fundamentos.join("; ")}. O sistema não transforma isso em conclusão jurídica automática.</div>}
+        {triagem && <div style={{ marginTop: 14 }}><ForcaDoCaso triagem={triagem} /></div>}
+      </div></section>
 
       <Ficha caso={caso} atualizar={atualizar} />
 
-      <section className="pd-cartao" aria-label="Atividade recente">
-        <div className="pd-cartao-cabeca">
-          <h2>Atividade recente</h2>
-          <button type="button" className="pd-botao pd-botao-quieto pd-botao-pequeno" onClick={() => irPara("registros")}>Registros</button>
-        </div>
-        <div className="pd-cartao-corpo">
-          {recentes.length === 0
-            ? <p className="pd-vazio"><strong>Nenhum registro.</strong>A aba Registros guarda o que aconteceu no caso e o que foi combinado com o cliente.</p>
-            : <ol className="pd-tempo pdc-atividade">{recentes.map((registro) => <li key={registro.id}>
-              <strong>{registro.texto}</strong>
-              <time>{NOME_DO_TIPO[registro.tipo]} · {formatarMomento(registro.quando)}</time>
-            </li>)}</ol>}
-        </div>
-      </section>
+      <section className="card"><div className="card-head"><h2>Atividade recente</h2><button type="button" className="btn btn-quiet btn-sm" onClick={() => irPara("registros")}>Ver histórico completo</button></div><div className="card-body activity">
+        {recentes.length === 0
+          ? <div className="vazio"><strong>Nenhum registro.</strong>O histórico guarda o que aconteceu no caso e o que foi combinado com o cliente.</div>
+          : recentes.map((registro) => <div className="act" key={registro.id}><strong>{registro.texto}</strong><span>{formatarMomento(registro.quando)} · {NOME_DO_TIPO[registro.tipo]}</span></div>)}
+      </div></section>
     </div>
 
-    <aside className="pdc-visao-lateral">
-      <section className="pd-cartao" aria-label="Cliente do caso">
-        <div className="pd-cartao-cabeca">
-          <h2>Assistida</h2>
-          {cliente ? <span className="pd-estado pd-estado-ok">contato vinculado</span> : <span className="pd-estado pd-estado-atencao">sem contato</span>}
+    <aside className="stack">
+      <section className="card"><div className="card-head"><h2>Assistida</h2>{cliente ? <span className="status st-ok">Contato vinculado</span> : <span className="status st-warn">Sem contato</span>}</div><div className="card-body">
+        <div className="client-card">
+          <strong>{cliente ? cliente.nome : "Sem cliente cadastrado"}</strong>
+          <p>{cliente ? `${formatarTelefone(cliente.telefone)} · contato preferencial: WhatsApp` : "Cadastre o contato no alto da página para abrir a conversa."}</p>
+          <div className="inline"><button type="button" className="btn btn-secondary btn-sm" onClick={() => irPara("conversa")}>Abrir conversa</button><button type="button" className="btn btn-quiet btn-sm" onClick={() => irPara("relato")}>Ver o relato</button></div>
         </div>
-        <div className="pd-cartao-corpo">
-          <div className="pdc-assistida">
-            <strong>{cliente ? cliente.nome : "Sem cliente cadastrado"}</strong>
-            <p className="pd-auxiliar">{cliente ? formatarTelefone(cliente.telefone) : "Cadastre o contato no alto da página para ver a conversa."}</p>
-            <div className="pd-linha-campos">
-              <button type="button" className="pd-botao pd-botao-secundario pd-botao-pequeno" onClick={() => irPara("conversa")}>Abrir conversa</button>
-              <button type="button" className="pd-botao pd-botao-quieto pd-botao-pequeno" onClick={() => irPara("relato")}>Ver o relato</button>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div></section>
 
-      <section className="pdc-pedido" aria-label="Documentos pendentes">
-        <p className="pd-eyebrow">Checklist do caso</p>
-        <h3>Documentos a pedir</h3>
-        <p className="pd-auxiliar">
-          {semDocumento.length === 0
-            ? "Nada pendente na lista do caso."
-            : semDocumento.length === 1 ? "1 documento pendente." : `${semDocumento.length} documentos pendentes.`}
-        </p>
-        {semDocumento.length > 0 && <ul className="pdc-pedido-lista">
-          {semDocumento.slice(0, 4).map((documento) => <li key={documento.id}>{documento.nome}{documento.essencial ? <b>essencial</b> : null}</li>)}
-          {semDocumento.length > 4 && <li className="pd-auxiliar">e mais {semDocumento.length - 4}</li>}
-        </ul>}
-        <button type="button" className="pd-botao pd-botao-secundario pd-botao-bloco" onClick={() => irPara("documentos")}>Abrir o checklist</button>
-      </section>
+      <section className="request-box"><div className="eyebrow">Coleta dirigida</div><h3 style={{ margin: "5px 0" }}>Pedir informações sem formulário público</h3><p>Você escolhe o que precisa e pede pela conversa do caso; o que chegar fica marcado no checklist.</p><button type="button" className="btn btn-primary btn-block" style={{ marginTop: 8 }} onClick={() => irPara("conversa")}>Pedir pela conversa</button></section>
+
+      <section className="card"><div className="card-head"><h2>Documentos</h2>{semDocumento.length > 0 ? <span className="status st-warn">{semDocumento.length} {semDocumento.length === 1 ? "pendente" : "pendentes"}</span> : <span className="status st-ok">Em dia</span>}</div><div className="card-body">
+        {documentos.slice(0, 5).map((documento) => <div className="task" key={documento.id}><span className="check" aria-hidden="true">{documento.recebido ? "✓" : ""}</span><div><strong>{documento.nome}</strong><span>{documento.recebido ? "recebido" : documento.essencial ? "pendente · essencial" : "pendente"}</span></div></div>)}
+        {documentos.length === 0 && <p className="small muted" style={{ margin: 0 }}>Nenhum documento na lista do caso.</p>}
+        <button type="button" className="btn btn-secondary btn-sm btn-block" style={{ marginTop: 9 }} onClick={() => irPara("documentos")}>Ver documentos</button>
+      </div></section>
+
+      <section className="card"><div className="card-head"><h2>Honorários</h2></div><div className="card-body">
+        <div className="small"><strong>{honorarios ? `${etapasFeitas} de ${honorarios.etapas.length} etapas concluídas` : "Fluxo ainda não iniciado"}</strong></div>
+        <p className="tiny muted" style={{ margin: "3px 0 9px" }}>{honorarios ? "Acompanhamento aberto no módulo de honorários." : "Será aberto quando houver arbitramento ou certidão pertinente."}</p>
+        <Link href={`/escritorio/honorarios?caso=${caso.id}`} className="btn btn-secondary btn-sm btn-block">Abrir módulo</Link>
+      </div></section>
     </aside>
   </div>;
 }
@@ -339,9 +270,9 @@ function SituacaoDoCaso({ caso, atualizar }: { caso: Caso; atualizar: Atualizar 
     }
   }
 
-  return <div className={`pdc-situacao pdc-situacao-${caso.situacao}`}>
+  return <div className="case-situacao">
     <label htmlFor="situacao">Situação do caso</label>
-    <select id="situacao" className="pd-selecao" value={caso.situacao} onChange={(evento) => mudar(evento.target.value as Situacao)} disabled={estado === "salvando"}>
+    <select id="situacao" className="select" value={caso.situacao} onChange={(evento) => mudar(evento.target.value as Situacao)} disabled={estado === "salvando"}>
       {SITUACOES.map((opcao) => <option key={opcao} value={opcao}>{NOMES_DA_SITUACAO[opcao]}</option>)}
     </select>
     <small aria-live="polite">{estado === "salvando" ? "Salvando…" : estado === "salvo" ? "Salvo" : erro ?? "Salva na hora, sem botão"}</small>
@@ -397,7 +328,7 @@ function VincularCliente({ caso, cliente, atualizar }: { caso: Caso; cliente: Cl
     }
   }
 
-  if (!aberto) return <button type="button" className="pdc-vincular-abrir" onClick={() => setAberto(true)}>
+  if (!aberto) return <button type="button" className="case-top-vincular" onClick={() => setAberto(true)}>
     {cliente ? "Trocar o cliente" : "Cadastrar ou escolher o cliente"}
   </button>;
 
