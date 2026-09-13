@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAdvogado } from "./Advogado";
 
 // Ícones do protótipo (24px, traço 1.7), um por seção.
@@ -108,7 +108,16 @@ export function Navegacao({ contagens, aoNavegar }: { contagens: Contagens; aoNa
 export function Casca({ contagens, children }: { contagens: Contagens; children: React.ReactNode }) {
   const advogado = useAdvogado();
   const [aberto, setAberto] = useState(false);
+  useEffect(() => {
+    if (!aberto) return;
+    const fecharComEscape = (evento: KeyboardEvent) => {
+      if (evento.key === "Escape") setAberto(false);
+    };
+    window.addEventListener("keydown", fecharComEscape);
+    return () => window.removeEventListener("keydown", fecharComEscape);
+  }, [aberto]);
   return <div className="app">
+    {aberto && <button type="button" className="sidebar-backdrop" aria-label="Fechar menu" onClick={() => setAberto(false)} />}
     <aside className={`sidebar${aberto ? " open" : ""}`} id="sidebar">
       <Link href="/escritorio" className="brand" aria-label="Escritório Dativo, ir para o início">
         <div className="ed-symbol" aria-hidden="true" />
@@ -125,7 +134,7 @@ export function Casca({ contagens, children }: { contagens: Contagens; children:
       </div>
     </aside>
     <main className="main">
-      <Barra aoAbrirMenu={() => setAberto((valor) => !valor)} />
+      <Barra aberto={aberto} aoAbrirMenu={() => setAberto((valor) => !valor)} />
       <div className="demo">DEMONSTRAÇÃO · DADOS FICTÍCIOS · A DECISÃO TÉCNICA, O PRAZO E O ATO PROCESSUAL SÃO SEMPRE DE RESPONSABILIDADE DO ADVOGADO</div>
       <div className="content">{children}</div>
     </main>
@@ -143,7 +152,7 @@ function iniciais(nome: string) {
 // Topbar: breadcrumb à esquerda, identificação institucional à direita. O
 // chip da direita diz o que é verdade aqui (a conta está ativa); a habilitação
 // perante a OAB/PR não é validada nesta demonstração.
-function Barra({ aoAbrirMenu }: { aoAbrirMenu: () => void }) {
+function Barra({ aberto, aoAbrirMenu }: { aberto: boolean; aoAbrirMenu: () => void }) {
   const caminho = usePathname();
   const migalha = MIGALHAS.find((item) => item.prefixo.endsWith("/")
     ? caminho.startsWith(item.prefixo) && caminho.length > item.prefixo.length
@@ -152,7 +161,7 @@ function Barra({ aoAbrirMenu }: { aoAbrirMenu: () => void }) {
 
   return <header className="topbar">
     <div className="inline">
-      <button type="button" className="icon-btn mobile-menu" aria-label="Abrir menu" onClick={aoAbrirMenu}>
+      <button type="button" className="icon-btn mobile-menu" aria-label={aberto ? "Fechar menu" : "Abrir menu"} aria-controls="sidebar" aria-expanded={aberto} onClick={aoAbrirMenu}>
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
       </button>
       <nav className="breadcrumb" aria-label="Você está em"><span>{migalha.secao}</span><span aria-hidden="true">›</span><strong>{migalha.detalhe}</strong></nav>
