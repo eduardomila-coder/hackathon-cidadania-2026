@@ -16,6 +16,8 @@ export type MensagemDaConversa = {
   quando: string;
   casoId: string | null;
   lida: boolean;
+  // Resposta que saiu pelo estagiário virtual, não pela mão do advogado.
+  doEstagiario?: boolean;
 };
 
 const INTERVALO_MS = 10000;
@@ -57,19 +59,39 @@ type Props = {
   // Chamado depois de enviar ou quando chega mensagem nova, para a tela em
   // volta (lista de conversas, registros do caso) se atualizar também.
   aoAtualizar?: () => void;
+  // Resposta que o estagiário virtual preparou e não enviou. Aparece acima da
+  // caixa, para o advogado mandar com um clique, editar ou descartar.
+  sugestao?: { id: string; texto: string; motivo: string } | null;
+  aoEnviarSugestao?: (id: string, texto: string) => void;
+  aoDescartarSugestao?: (id: string) => void;
 };
 
 // Sem contato não há o que mostrar. Com contato, a `key` faz o React
 // recomeçar do zero (caixa limpa, sem mensagens da conversa anterior) toda
 // vez que o contato muda.
-export function Conversa({ contato, casoId = null, aoAtualizar }: Props) {
+export function Conversa({ contato, casoId = null, aoAtualizar, sugestao = null, aoEnviarSugestao, aoDescartarSugestao }: Props) {
   if (!contato) {
     return <div className="pd-conversa pd-conversa-vazia"><p>Cadastre o telefone do cliente para ver a conversa aqui.</p></div>;
   }
-  return <ConversaDoContato key={contato} contato={contato} casoId={casoId} aoAtualizar={aoAtualizar} />;
+  return <ConversaDoContato
+    key={contato}
+    contato={contato}
+    casoId={casoId}
+    aoAtualizar={aoAtualizar}
+    sugestao={sugestao}
+    aoEnviarSugestao={aoEnviarSugestao}
+    aoDescartarSugestao={aoDescartarSugestao}
+  />;
 }
 
-function ConversaDoContato({ contato, casoId, aoAtualizar }: { contato: string; casoId: string | null; aoAtualizar?: () => void }) {
+function ConversaDoContato({ contato, casoId, aoAtualizar, sugestao, aoEnviarSugestao, aoDescartarSugestao }: {
+  contato: string;
+  casoId: string | null;
+  aoAtualizar?: () => void;
+  sugestao: { id: string; texto: string; motivo: string } | null;
+  aoEnviarSugestao?: (id: string, texto: string) => void;
+  aoDescartarSugestao?: (id: string) => void;
+}) {
   const [mensagens, setMensagens] = useState<MensagemDaConversa[] | null>(null);
   const [erroCarga, setErroCarga] = useState<string | null>(null);
   const [texto, setTexto] = useState("");
@@ -194,6 +216,7 @@ function ConversaDoContato({ contato, casoId, aoAtualizar }: { contato: string; 
             <div className={`wa-bubble ${mensagem.deMim ? "out" : "in"}${agrupada ? " grouped" : ""}`}>
               <p className="wa-message-text">{mensagem.texto}</p>
               <span className="wa-meta">
+                {mensagem.doEstagiario && <span className="wa-selo-estagiario" title="Resposta enviada pelo estagiário virtual">estagiário</span>}
                 <time dateTime={mensagem.quando}>{formatarHora(mensagem.quando)}</time>
                 {mensagem.deMim && <svg width="14" height="11" viewBox="0 0 16 11" fill="none" aria-hidden="true"><title>enviada por você</title><path d="M1 5.5 4.5 9 11 1.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /><path d="M6 5.5 9.5 9 16 1.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>}
               </span>
@@ -204,6 +227,16 @@ function ConversaDoContato({ contato, casoId, aoAtualizar }: { contato: string; 
     </div>
 
     <form className="pd-resposta" onSubmit={(evento) => { evento.preventDefault(); void enviar(); }}>
+      {sugestao && <div className="pd-estagiario-sugestao">
+        <p className="pd-estagiario-etiqueta">Estagiário virtual preparou esta resposta</p>
+        <p className="pd-estagiario-texto">{sugestao.texto}</p>
+        <p className="pd-estagiario-motivo">{sugestao.motivo}</p>
+        <div className="pd-estagiario-acoes">
+          <button type="button" className="wa-botao-sugerir" disabled={enviando} onClick={() => aoEnviarSugestao?.(sugestao.id, sugestao.texto)}>Enviar como está</button>
+          <button type="button" className="md-botao-secundario" disabled={enviando} onClick={() => { setTexto(sugestao.texto); setMotivo(sugestao.motivo); aoDescartarSugestao?.(sugestao.id); }}>Editar na caixa</button>
+          <button type="button" className="pd-estagiario-descartar" disabled={enviando} onClick={() => aoDescartarSugestao?.(sugestao.id)}>Descartar</button>
+        </div>
+      </div>}
       {motivo && <p className="pd-motivo"><b>O que o assistente fez</b>{motivo}</p>}
       <div className="wa-composer">
         <button

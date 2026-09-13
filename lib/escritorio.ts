@@ -54,6 +54,9 @@ export type Mensagem = {
   casoId: string | null;
   lida: boolean;
   idExterno: string | null;
+  // true quando quem respondeu foi o estagiário virtual, não o advogado. A
+  // tela marca a mensagem para ninguém confundir quem falou.
+  doEstagiario?: boolean;
 };
 export type Processo = {
   id: string;
@@ -457,6 +460,7 @@ export async function guardarMensagem(dados: NovaMensagem): Promise<Mensagem> {
     casoId: dados.casoId ?? null,
     lida: Boolean(dados.lida) || Boolean(dados.deMim),
     idExterno: textoOuNulo(dados.idExterno, 200),
+    ...(dados.doEstagiario ? { doEstagiario: true } : {}),
   };
   let guardada = mensagem;
   await alterar<Mensagem>(MENSAGENS, (mensagens) => {

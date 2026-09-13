@@ -1,16 +1,20 @@
+import { after } from "next/server";
 import { advogadoPorUsuario } from "@/lib/contas";
 import { clientePorTelefone, guardarMensagem, listarCasos } from "@/lib/escritorio";
 import { mensagensDoEvento, resumoDoEvento, usuarioDaInstancia, webhookAutorizado } from "@/lib/evolution";
+import { atenderComoEstagiario, configDaConversa } from "@/lib/estagiario";
 
 export const dynamic = "force-dynamic";
 
 // Esta rota é pública para a Evolution, mas só aceita o segredo configurado no
-// servidor. Ela guarda a mensagem na caixa do advogado dono da instância e
-// nada mais: não responde, não baixa mídia e não dispara triagem. Quem lê e
-// decide o que enviar é o advogado, na tela de Mensagens.
+// servidor. Ela guarda a mensagem na caixa do advogado dono da instância e,
+// quando o advogado ligou o estagiário virtual naquela conversa, deixa ele
+// atender. Não baixa mídia e não dispara triagem.
 //
 // A resposta é sempre 202 para evento válido, mesmo quando se ignora: a
-// Evolution reenvia o que não for aceito, e não há o que reenviar aqui.
+// Evolution reenvia o que não for aceito, e não há o que reenviar aqui. O
+// atendimento do estagiário roda depois da resposta (`after`), para o webhook
+// não ficar preso esperando o modelo.
 
 // O caso mais recente do advogado cujo cliente tem esse telefone, para a
 // mensagem já chegar ligada ao caso certo.
@@ -40,6 +44,7 @@ export async function POST(request: Request) {
   }
 
   let guardadas = 0;
+  const deClientes = new Set<string>();
   for (const mensagem of mensagens) {
     try {
       await guardarMensagem({
@@ -55,10 +60,34 @@ export async function POST(request: Request) {
         idExterno: mensagem.idExterno,
       });
       guardadas += 1;
+      // Mensagens seguidas do mesmo cliente viram um atendimento só, como o
+      // agrupamento do robô da Mila: o estagiário responde a última.
+      if (!mensagem.deMim) deClientes.add(mensagem.contato);
     } catch (e) {
       console.error("webhook whatsapp: mensagem não guardada:", e);
     }
   }
 
-  return Response.json({ recebido: true, acao: "guardada", guardadas, evento: resumo.evento, instancia: resumo.instancia }, { status: 202 });
+  // Só atende a conversa em que o estagiário virtual está ligado. Se estiver
+  // desligado, o webhook continua sendo só um cofre de mensagens.
+  const comEstagiario = [...deClientes].filter((contato) => configDaConversa(advogado.id, contato).ativo);
+  for (const contato of comEstagiario) {
+    after(async () => {
+      try {
+        const resultado = await atenderComoEstagiario(advogado, contato);
+        console.log(`estagiario virtual: ${contato} -> ${resultado.acao}`);
+      } catch (e) {
+        console.error("estagiario virtual: falhou ao atender", contato, e);
+      }
+    });
+  }
+
+  return Response.json({
+    recebido: true,
+    acao: "guardada",
+    guardadas,
+    estagiario: comEstagiario.length ? "acionado" : "desligado",
+    evento: resumo.evento,
+    instancia: resumo.instancia,
+  }, { status: 202 });
 }

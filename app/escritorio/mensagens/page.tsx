@@ -21,6 +21,25 @@ type ConversaResumo = {
 type CasoResumo = { id: string; titulo: string; situacao?: string };
 type EstadoWhatsApp = { configurado: boolean; estado: string };
 
+// Estagiário virtual da conversa: o mesmo desenho do robô da Mila, com as
+// travas de confiança mínima e de envio automático ou só sugestão.
+type ConfigDoEstagiario = {
+  ativo: boolean;
+  autoEnviar: boolean;
+  confiancaMinima: number;
+  instrucao: string;
+  avisarQueEDeMaquina: boolean;
+  atualizadoEm: string;
+  atualizadoPor: string;
+};
+type SugestaoDoEstagiario = { id: string; texto: string; motivo: string };
+type EstadoDoEstagiario = {
+  config: ConfigDoEstagiario;
+  sugestao: SugestaoDoEstagiario | null;
+  confiancas: Array<{ valor: number; nome: string; explicacao: string }>;
+  whatsapp: string;
+};
+
 const INTERVALO_CONVERSAS_MS = 10000;
 const INTERVALO_WHATSAPP_MS = 30000;
 
@@ -69,6 +88,11 @@ function Mensagens() {
   // Coluna da direita com o caso e o vínculo. Abre sozinha em tela larga, como
   // a terceira coluna do painel da Mila; nas demais fica no botão do cabeçalho.
   const [contextoAberto, setContextoAberto] = useState(false);
+  const [estagiario, setEstagiario] = useState<EstadoDoEstagiario | null>(null);
+  const [instrucao, setInstrucao] = useState("");
+  const [salvandoEstagiario, setSalvandoEstagiario] = useState(false);
+  const [testando, setTestando] = useState(false);
+  const [recadoEstagiario, setRecadoEstagiario] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
 
   useEffect(() => {
     const larga = window.matchMedia("(min-width: 1600px)");
@@ -89,6 +113,79 @@ function Mensagens() {
       setAviso({ tipo: "erro", texto: e instanceof Error && e.message ? e.message : "Não foi possível carregar as conversas." });
     }
   }, []);
+
+  async function salvarEstagiario(campos: Partial<Pick<ConfigDoEstagiario, "ativo" | "autoEnviar" | "confiancaMinima" | "instrucao" | "avisarQueEDeMaquina">>) {
+    if (!selecionado) return;
+    setSalvandoEstagiario(true);
+    setRecadoEstagiario(null);
+    try {
+      const resposta = await fetch("/api/escritorio/estagiario", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contato: selecionado, ...campos }),
+      });
+      if (!resposta.ok) throw new Error(await lerErro(resposta, "Não foi possível salvar o ajuste."));
+      const dados = await resposta.json() as EstadoDoEstagiario;
+      setEstagiario(dados);
+      setInstrucao(dados.config.instrucao);
+      setRecadoEstagiario({
+        tipo: "ok",
+        texto: campos.ativo === true
+          ? "Estagiário ligado nesta conversa. Ele responde o que for seguro e cala no resto."
+          : campos.ativo === false
+            ? "Estagiário desligado nesta conversa."
+            : "Ajuste salvo.",
+      });
+    } catch (e) {
+      setRecadoEstagiario({ tipo: "erro", texto: e instanceof Error && e.message ? e.message : "Não foi possível salvar o ajuste." });
+    } finally { setSalvandoEstagiario(false); }
+  }
+
+  async function testarEstagiario() {
+    if (!selecionado) return;
+    setTestando(true);
+    setRecadoEstagiario(null);
+    try {
+      const resposta = await fetch("/api/escritorio/estagiario/atender", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contato: selecionado }),
+      });
+      if (!resposta.ok) throw new Error(await lerErro(resposta, "O estagiário não conseguiu atender agora."));
+      const dados = await resposta.json() as { resultado: { acao: string; motivo?: string }; sugestao: SugestaoDoEstagiario | null };
+      const acao = dados.resultado.acao;
+      setRecadoEstagiario({
+        tipo: acao === "erro" ? "erro" : "ok",
+        texto: acao === "sugerida"
+          ? `Simulação pronta: ele preparou a resposta e mostrou o motivo (${dados.resultado.motivo ?? ""}).`
+          : acao === "calado"
+            ? `Nesta conversa ele preferiria não responder: ${dados.resultado.motivo ?? ""}`
+            : acao === "sem_mensagem_do_cliente"
+              ? "Não há mensagem do cliente para responder nesta conversa."
+              : `Resultado da simulação: ${acao}.`,
+      });
+      setEstagiario((atual) => (atual ? { ...atual, sugestao: dados.sugestao } : atual));
+    } catch (e) {
+      setRecadoEstagiario({ tipo: "erro", texto: e instanceof Error && e.message ? e.message : "O estagiário não conseguiu atender agora." });
+    } finally { setTestando(false); }
+  }
+
+  async function resolverSugestao(id: string, acao: "enviar" | "descartar", texto?: string) {
+    try {
+      const resposta = await fetch("/api/escritorio/estagiario/sugestao", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, acao, texto }),
+      });
+      if (!resposta.ok) throw new Error(await lerErro(resposta, "Não foi possível concluir agora."));
+      const dados = await resposta.json() as { sugestaoPendente?: SugestaoDoEstagiario | null };
+      setEstagiario((atual) => (atual ? { ...atual, sugestao: dados.sugestaoPendente ?? null } : atual));
+      setRecadoEstagiario({ tipo: "ok", texto: acao === "enviar" ? "Mensagem do estagiário enviada pelo seu WhatsApp." : "Sugestão descartada." });
+      void carregarConversas();
+    } catch (e) {
+      setRecadoEstagiario({ tipo: "erro", texto: e instanceof Error && e.message ? e.message : "Não foi possível concluir agora." });
+    }
+  }
 
   const carregarWhatsApp = useCallback(async () => {
     try {
@@ -142,11 +239,39 @@ function Mensagens() {
   const casoDaConversa = conversaAberta?.casoId ? casos.find((caso) => caso.id === conversaAberta.casoId) ?? null : null;
   const semConexao = whatsApp && whatsApp.estado !== "open";
 
+  // O estagiário virtual é por conversa: ao abrir cada uma, lê o estado
+  // daquela conversa. Tudo o que muda o estado acontece depois do fetch, como
+  // o lint de efeitos do React pede.
+  useEffect(() => {
+    let ativo = true;
+    const contato = selecionado;
+    void (async () => {
+      if (!contato) {
+        if (ativo) setEstagiario(null);
+        return;
+      }
+      try {
+        const resposta = await fetch(`/api/escritorio/estagiario?contato=${encodeURIComponent(contato)}`, { cache: "no-store" });
+        if (!resposta.ok) throw new Error(await lerErro(resposta, "Não foi possível ler o estagiário."));
+        const dados = await resposta.json() as EstadoDoEstagiario;
+        if (!ativo) return;
+        setEstagiario(dados);
+        setInstrucao(dados.config.instrucao);
+      } catch (e) {
+        if (!ativo) return;
+        setEstagiario(null);
+        setRecadoEstagiario({ tipo: "erro", texto: e instanceof Error && e.message ? e.message : "Não foi possível ler o estagiário." });
+      }
+    })();
+    return () => { ativo = false; };
+  }, [selecionado]);
+
   function abrir(contato: string) {
     setSelecionado(contato);
     setCasoEscolhido("");
     setTituloNovo("");
     setAviso(null);
+    setRecadoEstagiario(null);
     const url = new URL(window.location.href);
     url.searchParams.set("contato", contato);
     window.history.replaceState(null, "", url.toString());
@@ -274,11 +399,18 @@ function Mensagens() {
               </button>
             </header>
 
-            <Conversa contato={selecionado} casoId={conversaAberta?.casoId ?? null} aoAtualizar={() => { void carregarConversas(); }} />
+            <Conversa
+              contato={selecionado}
+              casoId={conversaAberta?.casoId ?? null}
+              aoAtualizar={() => { void carregarConversas(); }}
+              sugestao={estagiario?.sugestao ?? null}
+              aoEnviarSugestao={(id, texto) => { void resolverSugestao(id, "enviar", texto); }}
+              aoDescartarSugestao={(id) => { void resolverSugestao(id, "descartar"); }}
+            />
           </>}
         </div>
 
-        {selecionado && contextoAberto && <aside className="pd-contexto" aria-label="Caso e vínculo da conversa">
+        {selecionado && contextoAberto && <aside className="pd-contexto" aria-label="Caso, vínculo e estagiário da conversa">
           <h3>Conversa</h3>
           <div className="pd-contexto-caixa">
             <dl>
@@ -288,6 +420,98 @@ function Mensagens() {
             </dl>
           </div>
           {conversaAberta?.casoId && casoDaConversa && <Link className="pd-chip-caso" href={`/escritorio/casos/${casoDaConversa.id}`}>Abrir a página do caso →</Link>}
+
+          <div className="pd-contexto-caixa">
+            <h3>Estagiário virtual</h3>
+            <div className="pd-estagiario">
+              <p className="pd-estagiario-estado">
+                <span className={`pd-lampada${estagiario?.config.ativo ? " ligada" : ""}`} aria-hidden="true" />
+                {estagiario === null
+                  ? "Lendo o estagiário desta conversa…"
+                  : estagiario.config.ativo
+                    ? estagiario.whatsapp === "open"
+                      ? "Ligado nesta conversa e com WhatsApp conectado: ele responde sozinho o que for seguro."
+                      : "Ligado nesta conversa. Sem WhatsApp conectado, ele prepara a resposta e você envia."
+                    : "Desligado nesta conversa: ele não fala com o cliente."}
+              </p>
+              <button
+                type="button"
+                className="pd-alavanca"
+                onClick={() => { void salvarEstagiario({ ativo: !(estagiario?.config.ativo ?? false) }); }}
+                disabled={salvandoEstagiario || estagiario === null}
+                aria-pressed={estagiario?.config.ativo ?? false}
+              >
+                <span>
+                  <strong>Atender o cliente sozinho</strong>
+                  <small>Quem decide ligar é o advogado, conversa por conversa, como no robô da Mila.</small>
+                </span>
+                <span className="pd-interruptor" aria-hidden="true" />
+              </button>
+
+              {estagiario?.config.ativo && <>
+                <button
+                  type="button"
+                  className="pd-alavanca"
+                  onClick={() => { void salvarEstagiario({ autoEnviar: !estagiario.config.autoEnviar }); }}
+                  disabled={salvandoEstagiario}
+                  aria-pressed={estagiario.config.autoEnviar}
+                >
+                  <span>
+                    <strong>Responder sem me consultar</strong>
+                    <small>Desligado, ele prepara a resposta e espera o seu clique. É o mesmo interruptor do robô da Mila.</small>
+                  </span>
+                  <span className="pd-interruptor" aria-hidden="true" />
+                </button>
+
+                <label className="pd-estagiario-campo">
+                  <span>Confiança mínima para responder</span>
+                  <select
+                    value={String(estagiario.config.confiancaMinima)}
+                    onChange={(evento) => { void salvarEstagiario({ confiancaMinima: Number(evento.target.value) }); }}
+                    disabled={salvandoEstagiario}
+                  >
+                    {estagiario.confiancas.map((opcao) => <option key={opcao.valor} value={opcao.valor}>{opcao.nome} ({opcao.valor.toFixed(2)}) · {opcao.explicacao}</option>)}
+                  </select>
+                </label>
+
+                <button
+                  type="button"
+                  className="pd-alavanca"
+                  onClick={() => { void salvarEstagiario({ avisarQueEDeMaquina: !estagiario.config.avisarQueEDeMaquina }); }}
+                  disabled={salvandoEstagiario}
+                  aria-pressed={estagiario.config.avisarQueEDeMaquina}
+                >
+                  <span>
+                    <strong>Dizer que o atendimento é automático</strong>
+                    <small>Por padrão ele escreve como a equipe, igual ao robô da Mila. Ligado, avisa o cliente que é automático.</small>
+                  </span>
+                  <span className="pd-interruptor" aria-hidden="true" />
+                </button>
+
+                <label className="pd-estagiario-campo">
+                  <span>Instrução do escritório (tom, tratamento, o que evitar)</span>
+                  <textarea
+                    value={instrucao}
+                    onChange={(evento) => setInstrucao(evento.target.value)}
+                    maxLength={600}
+                    placeholder="Ex.: trate por senhor(a), sem emoji, e nunca fale de valores."
+                    disabled={salvandoEstagiario}
+                  />
+                </label>
+
+                <div className="pd-estagiario-botoes">
+                  <button type="button" className="secundario" onClick={() => { void salvarEstagiario({ instrucao }); }} disabled={salvandoEstagiario}>Salvar instrução</button>
+                  <button type="button" onClick={() => { void testarEstagiario(); }} disabled={testando || salvandoEstagiario}>{testando ? "Atendendo…" : "Testar agora"}</button>
+                </div>
+                <p className="pd-estagiario-motivo">
+                  O teste não envia nada: mostra a resposta que ele daria e por que.
+                  {estagiario.config.atualizadoEm ? ` Ajustado por ${estagiario.config.atualizadoPor} em ${new Date(estagiario.config.atualizadoEm).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}.` : ""}
+                </p>
+              </>}
+
+              {recadoEstagiario && <p className={`pd-estagiario-recado${recadoEstagiario.tipo === "erro" ? " erro" : ""}`} role={recadoEstagiario.tipo === "erro" ? "alert" : "status"}>{recadoEstagiario.texto}</p>}
+            </div>
+          </div>
 
           {!conversaAberta?.casoId && <div className="pd-contexto-caixa pd-vincular">
             <h3>Vincular a um caso</h3>
