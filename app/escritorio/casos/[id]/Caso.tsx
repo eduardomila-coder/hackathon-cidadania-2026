@@ -10,7 +10,7 @@ import {
   descreverPrazo, formatarCnj, formatarData, formatarMomento, formatarTelefone,
   NOMES_DA_ORIGEM, NOMES_DA_SITUACAO, ORIGENS, SITUACOES,
 } from "../formatos";
-import { CLASSE_DO_TOM, Documentos, Processo, Registros, Tarefas } from "./Secoes";
+import { Documentos, Processo, Registros, Tarefas } from "./Secoes";
 import { AgendaDoCaso } from "./AgendaDoCaso";
 import { ForcaDoCaso, TriagemDoCaso } from "./Triagem";
 

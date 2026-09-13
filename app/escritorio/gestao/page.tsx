@@ -18,7 +18,15 @@ export default async function PaginaDeGestao() {
   const advogados = listarAdvogados();
   const ativos = advogados.filter((conta) => conta.ativo);
   const casos = ativos.flatMap((conta) => listarCasos(conta.id));
-  const nomeacoes = ativos.flatMap((conta) => listarNomeacoes(conta.id));
+  // Nomeações contadas como a tela de Nomeações mostra: o registro próprio mais
+  // o caso de origem "nomeacao" que ainda não virou registro. Contar só os
+  // registros dava zero no institucional enquanto o escritório listava duas.
+  const nomeacoes = ativos.flatMap((conta) => {
+    const registros = listarNomeacoes(conta.id);
+    const vinculados = new Set(registros.map((registro) => registro.casoId).filter(Boolean));
+    const avulsos = listarCasos(conta.id).filter((caso) => caso.origem === "nomeacao" && !vinculados.has(caso.id));
+    return [...registros, ...avulsos];
+  });
   const abertos = casos.filter((caso) => caso.situacao !== "concluido").length;
   const percentual = (parte: number, todo: number) => todo ? `${Math.round((parte / todo) * 100)}%` : "—";
 

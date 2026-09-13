@@ -29,6 +29,83 @@ function emDias(dias) {
 // e processos (consulta pontual ao DataJud). Tudo fictício, sem pessoa real.
 const CONTAS = [
   {
+    nome: "Eduardo Mila",
+    oab: "OAB/PR 127088",
+    usuario: "eduardo",
+    conversas: true,
+    casos: [
+      {
+        titulo: "Nomeação: contestar cobrança de mensalidades escolares",
+        origem: "nomeacao",
+        situacao: "em_andamento",
+        cliente: { nome: "Maria Ferreira", telefone: "5541998220110" },
+        processo: "00023456720268160030",
+        orgao: "3º Juizado Especial Cível de Curitiba",
+        ato: "Contestar a ação de cobrança",
+        prazo: emDias(6),
+        resumo:
+          "Ré em cobrança de mensalidades escolares de 2024. Diz que pediu o cancelamento da matrícula por escrito em fevereiro e mesmo assim foi cobrada o ano inteiro. Prazo informado na intimação, a conferir no processo oficial.",
+        relato:
+          "A cliente matriculou a filha na escola em janeiro de 2024 e cancelou a matrícula em fevereiro, por escrito, no e-mail da secretaria. A escola continuou cobrando as mensalidades do ano todo e agora entrou com ação. Ela tem o e-mail do cancelamento, a resposta da secretaria e os boletos.",
+        recebidos: ["Documento de identificação", "Conversas e comprovantes"],
+        tarefas: [
+          { titulo: "Conferir a data de ciência no processo oficial", prazo: emDias(2) },
+          { titulo: "Pedir à cliente o e-mail de cancelamento com o cabeçalho completo", prazo: emDias(3) },
+          { titulo: "Levantar a jurisprudência sobre cobrança após cancelamento", prazo: null },
+        ],
+        registros: [
+          { tipo: "registro", texto: "Nomeação recebida pela Central. Ficha criada a partir do texto da intimação; prazo a conferir no processo." },
+          { tipo: "registro", texto: "Cliente contatada pelo WhatsApp e confirmou que tem o e-mail de cancelamento." },
+        ],
+        consultarProcesso: false,
+        triar: true,
+      },
+      {
+        titulo: "Compra pela internet não entregue há três meses",
+        origem: "plantao",
+        situacao: "aguardando_cliente",
+        cliente: { nome: "Fernando Alsterna", telefone: "5541998330221" },
+        processo: null,
+        orgao: null,
+        ato: null,
+        prazo: null,
+        resumo:
+          "Consumidor pagou uma geladeira pela internet em junho e não recebeu. A loja não responde e não devolve o dinheiro. Caso típico de Juizado Especial Cível.",
+        relato:
+          "O cliente comprou uma geladeira pela internet em junho, pagou à vista no Pix, e até hoje não recebeu. A loja deu três datas de entrega diferentes e parou de responder. Ele já abriu reclamação no site do consumidor e não teve resposta. Tem o comprovante do Pix, o pedido e as conversas com a loja.",
+        recebidos: ["Conversas e comprovantes"],
+        tarefas: [
+          { titulo: "Pedir ao cliente o comprovante do Pix e o número do pedido", prazo: emDias(2) },
+          { titulo: "Conferir o valor da causa e o limite do Juizado", prazo: null },
+        ],
+        registros: [{ tipo: "registro", texto: "Atendimento no plantão. Cliente prefere resolver sem audiência, se a loja devolver o valor." }],
+        consultarProcesso: false,
+        triar: false,
+      },
+      {
+        titulo: "Academia segue cobrando depois do cancelamento",
+        origem: "plantao",
+        situacao: "novo",
+        cliente: { nome: "Rita Camargo", telefone: "5541998440332" },
+        processo: null,
+        orgao: null,
+        ato: null,
+        prazo: null,
+        resumo:
+          "Cliente cancelou o plano da academia em maio, pelo aplicativo, e a cobrança continuou por quatro meses no cartão.",
+        relato:
+          "A cliente cancelou o plano da academia em maio pelo aplicativo e recebeu o protocolo. A cobrança continuou no cartão por quatro meses. Ela ligou duas vezes e pediram para esperar o próximo ciclo. Tem o protocolo do cancelamento e as faturas.",
+        recebidos: [],
+        tarefas: [
+          { titulo: "Somar o que foi cobrado depois do cancelamento", prazo: emDias(4) },
+        ],
+        registros: [{ tipo: "registro", texto: "Primeiro contato. Falta reunir as faturas do período." }],
+        consultarProcesso: false,
+        triar: false,
+      },
+    ],
+  },
+  {
     nome: "Ana Souza",
     oab: "OAB/PR 12345",
     usuario: "ana.souza",
@@ -353,6 +430,67 @@ async function semearCaso(cookie, caso) {
   console.log(`  ✓ ${caso.titulo}`);
 }
 
+
+// Conversas de WhatsApp da demonstração. Entram pelo webhook da Evolution, o
+// mesmo caminho de uma mensagem de verdade, e não escrevendo no arquivo: assim
+// a mensagem já chega ligada ao caso do cliente pelo telefone. Precisa de
+// EVOLUTION_WEBHOOK_SECRET no ambiente e da instância do advogado cadastrada.
+const CONVERSAS = [
+  {
+    contato: "5541998220110",
+    nome: "Maria Ferreira",
+    falas: [
+      { de: "cliente", hora: -50, texto: "Doutor, bom dia. Recebi uma carta do fórum sobre a escola. É aquela cobrança que o senhor falou?" },
+      { de: "mim", hora: -49, texto: "Bom dia, Maria. É sim. A nomeação chegou para mim e eu já abri o caso. Vou contestar." },
+      { de: "mim", hora: -49, texto: "Preciso que a senhora me mande o e-mail do cancelamento da matrícula, aquele de fevereiro, com o cabeçalho completo." },
+      { de: "cliente", hora: -26, texto: "Achei aqui. Mando por e-mail ou por aqui mesmo?" },
+      { de: "mim", hora: -25, texto: "Pode mandar por aqui. Se der, mande também a resposta da secretaria." },
+      { de: "cliente", hora: -3, texto: "Mandei os dois. A escola ligou de novo ontem cobrando, mesmo com o processo." },
+    ],
+  },
+  {
+    contato: "5541998330221",
+    nome: "Fernando Alsterna",
+    falas: [
+      { de: "cliente", hora: -30, texto: "Boa tarde. Continuo sem a geladeira e a loja não responde mais nem no chat." },
+      { de: "mim", hora: -29, texto: "Boa tarde, Fernando. Me mande o comprovante do Pix e o número do pedido que eu conto o prazo e vejo o valor da causa." },
+      { de: "cliente", hora: -28, texto: "O pedido é 884213. O Pix foi em 12 de junho, 3.480 reais." },
+      { de: "mim", hora: -27, texto: "Anotado. Com esse valor o caso cabe no Juizado Especial. Até 20 salários mínimos o senhor pode entrar sem advogado, mas eu acompanho." },
+      { de: "cliente", hora: -2, texto: "Prefiro com o senhor acompanhando. Quando a gente entra?" },
+    ],
+  },
+];
+
+async function semearConversas(conta) {
+  const segredo = process.env.EVOLUTION_WEBHOOK_SECRET;
+  if (!segredo) { console.log("  (sem EVOLUTION_WEBHOOK_SECRET: conversas não semeadas)"); return; }
+  const instancia = "ponto-dativo-" + conta.usuario.toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
+  let enviadas = 0;
+  for (const conversa of CONVERSAS) {
+    for (const fala of conversa.falas) {
+      const quando = Math.floor((Date.now() + fala.hora * 60 * 60 * 1000) / 1000);
+      const corpo = {
+        event: "messages.upsert",
+        instance: instancia,
+        data: [{
+          key: { remoteJid: `${conversa.contato}@s.whatsapp.net`, fromMe: fala.de === "mim", id: `demo-${conversa.contato}-${fala.hora}` },
+          pushName: conversa.nome,
+          message: { conversation: fala.texto },
+          messageTimestamp: quando,
+        }],
+      };
+      const resposta = await fetch(`${BASE}/api/whatsapp/webhook?token=${encodeURIComponent(segredo)}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(corpo),
+      });
+      if (resposta.status === 202) enviadas += 1;
+      else { console.log(`  aviso: webhook devolveu HTTP ${resposta.status}; conversas não semeadas`); return; }
+    }
+  }
+  console.log(`  ✓ ${enviadas} mensagens em ${CONVERSAS.length} conversas`);
+}
+
 console.log(`Semeando demonstração em ${BASE}\n`);
 for (const conta of CONTAS) {
   const estado = await garantirConta(conta);
@@ -363,6 +501,7 @@ for (const conta of CONTAS) {
   const repetidos = conta.casos.length - pendentes.length;
   console.log(`${conta.nome} (${conta.usuario}) · ${estado} · ${pendentes.length} caso(s) a semear${repetidos ? ` · ${repetidos} já estava(m) lá` : ""}`);
   for (const caso of pendentes) await semearCaso(entrada.cookieEmitido, caso);
+  if (conta.conversas) await semearConversas(conta);
   console.log("");
 }
 console.log("Pronto. Cada conta enxerga só os casos dela: é o isolamento por advogadoId.");
