@@ -70,9 +70,10 @@ Três comandos dentro do Claude Code, que a pessoa digita como `/comecar`:
 | `/enviar-revisao` | build, commit e envia a branch para aprovação |
 | `/situacao` | quem enviou o quê, o que está aberto, próxima entrega com hora |
 
-Ninguém publica diretamente em `main`: toda mudança usa `/enviar-revisao` ou
-`/entregar`. Eduardo aprova pelo Habeas Release em `/revisoes` e faz a
-publicação final no GitHub.
+Maria sempre usa `/enviar-revisao` ou `/entregar`: ninguém publica em `main`
+em nome dela. Eduardo aprova as revisões pelo Habeas Release em `/revisoes` e
+faz a publicação final no GitHub. Fernando também pode publicar direto em
+`main` (como o Eduardo), desde que o `npm run build` passe antes.
 
 Por baixo, `npm run pegar` e `npm run enviar -- "mensagem"` (`scripts/git.mjs`,
 funciona igual em Mac e Windows). Use-os quando o usuário pedir para
@@ -128,10 +129,11 @@ início da sessão e anote lá o que mudar.
 Quando qualquer integrante pedir uma alteração em linguagem normal, o agente
 deve concluir o ciclo sozinho, sem exigir comandos de barra: identificar a
 pessoa, criar ou retomar a branch dela, editar, testar, rodar o build, fazer o
-commit, enviar a branch ao GitHub e abrir a Pull Request para `main`.
-Ninguém deve publicar diretamente em `main`. A Pull Request aparece no Habeas
-Release em `/revisoes`; a aprovação final continua sendo feita pelo Eduardo
-no GitHub.
+commit e enviar a branch ao GitHub. Para Maria, isso termina em abrir a Pull
+Request para `main`: ela nunca publica direto, a Pull Request aparece no
+Habeas Release em `/revisoes` e a aprovação final é feita pelo Eduardo no
+GitHub. Eduardo e Fernando podem publicar direto em `main` depois que o
+build passar, sem precisar de Pull Request.
 
 ## O que não fazer
 
